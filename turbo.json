@@ -1,0 +1,10 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalEnv": ["DATABASE_URL", "REVALIDATE_SECRET", "PREVIEW_SECRET", "AUTH_SECRET", "SITES_APP_URL", "PLATFORM_ROOT_DOMAIN", "ADMIN_EMAIL", "ADMIN_PASSWORD"],
+  "tasks": {
+    "build": { "dependsOn": ["^build"], "outputs": [".next/**", "!.next/cache/**", "dist/**"] },
+    "dev": { "cache": false, "persistent": true },
+    "lint": {},
+    "typecheck": {}
+  }
+}

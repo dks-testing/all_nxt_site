@@ -1,0 +1,94 @@
+
+# ============================================
+# SHOP PLATFORM - GITIGNORE
+# Next.js 16 | Turbopack | pnpm | TypeScript
+# ============================================
+
+# Dependencies
+node_modules/
+**/node_modules/
+.pnpm-store/
+.pnp
+.pnp.js
+
+# Next.js - All applications
+.next/
+**/.next/
+out/
+**/out/
+# Turbopack / Turbo cache
+.turbo/
+**/.turbo/
+.turbopack/
+
+# Production builds
+build/
+dist/
+**/build/
+**/dist/
+**/.next/
+# Testing
+coverage/
+**/coverage/
+.nyc_output/
+playwright-report/
+test-results/
+docs
+# Environment files and secrets
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Allow example environment configurations
+!.env.example
+!.env.*.example
+
+# Vercel
+.vercel/
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Debug and application logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE files
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Certificates and private keys
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+
+# Local project backup archives
+RaHNextJSSites.zip
+
+# Local database backups
+*.sql.gz
+*.sql.zip
+/apps/sites/.next/
+/apps/admin/.next/
+# Keep the project source, package manifests,
+# pnpm-lock.yaml, migrations and public assets tracked.

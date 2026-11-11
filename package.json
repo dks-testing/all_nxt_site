@@ -1,0 +1,21 @@
+{
+  "name": "shop-platform",
+  "private": true,
+  "packageManager": "pnpm@10.28.0",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "db:push": "pnpm --filter @platform/db db:push",
+    "db:seed": "pnpm --filter @platform/db db:seed",
+    "db:sync-micks": "pnpm --filter @platform/db db:sync-micks",
+    "db:upgrade": "pnpm --filter @platform/db db:upgrade",
+    "db:generate": "pnpm --filter @platform/db db:generate",
+    "db:migrate": "pnpm --filter @platform/db db:migrate",
+    "db:studio": "pnpm --filter @platform/db db:studio"
+  },
+  "devDependencies": {
+    "turbo": "^2.11.10"
+  }
+}
