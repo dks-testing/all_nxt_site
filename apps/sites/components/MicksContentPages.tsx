@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { SiteBundle } from "@platform/db";
 import { buildSlots } from "@platform/db/booking";
 import { getDesign } from "@platform/db/theme";
-import { getServices, getSpecials, getTestimonials, type SiteCtx } from "@/lib/data";
+import { getServices, getTestimonials, type SiteCtx } from "@/lib/data";
 import { formatAddress, groupHours, telHref } from "@/lib/format";
 import { localSiteHref } from "@/lib/url";
 import { Stars, PhoneIcon, PinIcon, ClockIcon } from "./Icons";
@@ -12,6 +12,7 @@ import { CertificationBadges } from "./CertificationBadge";
 import { QuoteMark } from "./QuoteMark";
 import { globalText, sharedToolConfig } from "@/lib/global-content";
 import { StepListIcon } from "./TrustListIcon";
+import { MicksSpecials } from "./MicksSpecials";
 
 const WP = "https://www.micksrepair.com/wp-content/uploads";
 
@@ -127,11 +128,6 @@ function MicksSmartTool({ bundle, kind }: { bundle: SiteBundle; kind: "diagnosti
     <section className="micks-smart-experience section"><div className="container-site micks-smart-grid"><img src={image} alt="" /><div><h2>Experience You Trust.<br />Technology That Delivers.</h2><p>For Worthington drivers, smart car care means combining local expertise with the best technology available.</p><p>At {bundle.settings?.businessName ?? bundle.site.name}, we make it simple to understand your car, plan repairs, and choose the right tires—all from one trusted shop.</p></div></div></section>
     <section className="micks-smart-cta section"><div><h2>{diagnostics ? "Something Feels Off? Start Your Free Diagnosis." : "Find the Perfect Tires. Fast."}</h2><p>{diagnostics ? "Describe your vehicle’s symptoms and get quick, accurate insights from real repair estimates and trusted local professionals." : "Match your driving style, vehicle, and budget with the right tires at competitive prices."}</p><a href={href}>{cta}</a></div></section>
   </>;
-}
-
-async function MicksSpecials({ bundle, ctx }: { bundle: SiteBundle; ctx: SiteCtx }) {
-  const items = await getSpecials(ctx);
-  return <section className="micks-specials-page section"><div className="container-site"><h2>Featured Offers &amp; Specials</h2><p>Stay ahead of the road (and the weather) with these deals designed to keep your car in top shape.</p><div className="micks-specials-list">{items.map((item) => <article key={item.id}>{item.discount && <p className="micks-special-value">{item.discount}</p>}<h3>{item.title}</h3>{item.description && <p>{item.description}</p>}{item.couponCode && <strong>Code “{item.couponCode}”</strong>}<a href={telHref(bundle.settings?.phone)}>Call Us</a></article>)}</div></div></section>;
 }
 
 async function MicksTestimonials({ bundle, ctx }: { bundle: SiteBundle; ctx: SiteCtx }) {

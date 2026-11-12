@@ -26,6 +26,7 @@ export async function createSite(fd: FormData) {
     }
     await getDb().insert(siteMembers).values({ siteId, userId: user.id, role: "OWNER" });
     revalidatePath("/");
+    revalidatePath("/sites");
     return { ok: source && source !== "blank" ? "Site cloned as a draft" : "Site created as a draft", to: `/sites/${siteId}` };
   });
 }
@@ -68,12 +69,13 @@ export async function cloneSiteAction(fd: FormData) {
   const sourceId = str(fd, "sourceId");
   const { user } = await requireSiteAccess(sourceId, "VIEWER");
   const name = str(fd, "name");
-  return run(`/`, async () => {
+  return run(`/sites`, async () => {
     if (user.globalRole !== "SUPER_ADMIN") throw new Error("Only super-admins can clone sites");
     if (!name) throw new Error("Name is required");
     const { siteId } = await cloneSite({ sourceSiteId: sourceId, name, slug: str(fd, "slug") || name, createdBy: user.id, includeTestimonials: fd.get("includeTestimonials") === "on" });
     await getDb().insert(siteMembers).values({ siteId, userId: user.id, role: "OWNER" });
     revalidatePath("/");
+    revalidatePath("/sites");
     return { ok: `Cloned to "${name}" (draft)`, to: `/sites/${siteId}` };
   });
 }
@@ -100,6 +102,7 @@ export async function setStatus(fd: FormData) {
     await setSiteStatus(siteId, status, user.id, str(fd, "note") || undefined);
     const r = await revalidateSite(siteId);
     revalidatePath("/");
+    revalidatePath("/sites");
     revalidatePath(`/sites/${siteId}`, "layout");
     const label = { PUBLISHED: "Published. Live within ~30 seconds", UNPUBLISHED: "Unpublished. Visitors now see a 'temporarily unavailable' page", ARCHIVED: "Archived", DRAFT: "Moved to draft" }[status];
     return r.ok ? label : `${label} (cache refresh failed: ${r.error})`;
@@ -117,7 +120,8 @@ export async function deleteSiteAction(fd: FormData) {
     await dbDeleteSite(siteId, user.id);
     await revalidateSite(siteId);
     revalidatePath("/");
-    return { ok: `Deleted "${s.name}"`, to: "/" };
+    revalidatePath("/sites");
+    return { ok: `Deleted "${s.name}"`, to: "/sites" };
   });
 }
 

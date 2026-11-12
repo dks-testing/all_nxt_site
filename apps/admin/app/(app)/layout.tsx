@@ -22,7 +22,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             />
           </Link>
           <nav className="flex gap-0 text-xs sm:gap-1 sm:text-sm">
-            <Link href="/" className="rounded-md px-2 py-1.5 font-medium text-slate-600 sm:px-3 hover:bg-slate-100 hover:text-slate-900">Sites</Link>
+            <Link href="/" className="rounded-md px-2 py-1.5 font-medium text-slate-600 sm:px-3 hover:bg-slate-100 hover:text-slate-900">Dashboard</Link>
+            <Link href="/sites" className="rounded-md px-2 py-1.5 font-medium text-slate-600 sm:px-3 hover:bg-slate-100 hover:text-slate-900">Websites</Link>
             {user.globalRole === "SUPER_ADMIN" && <Link href="/users" className="rounded-md px-2 py-1.5 font-medium text-slate-600 sm:px-3 hover:bg-slate-100 hover:text-slate-900">Users</Link>}
           </nav>
           <div className="ml-auto flex items-center gap-2 text-sm sm:gap-3">
