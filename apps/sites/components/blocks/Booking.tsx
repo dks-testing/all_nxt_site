@@ -2,7 +2,6 @@ import { buildSlots } from "@platform/db/booking";
 import { BookingFormClient } from "../BookingFormClient";
 import type { BlockComponentProps } from "./types";
 import { telHref, formatAddress, groupHours } from "@/lib/format";
-import { PhoneIcon, PinIcon, ClockIcon } from "../Icons";
 import Link from "next/link";
 import { localSiteHref } from "@/lib/url";
 import { getDesign } from "@platform/db/theme";
@@ -54,7 +53,6 @@ export function MicksContactBooking({ bundle, contactProps, bookingProps }: {
       </div>
       <div className="micks-booking-column" id="book">
         <h2>{booking?.appearance?.landingHeading || bookingProps.heading}</h2>
-        <div className="micks-booking-benefits"><span><PinIcon />No payment<br />required</span><span><ClockIcon />Quick &amp; easy<br />in minutes</span><span><PhoneIcon />We&apos;ll confirm<br />with you</span></div>
         <BookingFormClient siteSlug={bundle.site.slug} slots={buildSlots(rules)} closedDays={rules.closedDays} disabledDates={booking?.disabledDates ?? []} leadDays={booking?.leadDays ?? 0} confirmation={booking?.confirmationMessage ?? "Thanks! We'll be in touch shortly to confirm."} fields={booking?.formFields ?? []} variant="landing" appearance={booking?.appearance} />
       </div>
     </div>

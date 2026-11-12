@@ -3895,6 +3895,648 @@ details>summary::-webkit-details-marker {
   }
 }
 
+/* Booking widgets share the structure and visual language of the supplied
+   contact-page and landing-page tools while retaining the platform's React
+   submission, availability, and CMS appearance settings. */
+.micks-appointment-page>div {
+  max-width: 1284px;
+}
+
+.book-tool--appointment,
+.book-tool--landing {
+  font-family: var(--font-body), sans-serif;
+  line-height: normal;
+}
+
+.book-tool--appointment {
+  width: 100%;
+  max-width: 1284px !important;
+  gap: 16px;
+  padding: 37px 45px 20px;
+  border: 2px solid var(--book-accent);
+  background: var(--book-bg);
+}
+
+.book-appointment-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 26px;
+}
+
+.book-appointment-header h2 {
+  margin: 0;
+  color: var(--book-text);
+  font-family: var(--font-heading), sans-serif;
+  font-size: clamp(34px, 4.4vw, 51px);
+  font-weight: 800;
+  line-height: .86;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.book-appointment-header p {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 12px 0 0;
+  color: var(--book-text);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.book-appointment-header p strong {
+  font-weight: 600;
+}
+
+.book-benefits {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 23px;
+  color: var(--book-text);
+  white-space: nowrap;
+}
+
+.book-benefits>span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.book-benefits>span svg {
+  width: 32px;
+  height: 36px;
+  color: var(--book-accent);
+}
+
+.book-benefits b {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.book-benefits>i {
+  width: 1px;
+  height: 42px;
+  background: #e1e3ec;
+}
+
+.book-tool--landing {
+  width: 100%;
+  max-width: 760px;
+  margin-inline: auto;
+  gap: 14px;
+  padding: 0;
+  border: 0;
+}
+
+.book-tool--landing>.book-benefits {
+  padding-bottom: 8px;
+}
+
+.book-tool--appointment .book-contact-fields {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 4px;
+}
+
+.book-tool--landing .book-contact-fields {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.book-tool--appointment .book-field,
+.book-tool--landing .book-field {
+  min-height: 58px;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 12px;
+  padding: 0 14px;
+  border: 2px solid #f1eff4;
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px rgb(24 21 35 / 1%), 0 8px 20px rgb(20 20 30 / 2%);
+  font-size: 14px;
+}
+
+.book-tool--appointment .book-field {
+  min-height: 63px;
+}
+
+.book-tool--appointment .book-field>svg,
+.book-tool--landing .book-field>svg {
+  width: 27px;
+  height: 27px;
+  color: #554e5f;
+}
+
+.book-tool--appointment .book-field:focus-within,
+.book-tool--landing .book-field:focus-within {
+  border-color: color-mix(in srgb, var(--book-accent) 70%, #fff);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--book-accent) 14%, transparent);
+}
+
+.book-contact-preferences {
+  display: flex;
+  justify-content: center;
+  max-width: none;
+  margin: 0;
+}
+
+.book-contact-preferences label {
+  min-width: 220px;
+  min-height: 58px;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 14px 18px;
+  border: 0;
+  background: var(--book-input-bg);
+  cursor: pointer;
+}
+
+.book-contact-preferences label>span {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.book-contact-preferences input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.book-contact-preferences label>i {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  place-items: center;
+  border: 2px solid #554e5f;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.book-contact-preferences label>i svg {
+  display: none;
+  width: 18px;
+  height: 18px;
+  color: #fff;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 4;
+}
+
+.book-contact-preferences label:has(input:checked)>i {
+  border-color: var(--book-accent);
+  background: var(--book-accent);
+}
+
+.book-contact-preferences label:has(input:checked)>i svg {
+  display: block;
+}
+
+.book-tool--appointment .book-step-label {
+  margin: 1px 0 -4px 2px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.book-tool--appointment .book-vehicle-mode,
+.book-tool--landing .book-vehicle-mode {
+  gap: 14px;
+}
+
+.book-tool--appointment .book-vehicle-mode button {
+  min-height: 85px;
+  grid-template-columns: 54px 1fr 35px;
+  padding: 0 28px 0 22px;
+}
+
+.book-tool--landing .book-vehicle-mode button {
+  min-height: 78px;
+  grid-template-columns: 43px 1fr 28px;
+  padding: 10px 12px;
+}
+
+.book-tool--appointment .book-vehicle-mode button>svg {
+  width: 54px;
+  height: 54px;
+  padding: 11px;
+}
+
+.book-tool--landing .book-vehicle-mode button>svg {
+  width: 36px;
+  height: 36px;
+  padding: 6px;
+}
+
+.book-tool--appointment .book-vehicle-mode button strong {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.book-tool--appointment .book-vehicle-mode button small {
+  color: var(--book-text);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.book-tool--appointment .book-vehicle-mode button i {
+  width: 30px;
+  height: 30px;
+  border-width: 2px;
+}
+
+.book-tool--appointment .book-vehicle-mode button.selected i {
+  border-width: 8px;
+}
+
+.book-tool--appointment .book-plate-fields {
+  gap: 12px;
+}
+
+.book-tool--landing .book-plate-fields {
+  gap: 14px;
+}
+
+.book-appointment-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 2px;
+}
+
+.book-appointment-grid>section {
+  min-height: 0;
+  padding: 18px 16px 16px;
+  border: 1px solid #f1eff4;
+  border-radius: 10px;
+  background: var(--book-input-bg);
+  box-shadow: 0 0 0 1px rgb(24 21 35 / 1%), 0 8px 20px rgb(20 20 30 / 2%);
+}
+
+.book-appointment-grid h3 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+  color: var(--book-text);
+  font: 500 15px/1.2 var(--font-body), sans-serif;
+}
+
+.book-appointment-grid h3 b {
+  font-weight: 500;
+}
+
+.book-calendar {
+  padding: 10px;
+  border: 2px solid #f1eff4;
+  border-radius: 6px;
+}
+
+.book-calendar-head {
+  grid-template-columns: 35px 1fr 35px;
+  margin-bottom: 8px;
+}
+
+.book-calendar-head button {
+  min-height: 30px;
+  color: var(--book-text);
+  font-size: 30px;
+  line-height: 1;
+}
+
+.book-calendar-head strong {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.book-calendar-grid {
+  gap: 4px 0;
+}
+
+.book-calendar-grid small {
+  color: #a09aaf;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.book-calendar-grid button {
+  width: 35px;
+  height: 35px;
+  justify-self: center;
+  border: 0;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.book-calendar-grid button.available {
+  background: color-mix(in srgb, var(--book-accent) 10%, #fff);
+}
+
+.book-calendar-grid button.today:not(.selected) {
+  border: 2px solid #c9c4d2;
+  background: transparent;
+}
+
+.book-calendar-grid button.selected {
+  border-color: var(--book-accent);
+  color: var(--book-accent-text);
+  background: var(--book-accent);
+}
+
+.book-calendar-legend {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed #f1eff4;
+  font-size: 10px;
+}
+
+.book-calendar-legend span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.book-calendar-legend i {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+}
+
+.book-calendar-legend i.today {
+  box-shadow: inset 0 0 0 1.6px #b9b3c4;
+}
+
+.book-calendar-legend i.available {
+  background: color-mix(in srgb, var(--book-accent) 18%, #fff);
+}
+
+.book-calendar-legend i.selected {
+  background: var(--book-accent);
+}
+
+.book-time-grid {
+  gap: 10px;
+}
+
+.book-time-grid button,
+.book-more-times {
+  min-height: 50px;
+  border: 2px solid #f1eff4;
+  border-radius: 6px;
+  color: var(--book-text);
+  background: var(--book-input-bg);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.book-time-grid button.selected {
+  border-color: color-mix(in srgb, var(--book-accent) 50%, #fff);
+  color: var(--book-accent);
+  background: color-mix(in srgb, var(--book-accent) 10%, #fff);
+}
+
+.book-more-times {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.book-more-times[aria-expanded="true"] span {
+  transform: rotate(180deg);
+}
+
+.book-time-or {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0;
+  color: #b6b0c1;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.book-time-or::before,
+.book-time-or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #f1eff4;
+}
+
+.book-soonest {
+  width: 100%;
+  min-height: 85px;
+  display: grid;
+  grid-template-columns: 38px 1fr 22px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border: 2px solid #f1eff4;
+  border-radius: 6px;
+  color: var(--book-text);
+  background: var(--book-input-bg);
+  text-align: left;
+}
+
+.book-soonest>svg {
+  width: 30px;
+  height: 30px;
+}
+
+.book-soonest>span {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.book-soonest strong {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.book-soonest small {
+  margin: 0;
+  color: #847e92;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.book-soonest>i,
+.book-drop-card>i {
+  justify-self: end;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #c9c4d2;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.book-soonest.selected,
+.book-drop-card.selected {
+  border-color: color-mix(in srgb, var(--book-accent) 50%, #fff);
+  background: color-mix(in srgb, var(--book-accent) 10%, #fff);
+}
+
+.book-soonest.selected>i,
+.book-drop-card.selected>i {
+  border: 6px solid var(--book-accent);
+}
+
+.book-drop-card {
+  min-height: 85px;
+  grid-template-columns: 44px 1fr 22px;
+  gap: 14px;
+  padding: 14px 18px;
+  border: 2px solid #f1eff4;
+  border-radius: 6px;
+}
+
+.book-drop-card>svg {
+  width: 40px;
+  height: 40px;
+}
+
+.book-drop-card strong {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.book-drop-card small {
+  color: var(--book-text);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.book-tool--appointment .book-issue textarea {
+  min-height: 180px;
+  padding: 48px 52px 20px;
+  border-color: #f1eff4;
+  box-shadow: 0 0 0 1px rgb(24 21 35 / 1%), 0 8px 20px rgb(20 20 30 / 2%);
+}
+
+.book-tool--appointment .book-issue>strong {
+  top: 18px;
+  left: 18px;
+  font-size: 16px;
+}
+
+.book-tool--landing .book-issue textarea {
+  min-height: 92px;
+  padding: 42px 42px 14px 14px;
+}
+
+.book-tool--landing .book-issue>strong {
+  top: 13px;
+  left: 14px;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.book-tool--appointment .book-submit {
+  width: min(100%, 610px);
+  min-height: 50px;
+  margin-top: 7px;
+  border-radius: 6px;
+  font-size: 21px;
+}
+
+.book-tool--landing .book-submit {
+  width: 100%;
+  min-height: 62px;
+  margin-top: 2px;
+  border-radius: 5px;
+  font-size: 21px;
+}
+
+.book-tool--appointment .book-note,
+.book-tool--landing .book-note {
+  margin: -3px 0 0;
+  font-size: 11px;
+}
+
+@media (max-width: 1100px) {
+  .book-tool--appointment {
+    padding: 20px;
+  }
+
+  .book-appointment-header {
+    display: block;
+  }
+
+  .book-appointment-header>.book-benefits {
+    justify-content: flex-start;
+    margin-top: 18px;
+  }
+
+  .book-appointment-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .book-tool--appointment,
+  .book-tool--landing {
+    padding: 14px 12px 18px;
+  }
+
+  .book-tool--landing {
+    padding-inline: 0;
+  }
+
+  .book-tool--appointment .book-contact-fields,
+  .book-tool--landing .book-contact-fields,
+  .book-tool--landing .book-landing-when {
+    grid-template-columns: 1fr;
+  }
+
+  .book-benefits {
+    gap: 10px;
+  }
+
+  .book-benefits>i {
+    display: none;
+  }
+
+  .book-benefits>span svg {
+    width: 22px;
+    height: 24px;
+  }
+
+  .book-benefits b {
+    font-size: 10px;
+    line-height: 15px;
+  }
+
+  .book-contact-preferences {
+    flex-direction: column;
+  }
+
+  .book-contact-preferences label {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .book-tool--appointment .book-vehicle-mode,
+  .book-tool--landing .book-vehicle-mode {
+    grid-template-columns: 1fr;
+  }
+
+  .book-tool--appointment .book-issue textarea {
+    padding-inline: 18px;
+  }
+
+  .book-tool--appointment .book-submit,
+  .book-tool--landing .book-submit {
+    font-size: 18px;
+  }
+}
+
 .micks-services-index {
   color: #050505;
   background: #fff;

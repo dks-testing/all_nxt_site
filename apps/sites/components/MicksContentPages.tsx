@@ -5,7 +5,7 @@ import { getDesign } from "@platform/db/theme";
 import { getServices, getTestimonials, type SiteCtx } from "@/lib/data";
 import { formatAddress, groupHours, telHref } from "@/lib/format";
 import { localSiteHref } from "@/lib/url";
-import { Stars, PhoneIcon, PinIcon, ClockIcon } from "./Icons";
+import { Stars } from "./Icons";
 import { MicksInnerHero } from "./MicksInnerHero";
 import { BookingFormClient } from "./BookingFormClient";
 import { CertificationBadges } from "./CertificationBadge";
@@ -144,5 +144,5 @@ async function MicksTestimonials({ bundle, ctx }: { bundle: SiteBundle; ctx: Sit
 function MicksAppointment({ bundle }: { bundle: SiteBundle }) {
   const booking = bundle.booking;
   const rules = { slotMinutes: booking?.slotMinutes ?? 30, openTime: booking?.openTime ?? "07:30", closeTime: booking?.closeTime ?? "17:00", closedDays: booking?.closedDays ?? [0, 6] };
-  return <section className="micks-appointment-page section" id="book"><div className="container-site"><h2>{booking?.appearance?.appointmentHeading || "Schedule Your Service Online"}</h2><p><strong>Fast, easy, and always free.</strong> A real advisor will confirm everything with you.</p><div className="micks-booking-benefits"><span><PinIcon />No payment<br />required</span><span><ClockIcon />Quick &amp; easy<br />in minutes</span><span><PhoneIcon />We’ll confirm<br />with you</span></div><BookingFormClient siteSlug={bundle.site.slug} slots={buildSlots(rules)} closedDays={rules.closedDays} disabledDates={booking?.disabledDates ?? []} leadDays={booking?.leadDays ?? 0} confirmation={booking?.confirmationMessage ?? "Thanks! We'll be in touch shortly to confirm."} fields={booking?.formFields ?? []} variant="appointment" appearance={booking?.appearance} /></div></section>;
+  return <section className="micks-appointment-page section" id="book"><div className="container-site"><BookingFormClient siteSlug={bundle.site.slug} slots={buildSlots(rules)} closedDays={rules.closedDays} disabledDates={booking?.disabledDates ?? []} leadDays={booking?.leadDays ?? 0} confirmation={booking?.confirmationMessage ?? "Thanks! We'll be in touch shortly to confirm."} fields={booking?.formFields ?? []} variant="appointment" appearance={booking?.appearance} /></div></section>;
 }
