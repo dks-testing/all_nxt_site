@@ -28,7 +28,7 @@ export async function ServicesGrid({ ctx, bundle, props }: BlockComponentProps<"
           ))}
         </div>
         {props.limit && all.length > props.limit && (
-          <div className="mt-10 text-center"><Link href={localSiteHref(bundle.site.slug, "/services/")} className="btn btn-dark">All services</Link></div>
+          <div className="mt-10 text-center"><Link href={localSiteHref(bundle.site.slug, "/services/")} className="btn btn-dark"><span>All services</span></Link></div>
         )}
       </div>
     </section>
@@ -46,14 +46,14 @@ export async function Specials({ ctx, bundle, props }: BlockComponentProps<"spec
           {items.map((sp) => (
             <div key={sp.id} className="flex flex-col overflow-hidden rounded-site border-2 border-dashed border-[var(--color-primary)] bg-white">
               <div className="bg-[var(--color-primary)] px-6 py-4 text-[var(--color-primary-foreground)]">
-                <h3 className="text-xl font-bold uppercase leading-tight">{sp.title}</h3>
-                {sp.discount && <p className="mt-1 font-semibold">{sp.discount}</p>}
+                <h3 className="text-xl font-bold uppercase leading-tight">{globalText(sp.title, bundle)}</h3>
+                {sp.discount && <p className="mt-1 font-semibold">{globalText(sp.discount, bundle)}</p>}
               </div>
               <div className="flex flex-1 flex-col p-6">
-                {sp.description && <p className="flex-1 text-sm text-[var(--color-muted)]">{sp.description}</p>}
+                {sp.description && <p className="flex-1 text-sm text-[var(--color-muted)]">{globalText(sp.description, bundle)}</p>}
                 {sp.couponCode && <p className="mt-4 text-sm">Code: <strong className="rounded bg-[var(--color-surface)] px-2 py-1 font-mono">{sp.couponCode}</strong></p>}
                 {sp.validUntil && <p className="mt-2 text-xs text-[var(--color-muted)]">Valid until {sp.validUntil}</p>}
-                <a href={telHref(bundle.settings?.phone) ?? localSiteHref(bundle.site.slug, "/make-an-appointment/")} className="btn btn-primary mt-5">Claim offer</a>
+                <a href={telHref(bundle.settings?.phone) ?? localSiteHref(bundle.site.slug, "/make-an-appointment/")} className="btn btn-primary mt-5"><span>Claim offer</span></a>
               </div>
             </div>
           ))}
@@ -81,7 +81,7 @@ export async function Reviews({ ctx, bundle, props }: BlockComponentProps<"revie
           <h2>{props.heading}</h2>
           <div className="micks-reviews-layout">
             <aside className="micks-review-summary">
-              <strong>Mick&apos;s Repair</strong>
+              <strong>{s?.businessName ?? bundle.site.name}</strong>
               {s?.ratingValue && <div><b>{s.ratingValue}</b> <Stars value={Number(s.ratingValue)} /></div>}
               {s?.ratingCount ? <p>Based on {s.ratingCount} reviews</p> : null}
               {googleUrl && <a href={googleUrl} target="_blank" rel="noopener noreferrer">review us on <b>G</b></a>}
@@ -91,7 +91,7 @@ export async function Reviews({ ctx, bundle, props }: BlockComponentProps<"revie
                 <figcaption><span className="micks-review-avatar">{t.author.charAt(0)}</span><strong>{t.author}</strong><b className="micks-google-mark">G</b></figcaption>
                 {t.reviewDate && <small>{t.reviewDate}</small>}
                 <Stars value={t.rating} />
-                <blockquote>{t.body}</blockquote>
+                <blockquote>{globalText(t.body, bundle)}</blockquote>
               </figure>)}
             </div>}
           </div>
@@ -119,7 +119,7 @@ export async function Reviews({ ctx, bundle, props }: BlockComponentProps<"revie
             {items.map((t) => (
               <figure key={t.id} className={micks ? "micks-review-card" : "rounded-site bg-[var(--color-surface)] p-6"}>
                 <Stars value={t.rating} />
-                <blockquote className="mt-3 text-[var(--color-text)]">&ldquo;{t.body}&rdquo;</blockquote>
+                <blockquote className="mt-3 text-[var(--color-text)]">&ldquo;{globalText(t.body, bundle)}&rdquo;</blockquote>
                 <figcaption className="mt-4 text-sm font-bold">{t.author}{t.source === "google" && <span className="font-normal text-[var(--color-muted)]"> · Google</span>}</figcaption>
               </figure>
             ))}
@@ -127,7 +127,7 @@ export async function Reviews({ ctx, bundle, props }: BlockComponentProps<"revie
         )}
         {googleUrl && (
           <div className="mt-8 text-center">
-            <a href={googleUrl} target="_blank" rel="noopener noreferrer" className="btn btn-outline text-[var(--color-primary)]">Read our reviews on Google</a>
+            <a href={googleUrl} target="_blank" rel="noopener noreferrer" className="btn btn-outline text-[var(--color-primary)]"><span>Read our reviews on Google</span></a>
           </div>
         )}
       </div>
@@ -135,7 +135,7 @@ export async function Reviews({ ctx, bundle, props }: BlockComponentProps<"revie
   );
 }
 
-export async function CaseStudies({ ctx, props }: BlockComponentProps<"case_studies">) {
+export async function CaseStudies({ ctx, bundle, props }: BlockComponentProps<"case_studies">) {
   const items = await getCaseStudies(ctx);
   if (!items.length) return null;
   const micks = props.variant === "micks-home";
@@ -150,11 +150,11 @@ export async function CaseStudies({ ctx, props }: BlockComponentProps<"case_stud
               {micks && <p className="micks-case-label">{props.labels[index] ?? "Repair result"}</p>}
               {micks && c.imageUrl && <div className="micks-case-image">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={c.imageUrl} alt="" /></div>}
               <div className={micks ? "micks-case-body" : ""}>
-              <h3 className="mb-4 text-xl font-bold uppercase leading-tight text-[var(--color-accent)]">{c.title}</h3>
-              {micks ? <p className="micks-case-summary">{[c.problem, c.diagnosis, c.fix].filter(Boolean).join(" ")}</p> : <dl className="space-y-3 text-sm text-white/85">
-                <div><dt className="font-bold uppercase text-white">Problem</dt><dd>{c.problem}</dd></div>
-                {c.diagnosis && <div><dt className="font-bold uppercase text-white">Diagnosis</dt><dd>{c.diagnosis}</dd></div>}
-                {c.fix && <div><dt className="font-bold uppercase text-white">Fix</dt><dd>{c.fix}</dd></div>}
+              <h3 className="mb-4 text-xl font-bold uppercase leading-tight text-[var(--color-accent)]">{globalText(c.title, bundle)}</h3>
+              {micks ? <p className="micks-case-summary">{globalText([c.problem, c.diagnosis, c.fix].filter(Boolean).join(" "), bundle)}</p> : <dl className="space-y-3 text-sm text-white/85">
+                <div><dt className="font-bold uppercase text-white">Problem</dt><dd>{globalText(c.problem, bundle)}</dd></div>
+                {c.diagnosis && <div><dt className="font-bold uppercase text-white">Diagnosis</dt><dd>{globalText(c.diagnosis, bundle)}</dd></div>}
+                {c.fix && <div><dt className="font-bold uppercase text-white">Fix</dt><dd>{globalText(c.fix, bundle)}</dd></div>}
               </dl>}
               </div>
             </article>
@@ -166,13 +166,13 @@ export async function CaseStudies({ ctx, props }: BlockComponentProps<"case_stud
   );
 }
 
-export async function Faq({ ctx, props }: BlockComponentProps<"faq">) {
+export async function Faq({ ctx, bundle, props }: BlockComponentProps<"faq">) {
   const items = await getFaqs(ctx);
   if (!items.length) return null;
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: items.map((f) => ({ "@type": "Question", name: f.question, acceptedAnswer: { "@type": "Answer", text: f.answer } })),
+    mainEntity: items.map((f) => ({ "@type": "Question", name: globalText(f.question, bundle), acceptedAnswer: { "@type": "Answer", text: globalText(f.answer, bundle) } })),
   };
   return (
     <section className="section">
@@ -182,10 +182,10 @@ export async function Faq({ ctx, props }: BlockComponentProps<"faq">) {
           {items.map((f) => (
             <details key={f.id} className="group p-5">
               <summary className="flex items-center justify-between gap-4 text-lg font-semibold">
-                {f.question}
+                {globalText(f.question, bundle)}
                 <span className="text-2xl text-[var(--color-primary)] transition group-open:rotate-45">+</span>
               </summary>
-              <p className="mt-3 text-[var(--color-muted)]">{f.answer}</p>
+              <p className="mt-3 text-[var(--color-muted)]">{globalText(f.answer, bundle)}</p>
             </details>
           ))}
         </div>
@@ -215,7 +215,7 @@ export function ContactMap({ bundle, props }: BlockComponentProps<"contact_map">
             )}
           </ul>
           {s?.serviceArea && <p className="mt-6 text-[var(--color-muted)]">Serving {s.serviceArea}.</p>}
-          {addr && <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(addr)}`} target="_blank" rel="noopener noreferrer" className="btn btn-dark mt-6">Get directions</a>}
+          {addr && <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(addr)}`} target="_blank" rel="noopener noreferrer" className="btn btn-dark mt-6"><span>Get directions</span></a>}
         </div>
         {addr && (
           <iframe

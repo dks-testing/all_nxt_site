@@ -3,7 +3,7 @@ import { getDb, auditLog, siteVersions, appointments, pages, services, users, eq
 import { loadSite } from "@/lib/site";
 import { platformUrl } from "@/lib/site-url";
 import { restoreVersionAction, deleteSiteAction, setStatus, syncCloneSectionsAction } from "@/lib/actions/sites";
-import { Card } from "@/components/ui";
+import { Card, PageHeader } from "@/components/ui";
 import { SubmitButton } from "@/components/ConfirmButton";
 
 export default async function Overview({ params }: { params: Promise<{ id: string }> }) {
@@ -33,14 +33,26 @@ export default async function Overview({ params }: { params: Promise<{ id: strin
 
   return (
     <div className="space-y-6">
+      <PageHeader title="Site dashboard" description={`Manage ${site.name}, review activity, and jump directly to the tools you use most.`} />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((s) => (
-          <Link key={s.label} href={s.href} className="card p-4 hover:border-indigo-300">
-            <p className="text-sm text-slate-500">{s.label}</p>
-            <p className="mt-1 text-2xl font-bold">{s.value}</p>
+          <Link key={s.label} href={s.href} className="site-stat-card group">
+            <div><p className="text-sm font-semibold text-slate-600">{s.label}</p><p className="mt-1 text-3xl font-bold tracking-tight text-slate-950">{s.value}</p></div>
+            <span className="text-lg text-slate-300 transition group-hover:translate-x-1 group-hover:text-indigo-600" aria-hidden="true">→</span>
           </Link>
         ))}
       </div>
+
+      <Card title="Quick actions" description="Common tasks for this website.">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {[
+            ["Edit pages", "Update page content and sections", `/sites/${id}/pages`],
+            ["Header & footer", "Manage public navigation", `/sites/${id}/navigation`],
+            ["Booking", "Availability and requests", `/sites/${id}/booking`],
+            ["Branding", "Logo, colours and typography", `/sites/${id}/branding`],
+          ].map(([label, description, href]) => <Link key={label} href={href} className="quick-action"><span className="quick-action__icon" aria-hidden="true">→</span><strong>{label}</strong><small>{description}</small></Link>)}
+        </div>
+      </Card>
 
       <div className="grid gap-6 xl:grid-cols-2">
         <Card title={process.env.NODE_ENV === "development" ? "Local access" : "Addresses"} description={process.env.NODE_ENV === "development" ? "Your site is available locally, no domain or DNS setup required." : "Where this site can be reached."}>
@@ -74,11 +86,11 @@ export default async function Overview({ params }: { params: Promise<{ id: strin
       </div>
 
       <Card title="Activity">
-        <ul className="divide-y divide-slate-100 text-sm">
+        {log.length ? <ul className="divide-y divide-slate-100 text-sm">
           {log.map((l, i) => (
             <li key={i} className="flex justify-between gap-3 py-2"><span><code className="text-xs">{l.action}</code> <span className="text-slate-500">by {l.email ?? "system"}</span></span><span className="text-slate-500">{new Date(l.createdAt).toLocaleString()}</span></li>
           ))}
-        </ul>
+        </ul> : <p className="text-sm text-slate-500">No activity has been recorded for this site yet.</p>}
       </Card>
 
       {role === "OWNER" && (

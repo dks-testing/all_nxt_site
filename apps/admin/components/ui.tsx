@@ -2,10 +2,10 @@ import type { SiteStatus } from "@platform/db";
 
 export function PageHeader({ title, description, actions }: { title: string; description?: string; actions?: React.ReactNode }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+    <div className="page-heading mb-6 flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
-        {description && <p className="mt-1 text-sm text-slate-500">{description}</p>}
+        <h1 className="text-2xl font-bold tracking-tight text-slate-950 sm:text-[1.75rem]">{title}</h1>
+        {description && <p className="mt-1.5 max-w-3xl text-sm leading-6 text-slate-500">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
     </div>
@@ -16,10 +16,10 @@ export function Card({ title, description, children, className = "", actions }: 
   return (
     <section className={`card p-5 ${className}`}>
       {(title || actions) && (
-        <div className="mb-4 flex items-start justify-between gap-4">
+        <div className="mb-5 flex items-start justify-between gap-4">
           <div>
-            {title && <h2 className="font-semibold">{title}</h2>}
-            {description && <p className="mt-0.5 text-sm text-slate-500">{description}</p>}
+            {title && <h2 className="font-semibold text-slate-950">{title}</h2>}
+            {description && <p className="mt-1 text-sm leading-5 text-slate-500">{description}</p>}
           </div>
           {actions}
         </div>

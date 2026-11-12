@@ -14,9 +14,9 @@ function FeatureLink({ bundle, href, children }: {
   const design = getDesign(bundle.theme ?? {});
   const resolved = /^https?:\/\//i.test(href) ? href : globalCtaHref(design, href, String(children));
   if (/^https?:\/\//i.test(resolved)) {
-    return <a href={resolved} target="_blank" rel="noopener noreferrer">{children}</a>;
+    return <a href={resolved} target="_blank" rel="noopener noreferrer"><span>{children}</span></a>;
   }
-  return <Link href={localSiteHref(bundle.site.slug, resolved)}>{children}</Link>;
+  return <Link href={localSiteHref(bundle.site.slug, resolved)}><span>{children}</span></Link>;
 }
 
 export function SmartFeature({ bundle, props, pageSlug }: BlockComponentProps<"smart_feature">) {

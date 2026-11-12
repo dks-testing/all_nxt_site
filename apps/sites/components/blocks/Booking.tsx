@@ -46,9 +46,9 @@ export function MicksContactBooking({ bundle, contactProps, bookingProps }: {
           {settings?.hours && <li className="micks-contact-hours"><strong>Hours:</strong> <span>{groupHours(settings.hours).map((row) => <span key={row.days}>{row.days}: {row.time}</span>)}</span></li>}
         </ul>
         <div className="micks-contact-actions">
-          {settings?.phone && <a href={telHref(settings.phone)}>Call Now</a>}
-          {address && <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`}>Get Directions</a>}
-          <Link href={localSiteHref(bundle.site.slug, globalCtaHref(getDesign(bundle.theme ?? {}), "/make-an-appointment/", "Schedule Service"))}>Schedule Service</Link>
+          {settings?.phone && <a href={telHref(settings.phone)}><span>Call Now</span></a>}
+          {address && <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`}><span>Get Directions</span></a>}
+          <Link href={localSiteHref(bundle.site.slug, globalCtaHref(getDesign(bundle.theme ?? {}), "/make-an-appointment/", "Schedule Service"))}><span>Schedule Service</span></Link>
         </div>
       </div>
       <div className="micks-booking-column" id="book">

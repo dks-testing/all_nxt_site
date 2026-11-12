@@ -10,16 +10,29 @@ const sharedBadgeControls = [
   { slot: 3, url: "serviceBadgeThreeUrl", link: "serviceBadgeThreeLink", alt: "serviceBadgeThreeAlt", visible: "serviceBadgeThreeVisible", title: "Certification badge 3 (optional)", fallbackAlt: "Automotive certification" },
 ] as const;
 
-const colorFields: [keyof ThemeColors, string][] = [
-  ["primary", "Primary (buttons, accents)"],
-  ["primaryForeground", "Text on primary"],
-  ["secondary", "Secondary (dark sections, footer)"],
-  ["accent", "Accent (highlights)"],
-  ["background", "Page background"],
-  ["surface", "Panel background"],
-  ["text", "Body text"],
-  ["muted", "Muted text"],
+const colorFields: [keyof ThemeColors, string, string][] = [
+  ["primary", "Primary", "Default brand accent and fallback color for buttons and links."],
+  ["primaryForeground", "Text on primary", "Text and icons placed on the primary brand color."],
+  ["secondary", "Secondary", "Dark sections, standard footer backgrounds, and secondary emphasis."],
+  ["accent", "Accent", "Highlights, small emphasis elements, and fallback badge color."],
+  ["background", "Page background", "Main background used across public pages."],
+  ["surface", "Panel background", "Cards, dropdown hover states, and light content panels."],
+  ["text", "Body text", "Default headings and paragraph text."],
+  ["muted", "Muted text", "Supporting copy, captions, and secondary information."],
 ];
+
+const componentColorFields = [
+  ["buttonBackground", "CTA button", "Background for Schedule Service and other main action buttons."],
+  ["buttonText", "CTA button text", "Text and icons inside main action buttons."],
+  ["buttonHoverBackground", "CTA hover", "Main action-button background while a visitor hovers."],
+  ["buttonHoverText", "CTA hover text", "Main action-button text while a visitor hovers."],
+  ["navButtonBackground", "Navigation button", "Background for the phone/call button in the website header."],
+  ["navButtonText", "Navigation button text", "Phone number and hours inside the header button."],
+  ["navButtonHoverBackground", "Navigation button hover", "Header phone/call button background on hover."],
+  ["navButtonHoverText", "Navigation hover text", "Header phone/call button text on hover."],
+  ["badgeBackground", "Badge background", "Background for small promotional or navigation badges."],
+  ["badgeText", "Badge text", "Text displayed inside small badges."],
+] as const;
 
 type Props = {
   siteId: string;
@@ -29,6 +42,13 @@ type Props = {
   media: MediaAsset[];
   publicOrigin: string;
 };
+
+function ColorControl({ name, label, help, value, onChange }: { name: string; label: string; help: string; value: string; onChange: (value: string) => void }) {
+  return <label className="block">
+    <span className="label inline-flex items-center gap-1.5">{label}<span className="group relative inline-grid h-4 w-4 cursor-help place-items-center rounded-full bg-slate-200 text-[10px] font-bold text-slate-600" tabIndex={0} aria-label={`${label}: ${help}`}>i<span role="tooltip" className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 hidden w-64 -translate-x-1/2 rounded-lg bg-slate-950 px-3 py-2 text-left text-xs font-normal leading-5 text-white shadow-xl group-hover:block group-focus:block">{help}</span></span></span>
+    <div className="flex gap-2"><input type="color" value={value} onChange={(event) => onChange(event.target.value)} className="h-11 w-12 cursor-pointer rounded-lg border border-slate-300 bg-white p-1" aria-label={`Choose ${label.toLowerCase()}`} /><input name={name} value={value} onChange={(event) => onChange(event.target.value)} className="input font-mono" pattern="#[0-9a-fA-F]{6}" /></div>
+  </label>;
+}
 
 export function ThemeEditor({ siteId, initial, action, media, publicOrigin }: Props) {
   const [c, setC] = useState(initial.colors);
@@ -48,6 +68,15 @@ export function ThemeEditor({ siteId, initial, action, media, publicOrigin }: Pr
   const stepIconHoverColor = design.serviceStepIconHoverColor ?? design.serviceTrustIconHoverColor ?? "";
   const ratio = contrastRatio(c.primary, c.primaryForeground);
   const textRatio = contrastRatio(c.text, c.background);
+  const componentFallbacks: Record<(typeof componentColorFields)[number][0], string> = {
+    buttonBackground: c.primary, buttonText: c.primaryForeground, buttonHoverBackground: c.primary, buttonHoverText: c.primaryForeground,
+    navButtonBackground: design.buttonBackground ?? c.primary, navButtonText: design.buttonText ?? c.primaryForeground,
+    navButtonHoverBackground: design.buttonHoverBackground ?? c.primary, navButtonHoverText: design.buttonHoverText ?? c.primaryForeground,
+    badgeBackground: c.accent, badgeText: c.primaryForeground,
+  };
+  const designColor = (key: (typeof componentColorFields)[number][0]) => typeof design[key] === "string" ? design[key] as string : componentFallbacks[key];
+  const buttonRatio = contrastRatio(designColor("buttonBackground"), designColor("buttonText"));
+  const navButtonRatio = contrastRatio(designColor("navButtonBackground"), designColor("navButtonText"));
 
   return (
     <form action={action} className="space-y-6">
@@ -63,22 +92,24 @@ export function ThemeEditor({ siteId, initial, action, media, publicOrigin }: Pr
           <p className="help mt-2">Choose an image from this site’s media library or upload a new optimized image.</p>
         </section>
 
-        <section className="card p-5">
-          <h2 className="mb-4 font-semibold">Colour scheme</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {colorFields.map(([k, label]) => (
-              <label key={k} className="block">
-                <span className="label">{label}</span>
-                <div className="flex gap-2">
-                  <input type="color" value={c[k]} onChange={(e) => setC({ ...c, [k]: e.target.value })} className="h-9 w-12 cursor-pointer rounded border border-slate-300" aria-label={label} />
-                  <input name={k} value={c[k]} onChange={(e) => setC({ ...c, [k]: e.target.value })} className="input font-mono" pattern="#[0-9a-fA-F]{6}" />
-                </div>
-              </label>
-            ))}
+        <section className="card overflow-hidden">
+          <div className="border-b border-slate-200 bg-slate-50/70 px-5 py-4"><h2 className="font-semibold">Complete colour scheme</h2><p className="mt-1 text-sm text-slate-500">All website colors are managed here. Hover or focus the information icon beside any color to see exactly where it is used.</p></div>
+          <div className="p-5">
+          <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-slate-500">Foundation colors</h3>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {colorFields.map(([key, label, help]) => <ColorControl key={key} name={key} label={label} help={help} value={c[key]} onChange={(value) => setC({ ...c, [key]: value })} />)}
+          </div>
+          <div className="my-6 border-t border-slate-200" />
+          <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-slate-500">Buttons, navigation &amp; badges</h3>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {componentColorFields.map(([key, label, help]) => <ColorControl key={key} name={key} label={label} help={help} value={designColor(key)} onChange={(value) => setOption({ [key]: value })} />)}
           </div>
           <div className="mt-4 flex flex-wrap gap-3 text-xs">
-            <Contrast label="Button text contrast" ratio={ratio} />
+            <Contrast label="Primary contrast" ratio={ratio} />
             <Contrast label="Body text contrast" ratio={textRatio} />
+            <Contrast label="CTA contrast" ratio={buttonRatio} />
+            <Contrast label="Navigation button contrast" ratio={navButtonRatio} />
+          </div>
           </div>
         </section>
 
@@ -91,7 +122,7 @@ export function ThemeEditor({ siteId, initial, action, media, publicOrigin }: Pr
             <label className="block"><span className="label">Button style</span><select name="buttonStyle" value={btn} onChange={(e) => setBtn(e.target.value)} className="input"><option value="rounded">Rounded</option><option value="pill">Pill</option><option value="square">Square</option></select></label>
           </div>
           <div className="mt-5 border-t border-slate-200 pt-4">
-            <h3 className="mb-3 font-semibold">Header, badges and buttons</h3>
+            <h3 className="mb-3 font-semibold">Header layout, shared assets &amp; button shape</h3>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block"><span className="label">Home hero layout</span><select name="heroStyle" value={design.heroStyle ?? (design.headerStyle === "angled" ? "micks-overlay" : "classic")} onChange={(e) => setOption({ heroStyle: e.target.value as "classic" | "micks-overlay" })} className="input"><option value="classic">Standard hero</option><option value="micks-overlay">Mick's overlay hero with trust cards</option></select></label>
               <label className="block"><span className="label">Header style</span><select name="headerStyle" value={design.headerStyle ?? "standard"} onChange={(e) => setOption({ headerStyle: e.target.value as "standard" | "angled" })} className="input"><option value="standard">Standard</option><option value="angled">Mick's angled header</option></select></label>
@@ -189,20 +220,9 @@ export function ThemeEditor({ siteId, initial, action, media, publicOrigin }: Pr
               <input type="hidden" name="diagnosticsCtaHref" value={design.diagnosticsCtaHref ?? "/diagnostics/"} />
               <input type="hidden" name="tiresCtaHref" value={design.tiresCtaHref ?? "/tires/"} />
               <div className="rounded-xl border border-indigo-100 bg-indigo-50 p-4 text-sm text-indigo-900 sm:col-span-2">Repeated button destinations are managed once in <a className="font-semibold underline" href={`/sites/${siteId}/global`}>Global settings</a>.</div>
-              <label className="block"><span className="label">Button skew (-25 to 25 deg)</span><input name="buttonSkew" type="number" className="input" min={-25} max={25} value={design.buttonSkew ?? 0} onChange={(e) => setOption({ buttonSkew: Number(e.target.value) })} /></label>
+              <label className="block"><span className="label">Button skew (-25 to 25 deg)</span><input name="buttonSkew" type="number" className="input" min={-25} max={25} value={design.buttonSkew ?? 0} onChange={(e) => setOption({ buttonSkew: Number(e.target.value) })} /><span className="help">Controls the angle of the button shape.</span></label>
+              <label className="block"><span className="label">Button text skew (-25 to 25 deg)</span><input name="buttonTextSkew" type="number" className="input" min={-25} max={25} value={design.buttonTextSkew ?? -(design.buttonSkew ?? 0)} onChange={(e) => setOption({ buttonTextSkew: Number(e.target.value) })} /><span className="help">Controls the text angle separately. Use the opposite value to keep text visually straight.</span></label>
               <label className="block"><span className="label">Button hover movement (px)</span><input name="buttonHoverTranslateY" type="number" className="input" min={-12} max={12} value={design.buttonHoverTranslateY ?? -2} onChange={(e) => setOption({ buttonHoverTranslateY: Number(e.target.value) })} /></label>
-            </div>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              {([
-                ["buttonBackground", "Button background", c.primary],
-                ["buttonText", "Button text", c.primaryForeground],
-                ["buttonHoverBackground", "Button hover background", c.primary],
-                ["buttonHoverText", "Button hover text", c.primaryForeground],
-                ["badgeBackground", "Badge background", c.accent],
-                ["badgeText", "Badge text", c.primaryForeground],
-              ] as const).map(([key, label, fallback]) => (
-                <label key={key} className="block"><span className="label">{label}</span><div className="flex gap-2"><input type="color" className="h-9 w-12 rounded border" value={design[key] ?? fallback} onChange={(e) => setOption({ [key]: e.target.value })} /><input className="input font-mono" name={key} pattern="#[0-9a-fA-F]{6}" value={design[key] ?? fallback} onChange={(e) => setOption({ [key]: e.target.value })} /></div></label>
-              ))}
             </div>
           </div>
           <label className="mt-4 block"><span className="label">Custom CSS (advanced)</span><textarea name="customCss" defaultValue={initial.customCss} rows={4} className="input font-mono text-xs" /></label>

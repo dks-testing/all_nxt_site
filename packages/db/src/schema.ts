@@ -107,10 +107,17 @@ export type DesignOptions = {
   buttonText?: string;
   buttonHoverBackground?: string;
   buttonHoverText?: string;
+  navButtonBackground?: string;
+  navButtonText?: string;
+  navButtonHoverBackground?: string;
+  navButtonHoverText?: string;
   buttonSkew?: number;
+  buttonTextSkew?: number;
   buttonHoverTranslateY?: number;
   badgeBackground?: string;
   badgeText?: string;
+  footerRedlineHiddenPages?: string[];
+  footerLogosHiddenPages?: string[];
 };
 export type VehicleInfo = { plate?: string; state?: string; vin?: string; year?: string; make?: string; model?: string };
 
@@ -155,6 +162,7 @@ export const domains = mysqlTable(
 export const siteSettings = mysqlTable("site_settings", {
   siteId: varchar("site_id", { length: 36 }).primaryKey(),
   businessName: varchar("business_name", { length: 191 }).notNull(),
+  ownerName: varchar("owner_name", { length: 191 }),
   tagline: varchar("tagline", { length: 255 }),
   phone: varchar("phone", { length: 40 }),
   email: varchar("email", { length: 191 }),

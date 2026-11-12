@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { SiteBundle } from "@platform/db";
 import { telHref, formatAddress, groupHours } from "@/lib/format";
 import { PhoneIcon, PinIcon, ClockIcon } from "./Icons";
@@ -6,6 +9,7 @@ import { localSiteHref } from "@/lib/url";
 import { getDesign } from "@platform/db/theme";
 import { Stars } from "./Icons";
 import { CertificationBadges } from "./CertificationBadge";
+import { globalText } from "@/lib/global-content";
 
 export function SiteFooter({ bundle }: { bundle: SiteBundle }) {
   const { settings, footerMenu, theme } = bundle;
@@ -26,7 +30,7 @@ export function SiteFooter({ bundle }: { bundle: SiteBundle }) {
             ) : (
               <p className="mb-3 font-[family-name:var(--font-heading)] text-2xl font-bold text-white">{name}</p>
             )}
-            {settings?.footerNote && <p className="text-sm leading-relaxed">{settings.footerNote}</p>}
+            {settings?.footerNote && <p className="text-sm leading-relaxed">{globalText(settings.footerNote, bundle)}</p>}
             {social.length > 0 && (
               <div className="mt-4 flex flex-wrap gap-3 text-sm">
                 {social.map(([k, v]) => (
@@ -57,7 +61,7 @@ export function SiteFooter({ bundle }: { bundle: SiteBundle }) {
             <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-white">Quick links</h3>
             <ul className="space-y-1.5 text-sm">
               {footerMenu.map((m) => (
-                <li key={m.href}><Link href={localSiteHref(bundle.site.slug, m.href)} className="hover:text-white">{m.label}</Link></li>
+                <li key={m.href}><Link href={localSiteHref(bundle.site.slug, m.href)} className="hover:text-white">{globalText(m.label, bundle)}</Link></li>
               ))}
             </ul>
           </div>
@@ -68,7 +72,7 @@ export function SiteFooter({ bundle }: { bundle: SiteBundle }) {
       </footer>
       {settings?.phone && (
         <a href={telHref(settings.phone)} className="btn btn-primary fixed inset-x-3 bottom-3 z-50 shadow-2xl sm:hidden">
-          <PhoneIcon className="h-5 w-5" /> Call {settings.phone}
+          <PhoneIcon className="h-5 w-5" /><span>Call {settings.phone}</span>
         </a>
       )}
     </>
@@ -76,8 +80,17 @@ export function SiteFooter({ bundle }: { bundle: SiteBundle }) {
 }
 
 function MicksFooter({ bundle }: { bundle: SiteBundle }) {
+  const pathname = usePathname();
   const { settings, theme, footerMenu } = bundle;
   const design = getDesign(theme ?? {});
+  const parts = pathname.split("/").filter(Boolean).map((part) => {
+    try { return decodeURIComponent(part); } catch { return part; }
+  });
+  const routeParts = parts[0] === bundle.site.slug ? parts.slice(1) : (["s", "p"].includes(parts[0]) ? parts.slice(2) : parts);
+  const pageSlug = routeParts.join("/");
+  const landingPage = pageSlug === "";
+  const showRedline = landingPage || !(design.footerRedlineHiddenPages ?? []).includes(pageSlug);
+  const showLogos = landingPage || !(design.footerLogosHiddenPages ?? []).includes(pageSlug);
   const name = settings?.businessName ?? bundle.site.name;
   const address = formatAddress(settings?.address);
   const email = settings?.email;
@@ -87,15 +100,15 @@ function MicksFooter({ bundle }: { bundle: SiteBundle }) {
   const legalLinks = footerMenu.filter((item) => /faq|terms|privacy/i.test(item.label));
   const footerLinks = legalLinks.length ? legalLinks : footerMenu;
   const poweredLink = design.footerPoweredLink;
-  const poweredText = design.footerPoweredText || "Powered by Raise a Hood";
-  const facebookText = design.footerFacebookText || "Follow us on Facebook";
+  const poweredText = globalText(design.footerPoweredText || "Powered by Raise a Hood", bundle);
+  const facebookText = globalText(design.footerFacebookText || "Follow us on Facebook", bundle);
   return <>
     <footer className="micks-site-footer">
-      <div className="micks-footer-redline" />
-      <div className="micks-footer-logos container-site">
+      {showRedline && <div className="micks-footer-redline" />}
+      {showLogos && <div className="micks-footer-logos container-site">
         {theme?.logoUrl ? <img src={theme.logoUrl} alt={name} className="micks-footer-main-logo" /> : <strong>{name}</strong>}
         <CertificationBadges design={design} className="micks-footer-certifications" />
-      </div>
+      </div>}
       <div className="micks-footer-main" style={{ backgroundImage: `linear-gradient(#0b0b0bd9,#0b0b0bd9),url(${JSON.stringify(footerBackground)})` }}>
         <div className="container-site micks-footer-main-grid">
           <div>
@@ -106,7 +119,7 @@ function MicksFooter({ bundle }: { bundle: SiteBundle }) {
               {address && <><dt>Address:</dt><dd>{address}</dd></>}
             </dl>
             <p>{groupHours(settings?.hours).map((row) => <span key={row.days}>{row.days}: {row.time}<br /></span>)}</p>
-            <nav>{footerLinks.map((item, index) => <span key={item.href}><Link href={localSiteHref(bundle.site.slug, item.href)}>{item.label}</Link>{index < footerLinks.length - 1 ? " | " : ""}</span>)}</nav>
+            <nav>{footerLinks.map((item, index) => <span key={item.href}><Link href={localSiteHref(bundle.site.slug, item.href)}>{globalText(item.label, bundle)}</Link>{index < footerLinks.length - 1 ? " | " : ""}</span>)}</nav>
           </div>
           <div className="micks-footer-trust">
             <h2>Trust</h2>
@@ -128,6 +141,6 @@ function MicksFooter({ bundle }: { bundle: SiteBundle }) {
         </div>
       </div>
     </footer>
-    {settings?.phone && <a href={telHref(settings.phone)} className="btn btn-primary fixed inset-x-3 bottom-3 z-50 shadow-2xl sm:hidden"><PhoneIcon className="h-5 w-5" /> Call {settings.phone}</a>}
+    {settings?.phone && <a href={telHref(settings.phone)} className="btn btn-primary fixed inset-x-3 bottom-3 z-50 shadow-2xl sm:hidden"><PhoneIcon className="h-5 w-5" /><span>Call {settings.phone}</span></a>}
   </>;
 }

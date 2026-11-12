@@ -37,6 +37,7 @@ export function themeToCss(t: { colors?: Partial<ThemeColors> | null; fonts?: Pa
   const btnRadius = t.buttonStyle === "pill" ? "9999px" : t.buttonStyle === "square" ? "0px" : radius;
   const design = getDesign(t);
   const skew = numberRange(design.buttonSkew, -25, 25);
+  const textSkew = numberRange(design.buttonTextSkew, -25, 25, -skew);
   const translate = numberRange(design.buttonHoverTranslateY, -12, 12, -2);
   const vars: Record<string, string> = {
     "--color-primary": safeColor(c.primary, defaultColors.primary),
@@ -55,7 +56,12 @@ export function themeToCss(t: { colors?: Partial<ThemeColors> | null; fonts?: Pa
     "--button-text": safeColor(design.buttonText, c.primaryForeground),
     "--button-hover-bg": safeColor(design.buttonHoverBackground, c.primary),
     "--button-hover-text": safeColor(design.buttonHoverText, c.primaryForeground),
+    "--nav-button-bg": safeColor(design.navButtonBackground, safeColor(design.buttonBackground, c.primary)),
+    "--nav-button-text": safeColor(design.navButtonText, safeColor(design.buttonText, c.primaryForeground)),
+    "--nav-button-hover-bg": safeColor(design.navButtonHoverBackground, safeColor(design.buttonHoverBackground, c.primary)),
+    "--nav-button-hover-text": safeColor(design.navButtonHoverText, safeColor(design.buttonHoverText, c.primaryForeground)),
     "--button-skew": `${skew}deg`,
+    "--button-text-skew": `${textSkew}deg`,
     "--button-hover-y": `${translate}px`,
     "--badge-bg": safeColor(design.badgeBackground, c.accent),
     "--badge-text": safeColor(design.badgeText, c.primaryForeground),

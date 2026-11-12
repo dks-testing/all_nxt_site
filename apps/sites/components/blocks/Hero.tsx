@@ -91,9 +91,9 @@ export async function Hero({ ctx, bundle, props, index, pageSlug, integratedTrus
         <h1 className={`font-bold uppercase leading-[1.05] ${big ? "text-4xl md:text-6xl" : "text-3xl md:text-5xl"}`}>{heading}</h1>
         {sub && <p className="mt-5 max-w-2xl text-lg text-white/85 md:text-xl">{sub}</p>}
         {(primary || secondary || tertiary) && <div className="mt-8 flex flex-wrap gap-3">
-          {primary && <Link href={localSiteHref(bundle.site.slug, primary.href)} className="btn btn-primary">{primary.label}</Link>}
-          {secondary && <Link href={localSiteHref(bundle.site.slug, secondary.href)} className="btn btn-outline text-white">{secondary.label}</Link>}
-          {tertiary && <Link href={localSiteHref(bundle.site.slug, tertiary.href)} className="btn btn-primary">{tertiary.label}</Link>}
+          {primary && <Link href={localSiteHref(bundle.site.slug, primary.href)} className="btn btn-primary"><span>{primary.label}</span></Link>}
+          {secondary && <Link href={localSiteHref(bundle.site.slug, secondary.href)} className="btn btn-outline text-white"><span>{secondary.label}</span></Link>}
+          {tertiary && <Link href={localSiteHref(bundle.site.slug, tertiary.href)} className="btn btn-primary"><span>{tertiary.label}</span></Link>}
         </div>}
         <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm">
           {props.showRating && s?.ratingValue && <span className="flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 backdrop-blur"><Stars value={Number(s.ratingValue)} /><strong>{s.ratingValue}</strong>{s.ratingCount ? <span className="text-white/75">from {s.ratingCount} Google reviews</span> : null}</span>}

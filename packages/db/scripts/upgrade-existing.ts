@@ -3,6 +3,7 @@ import mysql from "mysql2/promise";
 import { mysqlConnectionUrl, mysqlSslEnabled } from "../src/connection";
 
 const tables: Record<string, Record<string, string>> = {
+  site_settings: { owner_name: "VARCHAR(191) NULL" },
   themes: { design: "JSON NULL" },
   pages: { canonical_url: "VARCHAR(1024) NULL", no_index: "BOOLEAN NOT NULL DEFAULT FALSE", no_follow: "BOOLEAN NOT NULL DEFAULT FALSE", seo_keywords: "TEXT NULL" },
   services: { seo_keywords: "TEXT NULL" },

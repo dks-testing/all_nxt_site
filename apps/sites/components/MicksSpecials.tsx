@@ -4,6 +4,7 @@ import { getDesign } from "@platform/db/theme";
 import { getPage, getSpecials, type SiteCtx } from "@/lib/data";
 import { telHref } from "@/lib/format";
 import { localSiteHref } from "@/lib/url";
+import { globalText } from "@/lib/global-content";
 
 /** All offers come from this website's Specials collection. The first visible offer is featured. */
 type Offer = Awaited<ReturnType<typeof getSpecials>>[number];
@@ -49,8 +50,9 @@ function backgroundStyle(src?: string | null): CSSProperties | undefined {
 }
 
 function OfferCard({ item, bundle, featured, fallbackImage }: { item: Offer; bundle: SiteBundle; featured?: boolean; fallbackImage?: string | null }) {
-  const prices = offerPrices(item);
-  const copy = offerContent(item);
+  const content = { ...item, title: globalText(item.title, bundle), discount: globalText(item.discount, bundle) || null, description: globalText(item.description, bundle) || null };
+  const prices = offerPrices(content);
+  const copy = offerContent(content);
   const phone = telHref(bundle.settings?.phone);
   const ctaHref = phone || localSiteHref(bundle.site.slug, "/make-an-appointment/");
   const image = item.imageUrl || fallbackImage;
@@ -65,8 +67,8 @@ function OfferCard({ item, bundle, featured, fallbackImage }: { item: Offer; bun
               <span className="micks-offer-now">NOW {prices.now}.</span>
               {prices.saving && <span> SAVE {prices.saving}</span>}
             </p>
-          ) : item.discount ? <p className="micks-offer-pricing">{item.discount}</p> : null}
-          <h3>{item.title}</h3>
+          ) : content.discount ? <p className="micks-offer-pricing">{content.discount}</p> : null}
+          <h3>{content.title}</h3>
           {copy.intro && <p className="micks-offer-intro">{copy.intro}</p>}
         </div>
         {copy.items.length > 0 && (
@@ -77,7 +79,7 @@ function OfferCard({ item, bundle, featured, fallbackImage }: { item: Offer; bun
         )}
         {copy.note && <p className="micks-offer-note">{copy.note}</p>}
         <div className="micks-offer-actions">
-          <a className="micks-offer-call" href={ctaHref}>{phone ? "Call Us" : "Book Now"}</a>
+          <a className="micks-offer-call" href={ctaHref}><span>{phone ? "Call Us" : "Book Now"}</span></a>
           {item.couponCode && <span className="micks-offer-code">CODE &ldquo;{item.couponCode}&rdquo;</span>}
         </div>
         {item.validUntil && <p className="micks-offer-expiry">Valid until {item.validUntil}</p>}
@@ -91,8 +93,8 @@ export async function MicksSpecials({ bundle, ctx }: { bundle: SiteBundle; ctx: 
   const section = page?.sections.find((s) => s.type === "specials");
   const sourceHeading = (section?.props as { heading?: string } | undefined)?.heading?.trim();
   // Treat legacy seeded copy as the template default, but respect a custom CMS heading.
-  const heading = !sourceHeading || ["current specials", "this month's deals"].includes(sourceHeading.toLowerCase())
-    ? "Featured Offers & Specials" : sourceHeading;
+  const heading = globalText(!sourceHeading || ["current specials", "this month's deals"].includes(sourceHeading.toLowerCase())
+    ? "Featured Offers & Specials" : sourceHeading, bundle);
   const design = getDesign(bundle.theme ?? {});
   const fallbackImage = design.innerHeroImageUrl;
   const [featured, ...rest] = offers;

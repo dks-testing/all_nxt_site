@@ -4,6 +4,7 @@ import { telHref } from "@/lib/format";
 import { PhoneIcon, MenuIcon, ChevronIcon } from "./Icons";
 import { getDesign } from "@platform/db/theme";
 import { localSiteHref } from "@/lib/url";
+import { globalText } from "@/lib/global-content";
 
 export function SiteHeader({ bundle, topBar }: { bundle: SiteBundle; topBar?: { heading: string; ctaLabel: string | null; ctaUrl: string | null } | null }) {
   const { settings, theme, headerMenu } = bundle;
@@ -16,7 +17,7 @@ export function SiteHeader({ bundle, topBar }: { bundle: SiteBundle; topBar?: { 
     <header className="sticky top-0 z-40 bg-white/95 shadow-sm backdrop-blur">
       {topBar && (
         <div className="bg-[var(--color-secondary)] px-4 py-2 text-center text-sm text-white">
-          {topBar.heading}
+          {globalText(topBar.heading, bundle)}
           {topBar.ctaUrl && (
             <Link href={localSiteHref(bundle.site.slug, topBar.ctaUrl)} className="ml-2 font-semibold underline">
               {topBar.ctaLabel ?? "Learn more"}
@@ -36,14 +37,14 @@ export function SiteHeader({ bundle, topBar }: { bundle: SiteBundle; topBar?: { 
 
         <nav className="hidden items-center gap-0.5 xl:flex" aria-label="Main">
           {headerMenu.map((item) => (
-            <NavItem key={item.href + item.label} item={item} slug={bundle.site.slug} />
+            <NavItem key={item.href + item.label} item={item} bundle={bundle} />
           ))}
         </nav>
 
         <div className="flex items-center gap-3">
           {settings?.phone && (
-            <a href={telHref(settings.phone)} className="btn btn-primary hidden whitespace-nowrap !px-4 !py-2.5 sm:inline-flex">
-              <PhoneIcon className="h-4 w-4" /> {settings.phone}
+            <a href={telHref(settings.phone)} className="btn btn-primary nav-cta-button hidden whitespace-nowrap !px-4 !py-2.5 sm:inline-flex">
+              <PhoneIcon className="h-4 w-4" /><span>{settings.phone}</span>
             </a>
           )}
           <details className="relative xl:hidden">
@@ -53,9 +54,9 @@ export function SiteHeader({ bundle, topBar }: { bundle: SiteBundle; topBar?: { 
             <div className="absolute right-0 top-12 w-72 rounded-site border border-gray-200 bg-white p-3 shadow-xl">
               {headerMenu.map((item) => (
                 <div key={item.href + item.label}>
-                  <Link href={localSiteHref(bundle.site.slug, item.href)} className="block rounded px-3 py-2 font-semibold hover:bg-[var(--color-surface)]">{item.label}</Link>
+                  <Link href={localSiteHref(bundle.site.slug, item.href)} className="block rounded px-3 py-2 font-semibold hover:bg-[var(--color-surface)]">{globalText(item.label, bundle)}</Link>
                   {item.children?.map((c) => (
-                    <Link key={c.href} href={localSiteHref(bundle.site.slug, c.href)} className="block rounded px-6 py-1.5 text-sm text-[var(--color-muted)] hover:bg-[var(--color-surface)]">{c.label}</Link>
+                    <Link key={c.href} href={localSiteHref(bundle.site.slug, c.href)} className="block rounded px-6 py-1.5 text-sm text-[var(--color-muted)] hover:bg-[var(--color-surface)]">{globalText(c.label, bundle)}</Link>
                   ))}
                 </div>
               ))}
@@ -67,17 +68,18 @@ export function SiteHeader({ bundle, topBar }: { bundle: SiteBundle; topBar?: { 
   );
 }
 
-function NavItem({ item, slug }: { item: MenuItem; slug: string }) {
+function NavItem({ item, bundle }: { item: MenuItem; bundle: SiteBundle }) {
+  const slug = bundle.site.slug;
   const cls = "flex items-center gap-1 whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-semibold uppercase tracking-wide text-[var(--color-secondary)] hover:text-[var(--color-primary)]";
-  if (!item.children?.length) return <Link href={localSiteHref(slug, item.href)} className={cls}>{item.label}{item.badge && <span className="site-badge ml-1 rounded px-1.5 py-0.5 text-[10px]">{item.badge}</span>}</Link>;
+  if (!item.children?.length) return <Link href={localSiteHref(slug, item.href)} className={cls}>{globalText(item.label, bundle)}{item.badge && <span className="site-badge ml-1 rounded px-1.5 py-0.5 text-[10px]">{item.badge}</span>}</Link>;
   return (
     <div className="nav-dd">
       <Link href={localSiteHref(slug, item.href)} className={cls}>
-        {item.label} {item.badge && <span className="site-badge px-1.5 py-0.5 text-[10px]">{item.badge}</span>} <ChevronIcon className="h-3.5 w-3.5" />
+        {globalText(item.label, bundle)} {item.badge && <span className="site-badge px-1.5 py-0.5 text-[10px]">{item.badge}</span>} <ChevronIcon className="h-3.5 w-3.5" />
       </Link>
       <div className="nav-dd-menu absolute left-0 top-full min-w-64 rounded-site border border-gray-100 bg-white p-2 shadow-xl">
         {item.children.map((c) => (
-          <Link key={c.href} href={localSiteHref(slug, c.href)} className="block rounded px-3 py-2 text-sm hover:bg-[var(--color-surface)] hover:text-[var(--color-primary)]">{c.label}</Link>
+          <Link key={c.href} href={localSiteHref(slug, c.href)} className="block rounded px-3 py-2 text-sm hover:bg-[var(--color-surface)] hover:text-[var(--color-primary)]">{globalText(c.label, bundle)}</Link>
         ))}
       </div>
     </div>
@@ -103,8 +105,8 @@ function AngledHeader({ bundle }: { bundle: SiteBundle }) {
         </Link>
         <nav className="micks-primary-nav" aria-label="Main navigation">
           {links.map((item) => <div key={item.label + item.href} className="micks-nav-entry">
-            <Link href={localSiteHref(bundle.site.slug, item.href)} className="micks-nav-link">{item.label}{item.children?.length ? <ChevronIcon className="h-4 w-4" /> : null}{item.badge && <span className="site-badge rounded px-1 text-[10px]">{item.badge}</span>}</Link>
-            {item.children?.length ? <div className="micks-dropdown">{item.children.map((child) => <Link key={child.href} href={localSiteHref(bundle.site.slug, child.href)} className="block px-3 py-2 text-sm hover:bg-slate-100">{child.label}{child.badge && <span className="site-badge ml-2 rounded px-1 text-[10px]">{child.badge}</span>}</Link>)}</div> : null}
+            <Link href={localSiteHref(bundle.site.slug, item.href)} className="micks-nav-link">{globalText(item.label, bundle)}{item.children?.length ? <ChevronIcon className="h-4 w-4" /> : null}{item.badge && <span className="site-badge rounded px-1 text-[10px]">{item.badge}</span>}</Link>
+            {item.children?.length ? <div className="micks-dropdown">{item.children.map((child) => <Link key={child.href} href={localSiteHref(bundle.site.slug, child.href)} className="block px-3 py-2 text-sm hover:bg-slate-100">{globalText(child.label, bundle)}{child.badge && <span className="site-badge ml-2 rounded px-1 text-[10px]">{child.badge}</span>}</Link>)}</div> : null}
           </div>)}
         </nav>
         {settings?.phone && <a href={telHref(settings.phone)} className="micks-phone-panel" aria-label={`Call ${settings.phone}`}>
@@ -114,8 +116,8 @@ function AngledHeader({ bundle }: { bundle: SiteBundle }) {
           <summary className="p-3" aria-label="Open menu"><MenuIcon /></summary>
           <nav aria-label="Mobile navigation" className="micks-mobile-menu-list">
             {links.map((item) => <div key={item.href + item.label}>
-              <Link href={localSiteHref(bundle.site.slug, item.href)} className="block px-4 py-2 font-semibold">{item.label}</Link>
-              {item.children?.map((child) => <Link href={localSiteHref(bundle.site.slug, child.href)} key={child.href} className="block px-7 py-1.5 text-sm">{child.label}</Link>)}
+              <Link href={localSiteHref(bundle.site.slug, item.href)} className="block px-4 py-2 font-semibold">{globalText(item.label, bundle)}</Link>
+              {item.children?.map((child) => <Link href={localSiteHref(bundle.site.slug, child.href)} key={child.href} className="block px-7 py-1.5 text-sm">{globalText(child.label, bundle)}</Link>)}
             </div>)}
           </nav>
         </details>

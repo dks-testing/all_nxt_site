@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getDb, sites, siteMembers, themes, pages, services, specials, appointments, auditLog, eq, desc, count, and, inArray } from "@platform/db";
+import { getDb, sites, siteMembers, themes, appointments, auditLog, eq, desc, count, and, inArray } from "@platform/db";
 import { requireUser } from "@/lib/auth";
 import { PageHeader, StatusBadge } from "@/components/ui";
 import { SiteIdentity } from "@/components/SiteIdentity";
@@ -18,19 +18,13 @@ export default async function AdminDashboard() {
   const siteIds = visibleSites.map((site) => site.id);
   const isSuper = user.globalRole === "SUPER_ADMIN";
   const totals = siteIds.length ? await Promise.all([
-    db.select({ total: count() }).from(pages).where(inArray(pages.siteId, siteIds)),
-    db.select({ total: count() }).from(services).where(and(inArray(services.siteId, siteIds), eq(services.isActive, true))),
-    db.select({ total: count() }).from(specials).where(and(inArray(specials.siteId, siteIds), eq(specials.isActive, true))),
     db.select({ total: count() }).from(appointments).where(and(inArray(appointments.siteId, siteIds), eq(appointments.status, "NEW"))),
     db.select({ siteId: themes.siteId, logoUrl: themes.logoUrl }).from(themes).where(inArray(themes.siteId, siteIds)),
     db.select({ id: auditLog.id, siteId: auditLog.siteId, action: auditLog.action, createdAt: auditLog.createdAt }).from(auditLog).where(inArray(auditLog.siteId, siteIds)).orderBy(desc(auditLog.createdAt)).limit(8),
   ]) : null;
-  const pageCount = totals?.[0]?.[0]?.total ?? 0;
-  const serviceCount = totals?.[1]?.[0]?.total ?? 0;
-  const specialCount = totals?.[2]?.[0]?.total ?? 0;
-  const appointmentCount = totals?.[3]?.[0]?.total ?? 0;
-  const logos = totals?.[4] ?? [];
-  const activity = totals?.[5] ?? [];
+  const appointmentCount = totals?.[0]?.[0]?.total ?? 0;
+  const logos = totals?.[1] ?? [];
+  const activity = totals?.[2] ?? [];
   const logoMap = new Map(logos.map((logo) => [logo.siteId, logo.logoUrl]));
   const nameMap = new Map(visibleSites.map((site) => [site.id, site.name]));
   const liveCount = visibleSites.filter((site) => site.status === "PUBLISHED").length;
@@ -42,19 +36,16 @@ export default async function AdminDashboard() {
     { label: "Archived", total: visibleSites.filter((site) => site.status === "ARCHIVED").length, bar: "bg-slate-400", dot: "bg-slate-400" },
   ];
   const metrics = [
-    { label: "Websites", number: visibleSites.length, hint: "Websites you can manage", href: "/sites" },
-    { label: "Live websites", number: liveCount, hint: "Currently published", href: "/sites?status=PUBLISHED" },
-    { label: "Not published", number: offlineCount, hint: "Draft, unpublished or archived", href: "/sites" },
-    { label: "Pages", number: pageCount, hint: "Across your websites", href: "/sites" },
-    { label: "Active services", number: serviceCount, hint: "Currently visible services", href: "/sites" },
-    { label: "Active offers", number: specialCount, hint: "Currently visible specials", href: "/sites" },
-    { label: "New appointments", number: appointmentCount, hint: "Awaiting attention", href: "/sites" },
+    { label: "Websites", number: visibleSites.length, hint: "Sites in your workspace", tone: "indigo" },
+    { label: "Live", number: liveCount, hint: "Currently published", tone: "emerald" },
+    { label: "Needs publishing", number: offlineCount, hint: "Draft or offline", tone: "amber" },
+    { label: "New appointments", number: appointmentCount, hint: "Awaiting a response", tone: "rose" },
   ];
   return (
-    <main className="mx-auto max-w-7xl space-y-7 px-4 py-8">
-      <PageHeader title="Dashboard" description="Your websites and activity at a glance." actions={<div className="flex flex-wrap gap-2"><Link className="btn btn-secondary" href="/sites">View websites</Link>{isSuper && <Link className="btn btn-primary" href="/sites/new">+ New website</Link>}</div>} />
-      <section aria-label="Platform totals" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {metrics.map((metric) => <Link key={metric.label} href={metric.href} className="card group p-5 transition-colors hover:border-indigo-300 hover:bg-indigo-50/30"><p className="text-sm font-medium text-slate-600">{metric.label}</p><p className="mt-2 text-3xl font-bold tabular-nums text-slate-900">{metric.number}</p><p className="mt-2 text-xs text-slate-500">{metric.hint}</p></Link>)}
+    <main className="admin-page space-y-7">
+      <PageHeader title="Workspace dashboard" description="Monitor every website from one place, then open a site to manage its own dashboard." actions={<div className="flex flex-wrap gap-2"><Link className="btn btn-secondary" href="/sites">Manage websites</Link>{isSuper && <Link className="btn btn-primary" href="/sites/new">+ New website</Link>}</div>} />
+      <section aria-label="Workspace totals" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {metrics.map((metric) => <div key={metric.label} className="metric-card"><span className={`metric-card__mark metric-card__mark--${metric.tone}`} aria-hidden="true" /><div><p className="text-sm font-semibold text-slate-600">{metric.label}</p><p className="mt-1 text-3xl font-bold tabular-nums tracking-tight text-slate-950">{metric.number}</p><p className="mt-1.5 text-xs text-slate-500">{metric.hint}</p></div></div>)}
       </section>
       <section className="card p-5" aria-labelledby="dashboard-publishing">
         <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2"><h2 id="dashboard-publishing" className="font-semibold">Publishing overview</h2><span className="text-xs text-slate-500">Statuses across your websites</span></div>
@@ -67,9 +58,9 @@ export default async function AdminDashboard() {
       </section>
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <section className="card min-w-0 overflow-hidden" aria-labelledby="dashboard-websites">
-          <div className="flex items-center justify-between gap-2 border-b border-slate-100 p-5"><div><h2 id="dashboard-websites" className="font-semibold">Websites</h2><p className="text-xs text-slate-500">Recently updated websites</p></div><Link href="/sites" className="text-sm font-semibold text-indigo-700 hover:underline">See all</Link></div>
+          <div className="flex items-center justify-between gap-2 border-b border-slate-100 p-5"><div><h2 id="dashboard-websites" className="font-semibold">Site dashboards</h2><p className="text-xs text-slate-500">Open a website’s dedicated dashboard and tools</p></div><Link href="/sites" className="text-sm font-semibold text-indigo-700 hover:underline">View directory</Link></div>
           {visibleSites.length === 0 ? <p className="p-6 text-sm text-slate-500">No websites yet. Create a website to get started.</p> : <div className="divide-y divide-slate-100">
-            {visibleSites.slice(0, 7).map((site) => <div key={site.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3"><Link className="min-w-0 hover:text-indigo-700" href={`/sites/${site.id}`}><SiteIdentity name={site.name} slug={site.slug} logoUrl={logoMap.get(site.id)} compact /></Link><div className="flex items-center gap-2"><StatusBadge status={site.status} /><Link className="btn btn-secondary btn-sm" href={`/sites/${site.id}`}>Edit</Link></div></div>)}
+            {visibleSites.slice(0, 7).map((site) => <div key={site.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4"><SiteIdentity name={site.name} slug={site.slug} logoUrl={logoMap.get(site.id)} compact /><div className="flex items-center gap-2"><StatusBadge status={site.status} /><Link className="btn btn-secondary btn-sm" href={`/sites/${site.id}`}>Open dashboard</Link></div></div>)}
           </div>}
         </section>
         <section className="card min-w-0 overflow-hidden" aria-labelledby="dashboard-activity">

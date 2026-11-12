@@ -26,6 +26,7 @@ export async function saveGlobalSettings(fd: FormData) {
   return run(`/sites/${siteId}/global`, async () => {
     const db = getDb();
     const businessName = str(fd, "businessName").trim() || "Untitled";
+    const ownerName = str(fd, "ownerName").trim() || "Mick’s";
     const scheduleCtaHref = str(fd, "scheduleCtaHref").trim() || "/make-an-appointment/";
     const diagnosticsCtaHref = str(fd, "diagnosticsCtaHref").trim() || "/diagnostics/";
     const tiresCtaHref = str(fd, "tiresCtaHref").trim() || "/tires/";
@@ -33,8 +34,8 @@ export async function saveGlobalSettings(fd: FormData) {
     const toolEnabled = bool(fd, "toolEnabled");
 
     const [settingsRow] = await db.select({ siteId: siteSettings.siteId }).from(siteSettings).where(eq(siteSettings.siteId, siteId));
-    if (settingsRow) await db.update(siteSettings).set({ businessName }).where(eq(siteSettings.siteId, siteId));
-    else await db.insert(siteSettings).values({ siteId, businessName, hours: [] });
+    if (settingsRow) await db.update(siteSettings).set({ businessName, ownerName }).where(eq(siteSettings.siteId, siteId));
+    else await db.insert(siteSettings).values({ siteId, businessName, ownerName, hours: [] });
 
     const [themeRow] = await db.select().from(themes).where(eq(themes.siteId, siteId));
     if (!themeRow) throw new Error("Set up branding before saving global links");
@@ -49,7 +50,7 @@ export async function saveGlobalSettings(fd: FormData) {
       else if (toolUrl || toolEnabled) await db.insert(integrations).values({ siteId, type, config, enabled: toolEnabled });
     }
 
-    await afterChange(siteId, user.id, "global-settings.update", { businessName });
+    await afterChange(siteId, user.id, "global-settings.update", { businessName, ownerName });
     return "Global settings saved across the entire site";
   });
 }
@@ -110,8 +111,9 @@ export async function saveTheme(fd: FormData) {
     };
     const buttonStyle = str(fd, "buttonStyle") as "rounded" | "pill" | "square";
     const skew = Math.min(25, Math.max(-25, Number(str(fd, "buttonSkew") || "0")));
+    const textSkew = Math.min(25, Math.max(-25, Number(str(fd, "buttonTextSkew") || String(-skew))));
     const translate = Math.min(12, Math.max(-12, Number(str(fd, "buttonHoverTranslateY") || "-2")));
-    if (!Number.isFinite(skew) || !Number.isFinite(translate)) throw new Error("Button transforms must be numbers");
+    if (!Number.isFinite(skew) || !Number.isFinite(textSkew) || !Number.isFinite(translate)) throw new Error("Button transforms must be numbers");
     const headerStyle = str(fd, "headerStyle");
     if (!["standard", "angled"].includes(headerStyle)) throw new Error("Invalid header style");
     const heroStyle = str(fd, "heroStyle") || (headerStyle === "angled" ? "micks-overlay" : "classic");
@@ -191,8 +193,12 @@ export async function saveTheme(fd: FormData) {
       tiresCtaHref: opt(fd, "tiresCtaHref") ?? undefined,
       buttonBackground: hex("buttonBackground"), buttonText: hex("buttonText"),
       buttonHoverBackground: hex("buttonHoverBackground"), buttonHoverText: hex("buttonHoverText"),
+      navButtonBackground: hex("navButtonBackground"), navButtonText: hex("navButtonText"),
+      navButtonHoverBackground: hex("navButtonHoverBackground"), navButtonHoverText: hex("navButtonHoverText"),
       badgeBackground: hex("badgeBackground"), badgeText: hex("badgeText"),
-      buttonSkew: skew, buttonHoverTranslateY: translate,
+      buttonSkew: skew, buttonTextSkew: textSkew, buttonHoverTranslateY: translate,
+      footerRedlineHiddenPages: previousTheme?.design?.footerRedlineHiddenPages ?? [],
+      footerLogosHiddenPages: previousTheme?.design?.footerLogosHiddenPages ?? [],
     };
     const values = {
       logoUrl: opt(fd, "logoUrl"), logoDarkUrl: opt(fd, "logoDarkUrl"), faviconUrl: opt(fd, "faviconUrl"),
@@ -493,14 +499,21 @@ export async function saveMenus(fd: FormData) {
         try { value = JSON.parse(raw); } catch { throw new Error("Navigation data is invalid"); }
         if (!Array.isArray(value)) throw new Error("Navigation data is invalid");
         items = value.map((item) => ({
-          label: String(item?.label ?? "").trim(), href: String(item?.href ?? "").trim(), badge: String(item?.badge ?? "").trim() || undefined,
-          children: Array.isArray(item?.children) ? item.children.map((child: Record<string, unknown>) => ({ label: String(child.label ?? "").trim(), href: String(child.href ?? "").trim(), badge: String(child.badge ?? "").trim() || undefined })).filter((child: MenuItem) => child.label && child.href) : undefined,
+          label: String(item?.label ?? "").trim(), href: String(item?.href ?? "").trim(),
+          children: Array.isArray(item?.children) ? item.children.map((child: Record<string, unknown>) => ({ label: String(child.label ?? "").trim(), href: String(child.href ?? "").trim() })).filter((child: MenuItem) => child.label && child.href) : undefined,
         })).filter((item) => item.label && item.href) as MenuItem[];
       } else items = parseMenu(str(fd, location));
       const [m] = await db.select().from(menus).where(and(eq(menus.siteId, siteId), eq(menus.location, location)));
       if (m) await db.update(menus).set({ items }).where(eq(menus.id, m.id));
       else await db.insert(menus).values({ siteId, location, items });
     }
+    const pageRows = await db.select({ slug: pages.slug }).from(pages).where(eq(pages.siteId, siteId));
+    const shownRedline = new Set(fd.getAll("footerRedlineVisible").map(String));
+    const shownLogos = new Set(fd.getAll("footerLogosVisible").map(String));
+    const footerRedlineHiddenPages = pageRows.map((page) => page.slug).filter((slug) => slug && !shownRedline.has(slug));
+    const footerLogosHiddenPages = pageRows.map((page) => page.slug).filter((slug) => slug && !shownLogos.has(slug));
+    const [theme] = await db.select({ design: themes.design }).from(themes).where(eq(themes.siteId, siteId));
+    if (theme) await db.update(themes).set({ design: { ...(theme.design ?? {}), footerRedlineHiddenPages, footerLogosHiddenPages } }).where(eq(themes.siteId, siteId));
     await afterChange(siteId, user.id, "menus.update");
     return "Navigation saved";
   });

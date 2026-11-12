@@ -47,7 +47,7 @@ export function About({ bundle, props }: BlockComponentProps<"about">) {
             <h2>{props.heading}</h2>
             <RichText text={props.body} className="prose-site" />
             <div className="micks-about-actions">
-              {props.cta && <Link href={localSiteHref(bundle.site.slug, globalCtaHref(design, props.cta.href, props.cta.label))} className="btn btn-primary">{props.cta.label}</Link>}
+              {props.cta && <Link href={localSiteHref(bundle.site.slug, globalCtaHref(design, props.cta.href, props.cta.label))} className="btn btn-primary"><span>{props.cta.label}</span></Link>}
               <CertificationBadges design={design} className="micks-about-action-certifications" />
             </div>
           </div>
@@ -141,7 +141,7 @@ export function Embed({ bundle, props, id }: BlockComponentProps<"embed">) {
           {props.imageUrl && <div className="micks-tire-image">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={props.imageUrl} alt={`Wheel alignment at ${bundle.settings?.businessName ?? bundle.site.name}`} /></div>}
           <div className="micks-tire-copy">
             <h2>{props.heading}</h2>
-            {props.cta && <Link href={localSiteHref(bundle.site.slug, globalCtaHref(getDesign(bundle.theme ?? {}), props.cta.href, props.cta.label))} className="btn btn-primary">{props.cta.label}</Link>}
+            {props.cta && <Link href={localSiteHref(bundle.site.slug, globalCtaHref(getDesign(bundle.theme ?? {}), props.cta.href, props.cta.label))} className="btn btn-primary"><span>{props.cta.label}</span></Link>}
             {props.body && <RichText text={props.body} className="prose-site" />}
           </div>
         </div>
@@ -159,7 +159,7 @@ export function Embed({ bundle, props, id }: BlockComponentProps<"embed">) {
           <div className="mx-auto flex max-w-xl flex-col items-center gap-4 rounded-site border-2 border-dashed border-gray-300 bg-white p-10 text-center">
             <WrenchIcon className="h-8 w-8 text-[var(--color-primary)]" />
             <p className="text-[var(--color-muted)]">{cfg?.label ?? "This tool"} is coming soon. Call us and we&apos;ll help right away.</p>
-            <Link href={localSiteHref(bundle.site.slug, globalCtaHref(getDesign(bundle.theme ?? {}), "/make-an-appointment/", "Schedule service"))} className="btn btn-primary">Schedule service</Link>
+            <Link href={localSiteHref(bundle.site.slug, globalCtaHref(getDesign(bundle.theme ?? {}), "/make-an-appointment/", "Schedule service"))} className="btn btn-primary"><span>Schedule service</span></Link>
           </div>
         )}
       </div>

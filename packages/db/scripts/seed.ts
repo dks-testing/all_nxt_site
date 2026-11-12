@@ -60,6 +60,7 @@ async function main() {
   await db.insert(s.siteSettings).values({
     siteId,
     businessName: "Mick's Repair",
+    ownerName: "Mick’s",
     tagline: "Hometown trust. Advanced expertise. Pickup, repair, return.",
     phone: "(507) 376-3095",
     email: null,
