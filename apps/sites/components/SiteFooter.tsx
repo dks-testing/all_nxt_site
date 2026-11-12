@@ -80,12 +80,15 @@ function MicksFooter({ bundle }: { bundle: SiteBundle }) {
   const design = getDesign(theme ?? {});
   const name = settings?.businessName ?? bundle.site.name;
   const address = formatAddress(settings?.address);
-  const email = settings?.email || "info@micksrepair.com";
+  const email = settings?.email;
   const googleUrl = settings?.social?.google;
   const facebookUrl = settings?.social?.facebook;
   const footerBackground = design.footerBackgroundImageUrl || "https://www.micksrepair.com/wp-content/uploads/2026/03/Micks-Repair-Worthington-MN-1-of-4.jpeg";
   const legalLinks = footerMenu.filter((item) => /faq|terms|privacy/i.test(item.label));
   const footerLinks = legalLinks.length ? legalLinks : footerMenu;
+  const poweredLink = design.footerPoweredLink;
+  const poweredText = design.footerPoweredText || "Powered by Raise a Hood";
+  const facebookText = design.footerFacebookText || "Follow us on Facebook";
   return <>
     <footer className="micks-site-footer">
       <div className="micks-footer-redline" />
@@ -97,7 +100,11 @@ function MicksFooter({ bundle }: { bundle: SiteBundle }) {
         <div className="container-site micks-footer-main-grid">
           <div>
             <h2>Contact</h2>
-            <p>{settings?.phone && <>Call us: <a href={telHref(settings.phone)}>{settings.phone}</a><br /></>}Mail us: <a href={`mailto:${email}`}>{email}</a><br />{address && <>Address: {address}</>}</p>
+            <dl className="micks-footer-contact-list">
+              {settings?.phone && <><dt>Call us:</dt><dd><a href={telHref(settings.phone)}>{settings.phone}</a></dd></>}
+              {email && <><dt>Mail us:</dt><dd><a href={`mailto:${email}`}>{email}</a></dd></>}
+              {address && <><dt>Address:</dt><dd>{address}</dd></>}
+            </dl>
             <p>{groupHours(settings?.hours).map((row) => <span key={row.days}>{row.days}: {row.time}<br /></span>)}</p>
             <nav>{footerLinks.map((item, index) => <span key={item.href}><Link href={localSiteHref(bundle.site.slug, item.href)}>{item.label}</Link>{index < footerLinks.length - 1 ? " | " : ""}</span>)}</nav>
           </div>
@@ -112,7 +119,13 @@ function MicksFooter({ bundle }: { bundle: SiteBundle }) {
         </div>
       </div>
       <div className="micks-footer-bottom">
-        <div className="container-site"><span>© {new Date().getFullYear()} {name}, Inc. All Rights Reserved.</span>{facebookUrl && <a href={facebookUrl} target="_blank" rel="noopener noreferrer">Follow us on Facebook <b>f</b></a>}</div>
+        <div className="container-site">
+          <span>© {new Date().getFullYear()} {name}, Inc. All Rights Reserved.</span>
+          {(poweredLink || design.footerPoweredLogoUrl) && <a className="micks-footer-powered" href={poweredLink || "#"} target={poweredLink ? "_blank" : undefined} rel={poweredLink ? "noopener noreferrer" : undefined} aria-label={poweredText}>
+            {design.footerPoweredLogoUrl ? <><span>Powered by</span><img src={design.footerPoweredLogoUrl} alt={poweredText} /></> : poweredText}
+          </a>}
+          {facebookUrl && <a className="micks-footer-facebook" href={facebookUrl} target="_blank" rel="noopener noreferrer">{facebookText && <span>{facebookText}</span>}<b aria-hidden="true">f</b></a>}
+        </div>
       </div>
     </footer>
     {settings?.phone && <a href={telHref(settings.phone)} className="btn btn-primary fixed inset-x-3 bottom-3 z-50 shadow-2xl sm:hidden"><PhoneIcon className="h-5 w-5" /> Call {settings.phone}</a>}

@@ -82,7 +82,10 @@ export default async function Page({ params, searchParams }: Props) {
     if (sectionPreview && query.sectionOnly === "1") {
       return <div className="cms-section-preview"><style>{`body:has(.cms-section-preview)>header,body:has(.cms-section-preview)>footer,body:has(.cms-section-preview)>.sticky{display:none!important}body:has(.cms-section-preview){background:var(--color-background);overflow-x:hidden}.cms-section-preview{min-height:100vh}`}</style><RenderSections sections={sections.filter((section) => section.id === sectionPreview)} ctx={ctx} bundle={bundle} pageSlug={r.slug} /></div>;
     }
-    const micksPages = ["about-us", "services", "diagnostics", "tires", "specials", "testimonials", "make-an-appointment"];
+    // Diagnostics and Tires are composed from normal CMS sections so their
+    // content, visibility, and ordering stay editable. Remaining replicas are
+    // migrated separately.
+    const micksPages = ["about-us", "services", "specials", "testimonials", "make-an-appointment"];
     if (design.headerStyle === "angled" && micksPages.includes(r.slug)) return <MicksContentPage pageSlug={r.slug} bundle={bundle} ctx={ctx} />;
     return <RenderSections sections={sections} ctx={ctx} bundle={bundle} pageSlug={r.slug} />;
   }

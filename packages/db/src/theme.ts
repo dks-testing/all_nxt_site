@@ -1,6 +1,10 @@
 import type { ThemeColors, ThemeFonts, DesignOptions } from "./schema";
 
-export const fontOptions = ["Inter", "Roboto", "Open Sans", "Montserrat", "Poppins", "Oswald", "Lato", "Barlow", "Source Sans 3", "Merriweather"] as const;
+export const fontOptions = ["Inter", "Roboto", "Open Sans", "Montserrat", "Poppins", "Oswald", "Lato", "Barlow", "Source Sans 3", "Merriweather", "Nike Futura ND"] as const;
+
+const customFonts: Partial<Record<(typeof fontOptions)[number], string>> = {
+  "Nike Futura ND": "/fonts/nike-futura-nd.woff2",
+};
 
 export const defaultColors: ThemeColors = {
   primary: "#1d4ed8",
@@ -61,8 +65,19 @@ export function themeToCss(t: { colors?: Partial<ThemeColors> | null; fonts?: Pa
 
 export function googleFontsHref(fonts?: Partial<ThemeFonts> | null) {
   const f = { ...defaultFonts, ...(fonts ?? {}) };
-  const fams = Array.from(new Set([safeFont(f.heading, defaultFonts.heading), safeFont(f.body, defaultFonts.body)]));
+  const fams = Array.from(new Set([safeFont(f.heading, defaultFonts.heading), safeFont(f.body, defaultFonts.body)]))
+    .filter((font) => !customFonts[font as keyof typeof customFonts]);
+  if (!fams.length) return undefined;
   return `https://fonts.googleapis.com/css2?${fams.map((x) => `family=${encodeURIComponent(x)}:wght@400;500;600;700;800`).join("&")}&display=swap`;
+}
+
+/** Font-face declarations for licensed, non-Google brand fonts selected per tenant. */
+export function customFontCss(fonts?: Partial<ThemeFonts> | null) {
+  const selected = new Set([safeFont(fonts?.heading, defaultFonts.heading), safeFont(fonts?.body, defaultFonts.body)]);
+  return Array.from(selected).flatMap((font) => {
+    const url = customFonts[font as keyof typeof customFonts];
+    return url ? [`@font-face{font-family:"${font}";src:url("${url}") format("woff2");font-style:normal;font-weight:100 900;font-display:swap;}`] : [];
+  }).join("\n");
 }
 
 /** WCAG relative-luminance contrast ratio, used by the admin colour picker. */

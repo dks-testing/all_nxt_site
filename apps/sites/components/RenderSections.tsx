@@ -7,6 +7,7 @@ import { ServicesGrid, Specials, Reviews, CaseStudies, Faq, ContactMap } from ".
 import { BookingForm, MicksContactBooking } from "./blocks/Booking";
 import { getDesign } from "@platform/db/theme";
 import { globalizeContent } from "@/lib/global-content";
+import { SmartFeature } from "./blocks/SmartFeature";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const registry: Record<BlockType, (p: any) => React.ReactNode | Promise<React.ReactNode>> = {
@@ -23,6 +24,7 @@ const registry: Record<BlockType, (p: any) => React.ReactNode | Promise<React.Re
   cta: Cta,
   rich_text: RichTextBlock,
   embed: Embed,
+  smart_feature: SmartFeature,
 };
 
 type Section = { id: string; type: string; props: Record<string, unknown> };

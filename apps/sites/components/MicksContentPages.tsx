@@ -11,6 +11,7 @@ import { BookingFormClient } from "./BookingFormClient";
 import { CertificationBadges } from "./CertificationBadge";
 import { QuoteMark } from "./QuoteMark";
 import { globalText, sharedToolConfig } from "@/lib/global-content";
+import { StepListIcon } from "./TrustListIcon";
 
 const WP = "https://www.micksrepair.com/wp-content/uploads";
 
@@ -86,6 +87,12 @@ function MicksAbout({ bundle }: { bundle: SiteBundle }) {
     design.aboutCrewImageTwoUrl || `${WP}/2026/04/micks-repair-worthington-mn-terry-eggers.jpeg`,
     design.aboutCrewImageThreeUrl || `${WP}/2026/04/micks-repair-worthington-mn-customer-checkout.jpeg`,
   ];
+  const workItems = design.aboutWorkItems?.length ? design.aboutWorkItems : [
+    { title: "Straight-Talk Quotes", body: "No surprise add-ons; you approve every line before we touch a bolt." },
+    { title: "Speed With Integrity", body: "Same-day turnaround on most jobs; never at the cost of quality." },
+    { title: "Tools & Talent", body: "ASE-certified techs + factory-level diagnostics." },
+    { title: "Neighbors First", body: "We live where we work, and our name rides on every repair." },
+  ];
   return <>
     <section className="micks-about-page-intro section"><div className="container-site micks-about-page-grid">
       <img src={owner} alt={`Mick Eggers at ${name}`} />
@@ -99,12 +106,7 @@ function MicksAbout({ bundle }: { bundle: SiteBundle }) {
       </div>
     </div></section>
     <section className="micks-mission section"><div className="container-site micks-mission-grid"><div><h2>One Shop, One Mission</h2><h3>Keep our neighbors rolling with honest,<br />high-quality auto care.</h3><div className="micks-mission-table"><b>Location</b><b>Phone</b><b>Hours</b><span>{address}</span><a href={telHref(settings?.phone)}>{settings?.phone}</a><span>{groupHours(settings?.hours)[0]?.days}: {groupHours(settings?.hours)[0]?.time}</span></div><div className="micks-live-buttons">{settings?.phone && <a href={telHref(settings.phone)}>Call Now</a>}<Link href={localSiteHref(bundle.site.slug, design.scheduleCtaHref || "/make-an-appointment/")}>Schedule Service</Link></div></div><img src={car} alt="Vehicle" /></div></section>
-    <section className="micks-how-we-work section"><div className="container-site"><h2>How We Work</h2><img src={team} alt={`The ${name} team`} /><div className="micks-work-grid">{[
-      ["Straight-Talk Quotes", "No surprise add-ons; you approve every line before we touch a bolt."],
-      ["Speed With Integrity", "Same-day turnaround on most jobs; never at the cost of quality."],
-      ["Tools & Talent", "ASE-certified techs + factory-level diagnostics."],
-      ["Neighbors First", "We live where we work, and our name rides on every repair."],
-    ].map(([title, body]) => <div key={title}><b>{title}</b><span>{body}</span></div>)}</div></div></section>
+    <section className="micks-how-we-work section"><div className="container-site"><h2>How We Work</h2><img src={team} alt={`The ${name} team`} /><div className="micks-work-grid">{workItems.map(({ title, body }) => <div key={title}><StepListIcon design={design} label={title} /><b>{title}</b><span>{body}</span></div>)}</div></div></section>
     <section className="micks-owner section"><div className="container-site"><div className="micks-live-title"><QuoteMark design={design} className="micks-about-quote" /><h2>Meet the Crew</h2></div><div className="micks-owner-grid"><img src={owner} alt="Mick Eggers" /><div><p><strong>Mick Eggers</strong><br />Founder of {name}, Mick Eggers has spent his entire life building a reputation in the Worthington automotive community. For over 35 years, he has led a shop grounded in honesty, transparency, and long-term customer relationships. Today, he’s joined by his two sons, Kelly and Terry, continuing a tradition that has become a trusted name for generations of local families.</p><p>Spend a few minutes in the lobby and you’ll see what sets this place apart. It’s not uncommon to hear a technician, or Mick himself, advising a customer not to move forward with a repair when the cost doesn’t make sense for the vehicle.</p><p>Mick Eggers represents a rare combination of technical expertise, relentless work ethic, and unwavering integrity. It’s what defines {name} and why it continues to earn the trust of the community year after year.</p></div></div></div></section>
     <section className="micks-crew-gallery"><div className="container-site">{crew.map((src, index) => <img key={src} src={src} alt={["Kelly Eggers", "Terry Eggers", `${name} technician`][index]} />)}</div></section>
     <section className="micks-know-cta section"><div><h2>Know Before You Go.</h2><p>Describe what you’re seeing and get a clear answer in seconds.</p><Link href={localSiteHref(bundle.site.slug, design.diagnosticsCtaHref || "/diagnostics/")}>Start Diagnosis</Link></div></section>

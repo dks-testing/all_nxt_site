@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { themeToCss, googleFontsHref } from "@platform/db/theme";
+import { themeToCss, googleFontsHref, customFontCss } from "@platform/db/theme";
 import { getBundle, getTopBar, parseSiteParam } from "@/lib/data";
 import { siteOrigin } from "@/lib/url";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -30,14 +30,15 @@ export default async function SiteLayout({ children, params }: Params & { childr
   const topBar = await getTopBar(ctx);
   const ga4 = bundle.integrations.ga4?.measurementId;
   const gtm = bundle.integrations.gtm?.containerId;
+  const googleFonts = googleFontsHref(bundle.theme?.fonts);
   const safeId = (v?: string) => (v && /^[A-Z0-9-]+$/i.test(v) ? v : undefined);
 
   return (
     <>
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-      <link rel="stylesheet" href={googleFontsHref(bundle.theme?.fonts)} precedence="default" />
+      {googleFonts && <link rel="stylesheet" href={googleFonts} precedence="default" />}
       <style href={`theme-${bundle.site.id}`} precedence="high">
-        {themeToCss(bundle.theme ?? {}) + (bundle.theme?.customCss ? `\n${bundle.theme.customCss.replace(/<\/?style/gi, "")}` : "")}
+        {customFontCss(bundle.theme?.fonts) + "\n" + themeToCss(bundle.theme ?? {}) + (bundle.theme?.customCss ? `\n${bundle.theme.customCss.replace(/<\/?style/gi, "")}` : "")}
       </style>
       {ctx.preview && (
         <div className="sticky top-0 z-50 bg-amber-400 px-4 py-1.5 text-center text-sm font-semibold text-black">

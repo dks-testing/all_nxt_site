@@ -52,6 +52,7 @@ export const blockSchemas = {
     heading: z.string().default("Recent repairs"),
     subheading: z.string().optional(),
     closingText: z.string().optional(),
+    labels: z.array(z.string()).default(["Diagnostic Case", "Customer Concern", "Verified Repair"]),
     variant: z.enum(["default", "micks-home"]).default("default"),
   }),
   faq: z.object({ heading: z.string().default("Frequently asked questions") }),
@@ -82,6 +83,21 @@ export const blockSchemas = {
     offerHeading: z.string().optional(),
     offerBody: z.string().optional(),
   }),
+  smart_feature: z.object({
+    eyebrow: z.string().optional(),
+    heading: z.string().min(1),
+    body: z.string().default(""),
+    imageUrl: z.string().optional(),
+    secondaryImageUrl: z.string().optional(),
+    iconUrl: z.string().optional(),
+    cta: link.optional(),
+    calloutHeading: z.string().optional(),
+    calloutBody: z.string().optional(),
+    supportText: z.string().optional(),
+    variant: z.enum(["intro", "tool", "experience", "cta", "trust", "testimonial", "final"]).default("intro"),
+    integration: z.enum(["tire_finder", "ai_diagnostic", "custom"]).default("ai_diagnostic"),
+    showCertifications: z.boolean().default(false),
+  }),
 } as const;
 
 export type BlockType = keyof typeof blockSchemas;
@@ -102,6 +118,7 @@ export const blockLabels: Record<BlockType, string> = {
   cta: "Call to action",
   rich_text: "Rich text",
   embed: "Embed (tire finder, AI tool, iframe)",
+  smart_feature: "Smart tools feature",
 };
 
 /** Field descriptors that the admin turns into a form. `path` is dot-notation into props. */
@@ -158,6 +175,7 @@ export const blockFields: Record<BlockType, Field[]> = {
     { path: "heading", label: "Heading", kind: "text" },
     { path: "subheading", label: "Intro text", kind: "textarea" },
     { path: "closingText", label: "Closing text", kind: "textarea" },
+    { path: "labels", label: "Card category labels", kind: "list", help: "One label per card, in case-study order" },
     { path: "variant", label: "Layout", kind: "select", options: ["default", "micks-home"] },
   ],
   faq: [{ path: "heading", label: "Heading", kind: "text" }],
@@ -193,6 +211,22 @@ export const blockFields: Record<BlockType, Field[]> = {
     { path: "offerHeading", label: "Offer heading", kind: "text" },
     { path: "offerBody", label: "Offer text", kind: "textarea" },
   ],
+  smart_feature: [
+    { path: "eyebrow", label: "Eyebrow", kind: "text" },
+    { path: "heading", label: "Heading", kind: "text" },
+    { path: "body", label: "Body (blank line = new paragraph)", kind: "textarea" },
+    { path: "calloutHeading", label: "Callout heading", kind: "text" },
+    { path: "calloutBody", label: "Callout text", kind: "textarea" },
+    { path: "supportText", label: "Supporting text", kind: "text" },
+    { path: "imageUrl", label: "Primary image", kind: "image" },
+    { path: "secondaryImageUrl", label: "Secondary image", kind: "image" },
+    { path: "iconUrl", label: "Tool icon", kind: "image" },
+    { path: "cta.label", label: "Button label", kind: "text" },
+    { path: "cta.href", label: "Button link", kind: "text" },
+    { path: "variant", label: "Layout", kind: "select", options: ["intro", "tool", "experience", "cta", "trust", "testimonial", "final"] },
+    { path: "integration", label: "Tool source", kind: "select", options: ["tire_finder", "ai_diagnostic", "custom"] },
+    { path: "showCertifications", label: "Show shared certification badges", kind: "boolean" },
+  ],
 };
 
 export function parseBlock<T extends BlockType>(type: T, props: unknown): BlockProps<T> | null {
@@ -211,6 +245,7 @@ export function defaultBlockProps(type: BlockType): Record<string, unknown> {
     hero: { heading: "New hero heading", showRating: true, badges: [] },
     about: { heading: "About us", body: "" },
     cta: { heading: "Ready to get started?", cta: { label: "Contact us", href: "/contact" }, variant: "primary" },
+    smart_feature: { heading: "Smart tools", body: "", variant: "intro", integration: "ai_diagnostic", showCertifications: false },
   };
   return blockSchemas[type].parse(defaults[type] ?? {}) as Record<string, unknown>;
 }

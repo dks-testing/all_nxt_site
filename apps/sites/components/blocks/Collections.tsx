@@ -147,7 +147,7 @@ export async function CaseStudies({ ctx, props }: BlockComponentProps<"case_stud
         <div className={micks ? "micks-case-grid" : "mt-10 grid gap-6 md:grid-cols-3"}>
           {items.map((c, index) => (
             <article key={c.id} className={micks ? "micks-case-card" : "rounded-site bg-white/5 p-6 ring-1 ring-white/10"}>
-              {micks && <p className="micks-case-label">{["Diagnostic case", "Customer concern", "Verified repair"][index] ?? "Repair result"}</p>}
+              {micks && <p className="micks-case-label">{props.labels[index] ?? "Repair result"}</p>}
               {micks && c.imageUrl && <div className="micks-case-image">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={c.imageUrl} alt="" /></div>}
               <div className={micks ? "micks-case-body" : ""}>
               <h3 className="mb-4 text-xl font-bold uppercase leading-tight text-[var(--color-accent)]">{c.title}</h3>

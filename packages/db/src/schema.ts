@@ -87,12 +87,17 @@ export type DesignOptions = {
   serviceTrustImageUrl?: string;
   serviceVehicleImageUrl?: string;
   footerBackgroundImageUrl?: string;
+  footerPoweredLogoUrl?: string;
+  footerPoweredLink?: string;
+  footerPoweredText?: string;
+  footerFacebookText?: string;
   aboutOwnerImageUrl?: string;
   aboutTeamImageUrl?: string;
   aboutVehicleImageUrl?: string;
   aboutCrewImageOneUrl?: string;
   aboutCrewImageTwoUrl?: string;
   aboutCrewImageThreeUrl?: string;
+  aboutWorkItems?: { title: string; body: string }[];
   diagnosticsImageUrl?: string;
   tiresImageUrl?: string;
   scheduleCtaHref?: string;

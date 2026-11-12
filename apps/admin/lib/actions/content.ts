@@ -130,6 +130,10 @@ export async function saveTheme(fd: FormData) {
     const serviceStepIconUrl = opt(fd, "serviceStepIconUrl") ?? undefined;
     const serviceStepIconColor = optionalHex("serviceStepIconColor");
     const serviceStepIconHoverColor = optionalHex("serviceStepIconHoverColor");
+    const aboutWorkItems = str(fd, "aboutWorkItems").split(/\r?\n/).map((line) => line.trim()).filter(Boolean).slice(0, 8).map((line) => {
+      const [title, ...body] = line.split("|");
+      return { title: title.trim(), body: body.join("|").trim() };
+    }).filter((item) => item.title && item.body);
     if (quoteSvgHoverColor && !quoteSvgColor) throw new Error("Set an SVG Color before choosing an SVG Hover Color");
     if (serviceStepIconHoverColor && !serviceStepIconColor) throw new Error("Set a step-list SVG Color before choosing a Hover Color");
     const svgUrls = [quoteSvgUrl, serviceStepIconUrl].filter((url): url is string => Boolean(url));
@@ -169,12 +173,17 @@ export async function saveTheme(fd: FormData) {
       serviceTrustImageUrl: opt(fd, "serviceTrustImageUrl") ?? undefined,
       serviceVehicleImageUrl: opt(fd, "serviceVehicleImageUrl") ?? undefined,
       footerBackgroundImageUrl: opt(fd, "footerBackgroundImageUrl") ?? undefined,
+      footerPoweredLogoUrl: opt(fd, "footerPoweredLogoUrl") ?? undefined,
+      footerPoweredLink: opt(fd, "footerPoweredLink") ?? undefined,
+      footerPoweredText: opt(fd, "footerPoweredText") ?? undefined,
+      footerFacebookText: opt(fd, "footerFacebookText") ?? undefined,
       aboutOwnerImageUrl: opt(fd, "aboutOwnerImageUrl") ?? undefined,
       aboutTeamImageUrl: opt(fd, "aboutTeamImageUrl") ?? undefined,
       aboutVehicleImageUrl: opt(fd, "aboutVehicleImageUrl") ?? undefined,
       aboutCrewImageOneUrl: opt(fd, "aboutCrewImageOneUrl") ?? undefined,
       aboutCrewImageTwoUrl: opt(fd, "aboutCrewImageTwoUrl") ?? undefined,
       aboutCrewImageThreeUrl: opt(fd, "aboutCrewImageThreeUrl") ?? undefined,
+      aboutWorkItems,
       diagnosticsImageUrl: opt(fd, "diagnosticsImageUrl") ?? undefined,
       tiresImageUrl: opt(fd, "tiresImageUrl") ?? undefined,
       scheduleCtaHref: opt(fd, "scheduleCtaHref") ?? undefined,

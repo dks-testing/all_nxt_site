@@ -11,6 +11,26 @@ import * as s from "../src/schema";
 const WP = "https://www.micksrepair.com/wp-content/uploads";
 const db = getDb();
 
+async function revalidateSite(siteId: string) {
+  const base = process.env.SITES_APP_URL?.replace(/\/$/, "");
+  const secret = process.env.REVALIDATE_SECRET;
+  if (!base || !secret) {
+    console.warn("Skipped Sites cache refresh because SITES_APP_URL or REVALIDATE_SECRET is not configured.");
+    return;
+  }
+  try {
+    const response = await fetch(`${base}/api/revalidate/`, {
+      method: "POST",
+      headers: { authorization: `Bearer ${secret}`, "content-type": "application/json" },
+      body: JSON.stringify({ siteId }),
+    });
+    if (response.ok) console.log(`Refreshed the Sites cache for ${siteId}.`);
+    else console.warn(`Sites cache refresh returned HTTP ${response.status}; restart the local Sites app if it is already running.`);
+  } catch {
+    console.warn("Sites cache refresh could not reach the app; the next clean local start will load the synchronized content.");
+  }
+}
+
 const hero = {
   heading: "HOMETOWN TRUST\nADVANCED EXPERTISE\nPICKUP - REPAIR - RETURN",
   subheading: "Honest answers. Modern diagnostics. And free pickup and delivery that saves you time.",
@@ -67,6 +87,171 @@ const tireFeature = {
   cta: { label: "Find my tires", href: "/tires/" },
 };
 
+const diagnosticsSections: [string, Record<string, unknown>][] = [
+  ["hero", {
+    heading: "Diagnostics",
+    subheading: "Smarter Car Diagnostics",
+    primaryCta: { label: "Start Diagnostics", href: "/diagnostics/#tool" },
+    secondaryCta: { label: "Find the Right Tires", href: "/tires/" },
+    showRating: false,
+    badges: [],
+  }],
+  ["smart_feature", {
+    eyebrow: "Smart free pre-diagnosis from {{businessName}}",
+    heading: "Smarter Car Care for Worthington Drivers",
+    body: "{{businessName}} combines trusted local service with advanced technology to give you a smarter, more reliable automotive experience. Our skilled technicians bring years of hands-on expertise, while our modern diagnostic tools help quickly identify issues before they turn into costly problems. Whether you need help choosing the right tires, understanding a warning light, or keeping up with routine maintenance, we make the process simple and stress-free.\n\nWe believe car care should be convenient and transparent, which is why we offer clear recommendations, honest advice, and solutions tailored to your vehicle and driving needs. From quick check-ups to more complex repairs, {{businessName}} is committed to keeping your car performing at its best anytime, anywhere, so you can drive with confidence and peace of mind.",
+    imageUrl: `${WP}/2026/04/micks-repair-worthington-mn-terry-eggers-835x1024.jpeg`,
+    cta: { label: "Start My Free Diagnosis", href: "/diagnostics/#tool" },
+    calloutHeading: "Special Offer",
+    calloutBody: "Our digital tools save you time and save us time. We pass those savings back to you. Bring in your online results and take $25 off your associated service.",
+    supportText: "Fast Results — 24/7 Support — Trusted MN Experts",
+    variant: "intro",
+    integration: "ai_diagnostic",
+    showCertifications: false,
+  }],
+  ["smart_feature", {
+    heading: "Know the Problem Before You Visit.",
+    body: "Whether your dashboard light is on or your tires are wearing unevenly, our smart tools make it easy to get answers before you arrive.",
+    imageUrl: `${WP}/2026/06/engine-prediagnostic-vinson.png`,
+    secondaryImageUrl: `${WP}/2026/06/car-service-checking-2.png`,
+    calloutHeading: "Pre-Diagnosis Tool",
+    calloutBody: "Tell us what’s going on with your vehicle. Our system analyzes your symptoms, provides possible causes and repair estimates, and connects you directly with our certified staff.",
+    cta: { label: "Start My Free Diagnosis", href: "/diagnostics/#tool" },
+    supportText: "Fast Results — 24/7 Support — Trusted MN Experts",
+    variant: "tool",
+    integration: "ai_diagnostic",
+    showCertifications: false,
+  }],
+  ["smart_feature", {
+    heading: "Experience You Trust. Technology That Delivers.",
+    body: "Worthington drivers, smart car care means combining local expertise with the best technology available.\n\nAt {{businessName}}, we make it simple to understand your car, plan repairs, and choose the right tires—all from one trusted shop.",
+    imageUrl: `${WP}/2026/04/micks-repair-worthington-mn-terry-mick-kelly-eggers-1024x656.jpeg`,
+    supportText: "Trusted in Worthington",
+    variant: "experience",
+    integration: "ai_diagnostic",
+    showCertifications: false,
+  }],
+  ["smart_feature", {
+    heading: "Something Feels Off? Start Your Free Diagnosis.",
+    body: "Describe your vehicle’s symptoms and get quick, accurate insights from real repair estimates and trusted advice from the certified professionals at {{businessName}}.",
+    imageUrl: `${WP}/2026/06/Pre-Diagnostic-Tool-2.png`,
+    cta: { label: "Start My Free Diagnosis", href: "/diagnostics/#tool" },
+    supportText: "Free • Instant results • Local expertise",
+    variant: "cta",
+    integration: "ai_diagnostic",
+    showCertifications: false,
+  }],
+  ["smart_feature", {
+    heading: "Worthington's Most Trusted Tire and Auto Experts",
+    body: "{{businessName}} brings together decades of experience and advanced technology to help you diagnose issues, find the right tires, and keep your car running its best. Anytime. Anywhere.",
+    supportText: "Certified Technicians • Family-Owned & Operated",
+    variant: "trust",
+    integration: "ai_diagnostic",
+    showCertifications: true,
+  }],
+  ["smart_feature", {
+    heading: "What Drivers Say About {{businessName}}",
+    body: "“They always take great care of my vehicle and I can count on a fair price every time.”",
+    imageUrl: `${WP}/2026/04/micks-repair-worthington-mn-customer-checkout.jpeg`,
+    variant: "testimonial",
+    integration: "ai_diagnostic",
+    showCertifications: false,
+  }],
+  ["smart_feature", {
+    heading: "Drive Smarter with Smart Tools",
+    body: "From diagnosing issues to finding the right tires, everything starts with smart tools and trusted local care. Experience the balance of technology and craftsmanship, built for Worthington drivers.",
+    imageUrl: `${WP}/2026/04/micks-repair-worthington-mn-kelly-eggers-1024x1024.jpeg`,
+    cta: { label: "Start My Free Diagnosis", href: "/diagnostics/#tool" },
+    supportText: "Fast – Local – Accurate",
+    variant: "final",
+    integration: "ai_diagnostic",
+    showCertifications: false,
+  }],
+];
+
+const tiresSections: [string, Record<string, unknown>][] = [
+  ["hero", {
+    heading: "Tires",
+    subheading: "Smarter Tire Selection",
+    primaryCta: { label: "Schedule Service", href: "/make-an-appointment/" },
+    secondaryCta: { label: "Start Diagnostics", href: "/diagnostics/" },
+    tertiaryCta: { label: "Find the Right Tires", href: "/tires/#tire-finder" },
+    showRating: false,
+    badges: [],
+  }],
+  ["smart_feature", {
+    eyebrow: "Smart Tire Finder at {{businessName}}",
+    heading: "Smarter Car Care for Worthington Drivers",
+    body: "{{businessName}} combines trusted local service with advanced technology to help you find the perfect tires and keep your vehicle performing at its best anytime, anywhere.",
+    imageUrl: `${WP}/2026/04/micks-repair-worthington-mn-terry-eggers-835x1024.jpeg`,
+    cta: { label: "Find My Perfect Tire", href: "/tires/#tire-finder" },
+    calloutHeading: "Special Offer",
+    calloutBody: "Our digital tools save you time and save us time. We pass those savings back to you. Bring in your online results and take $25 off your associated service.",
+    supportText: "Fast Results — 24/7 Support — Trusted MN Experts",
+    variant: "intro",
+    integration: "tire_finder",
+    showCertifications: false,
+  }],
+  ["smart_feature", {
+    heading: "Smarter Tire Selection. Starts Here",
+    body: "Built on real-world data and vehicle insights, the recommendations help you choose tires that match your needs before you arrive.",
+    imageUrl: `${WP}/2026/04/Tire-1.png`,
+    secondaryImageUrl: `${WP}/2026/06/micksrepaire-tires.webp`,
+    calloutHeading: "Perfect Tire Tool",
+    calloutBody: "Enter your vehicle. Tell us your likes, dislikes, and priorities. Instantly see the best tire options. Tire shopping, finally made easy. Certified by local technicians.",
+    cta: { label: "Find My Perfect Tire", href: "/tires/#tire-finder" },
+    supportText: "Fast Results — 24/7 Support — Trusted MN Experts",
+    variant: "tool",
+    integration: "tire_finder",
+    showCertifications: false,
+  }],
+  ["smart_feature", {
+    heading: "Experience You Trust. Technology That Delivers.",
+    body: "For Worthington drivers, smart car care means combining local expertise with the best technology available.\n\nAt {{businessName}}, we make it simple to understand your car, plan repairs, and choose the right tires all from one trusted shop.",
+    imageUrl: `${WP}/2026/04/micks-repair-worthington-mn-terry-mick-kelly-eggers-1024x656.jpeg`,
+    supportText: "Trusted in Worthington",
+    variant: "experience",
+    integration: "tire_finder",
+    showCertifications: false,
+  }],
+  ["smart_feature", {
+    heading: "Find the Perfect Tires. Fast.",
+    body: "Use our Tire Finder to match your driving style, vehicle, and budget with the right tires at competitive prices. Compare brands and schedule installation with our experienced team.",
+    imageUrl: `${WP}/2026/04/tire-ai-1024x683.jpg`,
+    cta: { label: "Find My Perfect Tire", href: "/tires/#tire-finder" },
+    supportText: "Best brands • Competitive prices • Expert installation",
+    variant: "cta",
+    integration: "tire_finder",
+    showCertifications: false,
+  }],
+  ["smart_feature", {
+    heading: "Worthington's Most Trusted Tire and Auto Experts",
+    body: "{{businessName}} brings together decades of experience and advanced technology to help you diagnose issues, find the right tires, and keep your car running its best. Anytime. Anywhere.",
+    supportText: "Certified Technicians • Family-Owned & Operated",
+    variant: "trust",
+    integration: "tire_finder",
+    showCertifications: true,
+  }],
+  ["smart_feature", {
+    heading: "What Drivers Say About {{businessName}}",
+    body: "“They always take great care of my vehicle and I can count on a fair price every time.”",
+    imageUrl: `${WP}/2026/04/micks-repair-worthington-mn-customer-checkout.jpeg`,
+    variant: "testimonial",
+    integration: "tire_finder",
+    showCertifications: false,
+  }],
+  ["smart_feature", {
+    heading: "Drive Smarter with Smart Tools",
+    body: "From diagnosing issues to finding the right tires, everything starts with smart tools and trusted local care. Experience the balance of technology and craftsmanship, built for Worthington drivers.",
+    imageUrl: `${WP}/2026/04/micks-repair-worthington-mn-kelly-eggers-1024x1024.jpeg`,
+    cta: { label: "Find My Perfect Tire", href: "/tires/#tire-finder" },
+    supportText: "Fast – Local – Accurate",
+    variant: "final",
+    integration: "tire_finder",
+    showCertifications: false,
+  }],
+];
+
 async function main() {
   const [site] = await db.select({ id: s.sites.id }).from(s.sites).where(eq(s.sites.slug, "micks-repair"));
   if (!site) throw new Error("The micks-repair tenant does not exist. Run db:seed first.");
@@ -74,7 +259,7 @@ async function main() {
   const [theme] = await db.select().from(s.themes).where(eq(s.themes.siteId, site.id));
   if (!theme) throw new Error("The micks-repair tenant has no theme row.");
   await db.update(s.themes).set({
-    fonts: { ...(theme.fonts ?? {}), heading: "Oswald", body: "Poppins" },
+    fonts: { ...(theme.fonts ?? {}), heading: "Nike Futura ND", body: "Poppins" },
     design: {
       ...(theme.design ?? {}), headerStyle: "angled", heroStyle: "micks-overlay",
       innerHeroImageUrl: `${WP}/2026/03/Micks-Repair-Worthington-MN-4-of-4.jpeg`,
@@ -85,15 +270,24 @@ async function main() {
       serviceTrustImageUrl: `${WP}/2026/04/555799130_25292959790311872_8516031389215206101_n.jpg`,
       serviceVehicleImageUrl: `${WP}/2026/04/blue-car.webp`,
       footerBackgroundImageUrl: `${WP}/2026/03/Micks-Repair-Worthington-MN-1-of-4.jpeg`,
+      footerPoweredLink: "https://www.raiseahood.com/",
+      footerPoweredText: "Powered by Raise a Hood",
+      footerFacebookText: "Follow us on Facebook",
       aboutOwnerImageUrl: `${WP}/2026/04/micks-repair-worthington-mn-mick-eggers.jpeg`,
       aboutTeamImageUrl: `${WP}/2026/04/micks-repair-worthington-mn-team.jpeg`,
       aboutVehicleImageUrl: `${WP}/2026/04/blue-car.webp`,
       aboutCrewImageOneUrl: `${WP}/2026/04/micks-repair-worthington-mn-kelly-eggers.jpeg`,
       aboutCrewImageTwoUrl: `${WP}/2026/04/micks-repair-worthington-mn-terry-eggers.jpeg`,
       aboutCrewImageThreeUrl: `${WP}/2026/04/micks-repair-worthington-mn-customer-checkout.jpeg`,
+      aboutWorkItems: [
+        { title: "Straight-Talk Quotes", body: "No surprise add-ons; you approve every line before we touch a bolt." },
+        { title: "Speed With Integrity", body: "Same-day turnaround on most jobs; never at the cost of quality." },
+        { title: "Tools & Talent", body: "ASE-certified techs + factory-level diagnostics." },
+        { title: "Neighbors First", body: "We live where we work, and our name rides on every repair." },
+      ],
       diagnosticsImageUrl: `${WP}/2026/06/Pre-Diagnostic-Tool-2.png`,
       tiresImageUrl: `${WP}/2026/04/tire-ai-2048x1365.jpg`,
-      scheduleCtaHref: "/make-an-appointment/", diagnosticsCtaHref: "/diagnostics/", tiresCtaHref: "/tires/",
+      scheduleCtaHref: "/make-an-appointment/", diagnosticsCtaHref: "/diagnostics/", tiresCtaHref: "/tires/#tire-finder",
     },
   }).where(eq(s.themes.siteId, site.id));
 
@@ -110,6 +304,7 @@ async function main() {
       heading: "Proven repairs. Trusted outcomes.",
       subheading: "At Mick’s, the focus is simple: diagnose problems accurately and fix them right. Here are real examples from vehicles we’ve serviced.",
       closingText: "Every vehicle tells a different story. Our job is to diagnose it correctly and fix only what’s needed to get you back on the road safely.",
+      labels: ["Diagnostic Case", "Customer Concern", "Verified Repair"],
       variant: "micks-home",
     },
     reviews: { heading: "Our happy customers", limit: 6, variant: "micks-home" },
@@ -135,6 +330,26 @@ async function main() {
     if (props) await db.update(s.pageSections).set({ props, sortOrder: order[section.type] ?? 0, isVisible: true }).where(eq(s.pageSections.id, section.id));
   }
   if (!hasTireFeature) await db.insert(s.pageSections).values({ id: randomUUID(), siteId: site.id, pageId: home.id, type: "embed", props: tireFeature, sortOrder: 4, isVisible: true });
+
+  const [diagnosticsPage] = await db.select({ id: s.pages.id }).from(s.pages)
+    .where(and(eq(s.pages.siteId, site.id), eq(s.pages.slug, "diagnostics")));
+  if (!diagnosticsPage) throw new Error("The micks-repair diagnostics page does not exist.");
+  await db.transaction(async (tx) => {
+    await tx.delete(s.pageSections).where(and(eq(s.pageSections.siteId, site.id), eq(s.pageSections.pageId, diagnosticsPage.id)));
+    await tx.insert(s.pageSections).values(diagnosticsSections.map(([type, props], sortOrder) => ({
+      id: randomUUID(), siteId: site.id, pageId: diagnosticsPage.id, type, props, sortOrder, isVisible: true,
+    })));
+  });
+
+  const [tiresPage] = await db.select({ id: s.pages.id }).from(s.pages)
+    .where(and(eq(s.pages.siteId, site.id), eq(s.pages.slug, "tires")));
+  if (!tiresPage) throw new Error("The micks-repair tires page does not exist.");
+  await db.transaction(async (tx) => {
+    await tx.delete(s.pageSections).where(and(eq(s.pageSections.siteId, site.id), eq(s.pageSections.pageId, tiresPage.id)));
+    await tx.insert(s.pageSections).values(tiresSections.map(([type, props], sortOrder) => ({
+      id: randomUUID(), siteId: site.id, pageId: tiresPage.id, type, props, sortOrder, isVisible: true,
+    })));
+  });
 
   const caseRows = await db.select().from(s.caseStudies).where(eq(s.caseStudies.siteId, site.id));
   const caseImages = [`${WP}/2026/06/engine-micks-home.webp`, `${WP}/2026/06/suspension-micks-home.webp`, `${WP}/2026/06/start-stop-micks-home.webp`];
@@ -182,6 +397,7 @@ async function main() {
     const body = copy ? `# ${copy.heading}\n\n${copy.intro.join("\n\n")}\n\n## ${copy.listHeading}\n\n${copy.closing}` : service.body;
     await db.update(s.services).set({ imageUrl: service.imageUrl || `${WP}/2026/04/micks-repair-worthington-mn-terry-eggers.jpeg`, ...(copy ? { body, bullets: copy.bullets } : {}) }).where(eq(s.services.id, service.id));
   }
+  await revalidateSite(site.id);
   console.log("Synchronized the complete Mick's Repair landing page, theme, and service assets.");
 }
 
