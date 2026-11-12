@@ -26,7 +26,11 @@ export function SmartFeature({ bundle, props, pageSlug }: BlockComponentProps<"s
   const imageAlt = `${props.heading} at ${bundle.settings?.businessName ?? bundle.site.name}`;
   const ctaHref = props.variant === "tool" && toolUrl ? toolUrl : props.cta?.href;
   const cta = props.cta && ctaHref && <FeatureLink bundle={bundle} href={ctaHref}>{props.cta.label}</FeatureLink>;
-  const pageClass = pageSlug === "tires" ? " micks-smart-feature-page-tires" : "";
+  const pageClass = pageSlug === "tires"
+    ? " micks-smart-feature-page-tires"
+    : pageSlug === "diagnostics"
+      ? " micks-smart-feature-page-diagnostics"
+      : "";
 
   if (props.variant === "intro") {
     return <section className={`micks-smart-feature micks-smart-feature-intro${pageClass} section`}>

@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { resolve4, resolveCname } from "node:dns/promises";
 import { revalidatePath } from "next/cache";
 import {
-  getDb, and, eq, asc, siteSettings, themes, media, pages, pageSections, menus, domains, redirects, bookingSettings, appointments,
+  getDb, and, eq, asc, siteSettings, themes, media, pages, pageSections, menus, domains, redirects, bookingSettings, appointments, services,
   integrations, users, siteMembers, integrationTypes, appointmentStatus, siteRoles, audit,
   type DayHours, type MenuItem, type ThemeColors,
 } from "@platform/db";
@@ -26,7 +26,7 @@ export async function saveGlobalSettings(fd: FormData) {
   return run(`/sites/${siteId}/global`, async () => {
     const db = getDb();
     const businessName = str(fd, "businessName").trim() || "Untitled";
-    const ownerName = str(fd, "ownerName").trim() || "Mick’s";
+    const ownerName = str(fd, "ownerName").trim() || (/^Mick(?:'|’)?s Repair$/i.test(businessName) ? "Mick’s" : businessName);
     const scheduleCtaHref = str(fd, "scheduleCtaHref").trim() || "/make-an-appointment/";
     const diagnosticsCtaHref = str(fd, "diagnosticsCtaHref").trim() || "/diagnostics/";
     const tiresCtaHref = str(fd, "tiresCtaHref").trim() || "/tires/";
@@ -149,6 +149,9 @@ export async function saveTheme(fd: FormData) {
       if (!siteAsset && !inheritedUrls.includes(svgUrl)) throw new Error("Each SVG must be uploaded to this website");
     }
     const design = {
+      // Preserve older per-site design settings which this editor does not expose.
+      // Otherwise saving colors can silently erase icons and custom layout options.
+      ...(previousTheme?.design ?? {}),
       headerStyle: headerStyle as "standard" | "angled",
       heroStyle: heroStyle as "classic" | "micks-overlay",
       quoteSvgUrl,
@@ -507,11 +510,15 @@ export async function saveMenus(fd: FormData) {
       if (m) await db.update(menus).set({ items }).where(eq(menus.id, m.id));
       else await db.insert(menus).values({ siteId, location, items });
     }
-    const pageRows = await db.select({ slug: pages.slug }).from(pages).where(eq(pages.siteId, siteId));
+    const [pageRows, serviceRows] = await Promise.all([
+      db.select({ slug: pages.slug }).from(pages).where(eq(pages.siteId, siteId)),
+      db.select({ slug: services.slug }).from(services).where(eq(services.siteId, siteId)),
+    ]);
+    const targets = [...new Set([...pageRows, ...serviceRows].map((row) => row.slug).filter(Boolean))];
     const shownRedline = new Set(fd.getAll("footerRedlineVisible").map(String));
     const shownLogos = new Set(fd.getAll("footerLogosVisible").map(String));
-    const footerRedlineHiddenPages = pageRows.map((page) => page.slug).filter((slug) => slug && !shownRedline.has(slug));
-    const footerLogosHiddenPages = pageRows.map((page) => page.slug).filter((slug) => slug && !shownLogos.has(slug));
+    const footerRedlineHiddenPages = targets.filter((slug) => !shownRedline.has(slug));
+    const footerLogosHiddenPages = targets.filter((slug) => !shownLogos.has(slug));
     const [theme] = await db.select({ design: themes.design }).from(themes).where(eq(themes.siteId, siteId));
     if (theme) await db.update(themes).set({ design: { ...(theme.design ?? {}), footerRedlineHiddenPages, footerLogosHiddenPages } }).where(eq(themes.siteId, siteId));
     await afterChange(siteId, user.id, "menus.update");

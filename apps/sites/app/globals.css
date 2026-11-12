@@ -5336,3 +5336,22 @@ details>summary::-webkit-details-marker {
   .micks-offer-included ul { grid-template-columns: 1fr; font-size: 13px; }
   .micks-offer-call, .micks-offer-code { min-height: 40px; padding-inline: 18px; font-size: 12px; }
 }
+
+
+/* Diagnostics / Drive Smarter final card: match the live white outer section,
+   softly tinted inner card and intrinsic-width centered CTA. Scoped to
+   /diagnostics/ so shared SmartFeature variants on other pages are unchanged. */
+.micks-smart-feature-final.micks-smart-feature-page-diagnostics {
+  background: #fff;
+}
+
+.micks-smart-feature-final.micks-smart-feature-page-diagnostics .micks-smart-feature-grid {
+  background: linear-gradient(180deg, #fff 0%, #d2dfee 100%);
+}
+
+.micks-smart-feature-final.micks-smart-feature-page-diagnostics .micks-smart-feature-copy-wrap > a {
+  align-self: center;
+  width: fit-content;
+  max-width: 100%;
+  text-align: center;
+}

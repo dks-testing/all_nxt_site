@@ -15,6 +15,8 @@ export default async function GlobalSettingsPage({ params }: { params: Promise<{
     db.select().from(integrations).where(eq(integrations.siteId, id)),
   ]);
   const design = getDesign(theme ?? {});
+  const businessName = settings?.businessName || site.name;
+  const ownerName = settings?.ownerName || (/^Mick(?:'|’)?s Repair$/i.test(businessName) ? "Mick’s" : businessName);
   const tireTool = tools.find((row) => row.type === "tire_finder");
   const diagnosticTool = tools.find((row) => row.type === "ai_diagnostic");
   const tool = tireTool?.config?.url ? tireTool : diagnosticTool;
@@ -27,7 +29,7 @@ export default async function GlobalSettingsPage({ params }: { params: Promise<{
         <Card title="Global name placeholders" description="Manage the full business name and the short owner or brand name from one place.">
           <div className="grid gap-4 lg:grid-cols-2">
             <Input label="Business name" name="businessName" defaultValue={settings?.businessName ?? site.name} required help="Replaces {{businessName}}, {{shopName}}, and every full Mick’s Repair reference." />
-            <Input label="Owner / short name" name="ownerName" defaultValue={settings?.ownerName ?? "Mick’s"} required help="Replaces {{ownerName}} and standalone Mick’s references without changing the full business name." />
+            <Input label="Owner / short name" name="ownerName" defaultValue={ownerName} required help="Replaces {{ownerName}} and standalone Mick’s references without changing the full business name." />
           </div>
           <div className="mt-4 rounded-xl border border-indigo-100 bg-indigo-50 p-4 text-sm leading-6 text-indigo-900">
             Use <code className="rounded bg-white px-1.5 py-0.5 font-mono">{"{{businessName}}"}</code> for the complete shop name and <code className="rounded bg-white px-1.5 py-0.5 font-mono">{"{{ownerName}}"}</code> for the short name. Legacy “Mick’s Repair” and standalone “Mick’s” copy is replaced automatically.

@@ -1,4 +1,4 @@
-import { getDb, menus, pages, themes, eq, asc } from "@platform/db";
+import { getDb, menus, pages, services, themes, eq, asc } from "@platform/db";
 import { getDesign } from "@platform/db/theme";
 import { loadSite } from "@/lib/site";
 import { saveMenus } from "@/lib/actions/content";
@@ -10,9 +10,10 @@ export default async function NavigationPage({ params }: { params: Promise<{ id:
   const { id } = await params;
   await loadSite(id, "EDITOR");
   const db = getDb();
-  const [rows, sitePages, [theme]] = await Promise.all([
+  const [rows, sitePages, servicePages, [theme]] = await Promise.all([
     db.select().from(menus).where(eq(menus.siteId, id)),
     db.select({ slug: pages.slug, title: pages.title }).from(pages).where(eq(pages.siteId, id)).orderBy(asc(pages.sortOrder)),
+    db.select({ slug: services.slug, title: services.name }).from(services).where(eq(services.siteId, id)).orderBy(asc(services.sortOrder)),
     db.select({ design: themes.design }).from(themes).where(eq(themes.siteId, id)).limit(1),
   ]);
   const header = rows.find((r) => r.location === "header")?.items;
@@ -20,9 +21,14 @@ export default async function NavigationPage({ params }: { params: Promise<{ id:
   const design = getDesign(theme ?? {});
   const redlineHidden = new Set(design.footerRedlineHiddenPages ?? []);
   const logosHidden = new Set(design.footerLogosHiddenPages ?? []);
+  const pageSlugs = new Set(sitePages.map((page) => page.slug));
+  const targets = [
+    ...sitePages.map((page) => ({ ...page, kind: "Page" })),
+    ...servicePages.filter((page) => !pageSlugs.has(page.slug)).map((page) => ({ ...page, kind: "Service detail" })),
+  ];
   return (
     <>
-      <PageHeader title="Header & footer" description="Build the public navigation with structured links, dropdowns and optional badges." />
+      <PageHeader title="Header & footer" description="Edit navigation links and control which pages display the footer brand rows." />
       <form action={saveMenus} className="space-y-6">
         <input type="hidden" name="siteId" value={id} />
         <MenuEditor name="headerJson" title="Header navigation" description="Main navigation and service dropdowns shown at the top of every page." initial={header ?? []} allowChildren />
@@ -32,9 +38,9 @@ export default async function NavigationPage({ params }: { params: Promise<{ id:
           <div className="overflow-x-auto p-5 sm:p-6">
             <table className="table min-w-[620px]">
               <thead><tr><th>Page</th><th>Red divider</th><th>Logo &amp; certifications</th></tr></thead>
-              <tbody>{sitePages.map((page) => {
+              <tbody>{targets.map((page) => {
                 const landing = page.slug === "";
-                return <tr key={page.slug || "home"}><td><strong className="text-slate-800">{page.title}</strong><span className="ml-2 text-xs text-slate-400">{landing ? "Landing page" : `/${page.slug}/`}</span></td><td><label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" name="footerRedlineVisible" value={page.slug} defaultChecked={landing || !redlineHidden.has(page.slug)} disabled={landing} className="h-4 w-4 accent-indigo-600" />Show</label></td><td><label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" name="footerLogosVisible" value={page.slug} defaultChecked={landing || !logosHidden.has(page.slug)} disabled={landing} className="h-4 w-4 accent-indigo-600" />Show</label></td></tr>;
+                return <tr key={page.slug || "home"}><td><strong className="text-slate-800">{page.title}</strong><span className="ml-2 text-xs text-slate-400">{landing ? "Landing page" : `${page.kind}: /${page.slug}/`}</span></td><td><label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" name="footerRedlineVisible" value={page.slug} defaultChecked={landing || !redlineHidden.has(page.slug)} disabled={landing} className="h-4 w-4 accent-indigo-600" />Show</label></td><td><label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" name="footerLogosVisible" value={page.slug} defaultChecked={landing || !logosHidden.has(page.slug)} disabled={landing} className="h-4 w-4 accent-indigo-600" />Show</label></td></tr>;
               })}</tbody>
             </table>
           </div>

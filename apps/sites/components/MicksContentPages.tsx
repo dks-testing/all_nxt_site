@@ -10,7 +10,7 @@ import { MicksInnerHero } from "./MicksInnerHero";
 import { BookingFormClient } from "./BookingFormClient";
 import { CertificationBadges } from "./CertificationBadge";
 import { QuoteMark } from "./QuoteMark";
-import { globalText, sharedToolConfig } from "@/lib/global-content";
+import { getOwnerName, globalText, sharedToolConfig } from "@/lib/global-content";
 import { StepListIcon } from "./TrustListIcon";
 import { MicksSpecials } from "./MicksSpecials";
 
@@ -79,7 +79,7 @@ function MicksAbout({ bundle }: { bundle: SiteBundle }) {
   const design = getDesign(bundle.theme ?? {});
   const settings = bundle.settings;
   const name = settings?.businessName ?? bundle.site.name;
-  const ownerName = settings?.ownerName ?? "Mick’s";
+  const ownerName = getOwnerName(bundle);
   const address = formatAddress(settings?.address);
   const owner = design.aboutOwnerImageUrl || `${WP}/2026/04/micks-repair-worthington-mn-mick-eggers.jpeg`;
   const team = design.aboutTeamImageUrl || `${WP}/2026/04/micks-repair-worthington-mn-team.jpeg`;

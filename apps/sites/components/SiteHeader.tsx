@@ -71,11 +71,11 @@ export function SiteHeader({ bundle, topBar }: { bundle: SiteBundle; topBar?: { 
 function NavItem({ item, bundle }: { item: MenuItem; bundle: SiteBundle }) {
   const slug = bundle.site.slug;
   const cls = "flex items-center gap-1 whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-semibold uppercase tracking-wide text-[var(--color-secondary)] hover:text-[var(--color-primary)]";
-  if (!item.children?.length) return <Link href={localSiteHref(slug, item.href)} className={cls}>{globalText(item.label, bundle)}{item.badge && <span className="site-badge ml-1 rounded px-1.5 py-0.5 text-[10px]">{item.badge}</span>}</Link>;
+  if (!item.children?.length) return <Link href={localSiteHref(slug, item.href)} className={cls}>{globalText(item.label, bundle)}</Link>;
   return (
     <div className="nav-dd">
       <Link href={localSiteHref(slug, item.href)} className={cls}>
-        {globalText(item.label, bundle)} {item.badge && <span className="site-badge px-1.5 py-0.5 text-[10px]">{item.badge}</span>} <ChevronIcon className="h-3.5 w-3.5" />
+        {globalText(item.label, bundle)}  <ChevronIcon className="h-3.5 w-3.5" />
       </Link>
       <div className="nav-dd-menu absolute left-0 top-full min-w-64 rounded-site border border-gray-100 bg-white p-2 shadow-xl">
         {item.children.map((c) => (
@@ -105,8 +105,8 @@ function AngledHeader({ bundle }: { bundle: SiteBundle }) {
         </Link>
         <nav className="micks-primary-nav" aria-label="Main navigation">
           {links.map((item) => <div key={item.label + item.href} className="micks-nav-entry">
-            <Link href={localSiteHref(bundle.site.slug, item.href)} className="micks-nav-link">{globalText(item.label, bundle)}{item.children?.length ? <ChevronIcon className="h-4 w-4" /> : null}{item.badge && <span className="site-badge rounded px-1 text-[10px]">{item.badge}</span>}</Link>
-            {item.children?.length ? <div className="micks-dropdown">{item.children.map((child) => <Link key={child.href} href={localSiteHref(bundle.site.slug, child.href)} className="block px-3 py-2 text-sm hover:bg-slate-100">{globalText(child.label, bundle)}{child.badge && <span className="site-badge ml-2 rounded px-1 text-[10px]">{child.badge}</span>}</Link>)}</div> : null}
+            <Link href={localSiteHref(bundle.site.slug, item.href)} className="micks-nav-link">{globalText(item.label, bundle)}{item.children?.length ? <ChevronIcon className="h-4 w-4" /> : null}</Link>
+            {item.children?.length ? <div className="micks-dropdown">{item.children.map((child) => <Link key={child.href} href={localSiteHref(bundle.site.slug, child.href)} className="block px-3 py-2 text-sm hover:bg-slate-100">{globalText(child.label, bundle)}</Link>)}</div> : null}
           </div>)}
         </nav>
         {settings?.phone && <a href={telHref(settings.phone)} className="micks-phone-panel" aria-label={`Call ${settings.phone}`}>

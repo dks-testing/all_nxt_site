@@ -86,7 +86,22 @@ export default async function Page({ params, searchParams }: Props) {
     // content, visibility, and ordering stay editable. Remaining replicas are
     // migrated separately.
     const micksPages = ["about-us", "services", "specials", "testimonials", "make-an-appointment"];
-    if (design.headerStyle === "angled" && micksPages.includes(r.slug)) return <MicksContentPage pageSlug={r.slug} bundle={bundle} ctx={ctx} />;
+    if (design.headerStyle === "angled" && micksPages.includes(r.slug)) {
+      // Keep the reference-design page template, but render any additional CMS
+      // sections instead of silently dropping them on these legacy routes.
+      const templateSections: Record<string, ReadonlySet<string>> = {
+        "about-us": new Set(["hero", "about"]),
+        services: new Set(["hero", "services_grid"]),
+        specials: new Set(["hero", "specials"]),
+        testimonials: new Set(["hero", "reviews"]),
+        "make-an-appointment": new Set(["hero", "booking_form", "contact_map"]),
+      };
+      const extraSections = sections.filter((section) => !templateSections[r.slug]?.has(section.type));
+      return <>
+        <MicksContentPage pageSlug={r.slug} bundle={bundle} ctx={ctx} />
+        {extraSections.length > 0 && <RenderSections sections={extraSections} ctx={ctx} bundle={bundle} pageSlug={r.slug} />}
+      </>;
+    }
     return <RenderSections sections={sections} ctx={ctx} bundle={bundle} pageSlug={r.slug} />;
   }
 
