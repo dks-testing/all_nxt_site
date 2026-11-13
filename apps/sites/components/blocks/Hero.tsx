@@ -49,8 +49,8 @@ export async function Hero({ ctx, bundle, props, index, pageSlug, integratedTrus
                 {third && <Link className="micks-hero-button" href={localSiteHref(bundle.site.slug, third.href)}><span>{third.label}</span></Link>}
               </div>
               {(location || s?.phone) && <div className="micks-contact-strips">
-                {location && <div className="micks-contact-strip"><PinIcon className="inline-block h-4 w-4" /> {location}</div>}
-                {s?.phone && <a href={telHref(s.phone)} className="micks-contact-strip"><PhoneIcon className="inline-block h-4 w-4" /> {s.phone}</a>}
+                {location && <div className="micks-contact-strip"><PinIcon className="inline-block h-4 w-4" /><span>{location}</span></div>}
+                {s?.phone && <a href={telHref(s.phone)} className="micks-contact-strip"><PhoneIcon className="inline-block h-4 w-4" /><span>{s.phone}</span></a>}
               </div>}
             </div>
             {(props.showRating || props.reviewImageUrl || sharedCertifications.length > 0) && <aside className="micks-home-social-proof" aria-label="Ratings and certifications">

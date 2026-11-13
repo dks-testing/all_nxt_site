@@ -126,7 +126,7 @@ export function Embed({ bundle, props, id }: BlockComponentProps<"embed">) {
             <div className="micks-tool-card">
               {props.cta ? <Link href={localSiteHref(bundle.site.slug, globalCtaHref(getDesign(bundle.theme ?? {}), props.cta.href, props.cta.label))}>AI DIAGNOSTIC TOOL</Link> : <strong>AI DIAGNOSTIC TOOL</strong>}
             </div>
-            <p className="micks-tool-description">Try our AI diagnostic tool for an instant initial check before coming in.<br />Free, efficient, and time-saving.</p>
+            {props.toolDescription && <p className="micks-tool-description">{props.toolDescription}</p>}
             {(props.offerHeading || props.offerBody) && <div className="micks-ai-offer"><strong>{props.offerHeading}</strong>{props.offerBody && <span>{props.offerBody}</span>}</div>}
           </div>
           {props.imageUrl && <div className="micks-feature-image">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={props.imageUrl} alt={`${bundle.settings?.businessName ?? bundle.site.name} diagnostic specialist`} /></div>}

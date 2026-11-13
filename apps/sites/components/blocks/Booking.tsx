@@ -38,7 +38,7 @@ export function MicksContactBooking({ bundle, contactProps, bookingProps }: {
     <div className="container-site micks-contact-booking-grid">
       <div className="micks-contact-column">
         <h2>Contact Us</h2>
-        {address && <iframe title={`Map to ${settings?.businessName ?? "us"}`} src={`https://maps.google.com/maps?q=${encodeURIComponent(address)}&z=15&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />}
+        {address && <iframe title={`Map to ${settings?.businessName ?? "us"}`} src={`https://www.google.com/maps?q=${encodeURIComponent(address)}&z=15&output=embed`} width="600" height="360" loading="eager" allowFullScreen referrerPolicy="no-referrer-when-downgrade" />}
         <h3>{contactProps.heading}</h3>
         <ul>
           {address && <li><strong>Address:</strong> {address}</li>}

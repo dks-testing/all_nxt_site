@@ -8,7 +8,7 @@ import { PhoneIcon, PinIcon, ClockIcon } from "./Icons";
 import { localSiteHref } from "@/lib/url";
 import { getDesign } from "@platform/db/theme";
 import { Stars } from "./Icons";
-import { CertificationBadges } from "./CertificationBadge";
+import { CertificationBadge, getActiveCertificationBadges } from "./CertificationBadge";
 import { globalText } from "@/lib/global-content";
 
 export function SiteFooter({ bundle }: { bundle: SiteBundle }) {
@@ -102,13 +102,15 @@ function MicksFooter({ bundle }: { bundle: SiteBundle }) {
   const poweredLink = design.footerPoweredLink;
   const poweredText = globalText(design.footerPoweredText || "Powered by Raise a Hood", bundle);
   const facebookText = globalText(design.footerFacebookText || "Follow us on Facebook", bundle);
+  const footerBadges = getActiveCertificationBadges(design);
   return <>
     <footer className="micks-site-footer">
       {showRedline && <div className="micks-footer-redline" />}
-      {showLogos && <div className="micks-footer-logos container-site">
+      {showLogos && <div className="micks-footer-logo-band"><div className="micks-footer-logos container-site">
+        <div className="micks-footer-badge-side">{footerBadges.slice(0, 1).map((badge) => <CertificationBadge key={badge.slot} design={design} slot={badge.slot} />)}</div>
         {theme?.logoUrl ? <img src={theme.logoUrl} alt={name} className="micks-footer-main-logo" /> : <strong>{name}</strong>}
-        <CertificationBadges design={design} className="micks-footer-certifications" />
-      </div>}
+        <div className="micks-footer-badge-side">{footerBadges.slice(1).map((badge) => <CertificationBadge key={badge.slot} design={design} slot={badge.slot} />)}</div>
+      </div></div>}
       <div className="micks-footer-main" style={{ backgroundImage: `linear-gradient(#0b0b0bd9,#0b0b0bd9),url(${JSON.stringify(footerBackground)})` }}>
         <div className="container-site micks-footer-main-grid">
           <div>
@@ -123,11 +125,16 @@ function MicksFooter({ bundle }: { bundle: SiteBundle }) {
           </div>
           <div className="micks-footer-trust">
             <h2>Trust</h2>
-            <strong>{name}</strong>
-            {settings?.ratingValue && <div><b>{settings.ratingValue}</b> <Stars value={Number(settings.ratingValue)} /></div>}
-            {settings?.ratingCount && <p>Based on {settings.ratingCount} reviews</p>}
-            {googleUrl && <a className="micks-footer-review-link" href={googleUrl} target="_blank" rel="noopener noreferrer">review us on Google</a>}
-            <h3>“Trusted by drivers in Worthington”</h3>
+            <div className="micks-footer-rating">
+              <img className="micks-footer-rating-avatar" src={footerBackground} alt="" />
+              <div className="micks-footer-rating-details">
+                <strong>{name}</strong>
+                {settings?.ratingValue && <div className="micks-footer-rating-stars"><b>{settings.ratingValue}</b><Stars value={Number(settings.ratingValue)} /></div>}
+                {settings?.ratingCount && <p>Based on {settings.ratingCount} reviews</p>}
+                {googleUrl && <a className="micks-footer-review-link" href={googleUrl} target="_blank" rel="noopener noreferrer">review us on <span className="micks-footer-google-mark" aria-label="Google">G</span></a>}
+              </div>
+            </div>
+            <h3>{`“Trusted by drivers in ${settings?.address?.city || "Worthington"}”`}</h3>
           </div>
         </div>
       </div>

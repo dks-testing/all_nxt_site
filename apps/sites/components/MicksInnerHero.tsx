@@ -26,8 +26,8 @@ export function MicksInnerHero({ bundle, heading, primaryCta, imageUrl, variant 
         <h1>{heading}</h1>
         <div className="micks-shared-banner-actions">{actions.map((action) => <Link key={action.label} href={localSiteHref(bundle.site.slug, action.href)} className="micks-hero-button"><span>{action.label}</span></Link>)}</div>
         <div className="micks-contact-strips">
-          {address && <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`} className="micks-contact-strip"><PinIcon className="h-4 w-4" />{address}</a>}
-          {settings?.phone && <a href={telHref(settings.phone)} className="micks-contact-strip"><PhoneIcon className="h-4 w-4" />{settings.phone}</a>}
+          {address && <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`} className="micks-contact-strip"><PinIcon className="h-4 w-4" /><span>{address}</span></a>}
+          {settings?.phone && <a href={telHref(settings.phone)} className="micks-contact-strip"><PhoneIcon className="h-4 w-4" /><span>{settings.phone}</span></a>}
         </div>
       </div>
     </section>;

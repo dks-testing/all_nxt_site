@@ -57,7 +57,7 @@ export function SectionFields({ type, props, siteId, media, publicOrigin, onChan
       {groups.map((group) => <button key={group} type="button" role="tab" aria-selected={active === group} onClick={() => setActive(group)} className={`rounded-lg px-3 py-2 text-xs font-semibold transition ${active === group ? "bg-white text-indigo-700 shadow-sm" : "text-slate-500 hover:text-slate-900"}`}>{group}</button>)}
     </div>
     {groups.map((group) => <div key={group} className={`grid gap-4 sm:grid-cols-2 ${active === group ? "" : "hidden"}`} aria-hidden={active !== group}>
-      {fields.filter((field) => fieldGroup(field) === group).map((f) => <FieldInput key={f.path} f={f} value={get(props, f.path)} siteId={siteId} media={media} publicOrigin={publicOrigin} changed={changed} />)}
+      {fields.filter((field) => fieldGroup(field) === group).map((f) => <FieldInput key={f.path} f={f} value={get(props, f.path) ?? (type === "embed" && props.variant === "micks-ai" && f.path === "toolDescription" ? "Try our AI diagnostic tool for an instant initial check before coming in.\nFree, efficient, and time-saving." : undefined)} siteId={siteId} media={media} publicOrigin={publicOrigin} changed={changed} />)}
     </div>)}
     {active === "Advanced" && <p className="mt-4 rounded-lg bg-amber-50 p-3 text-xs text-amber-800">Advanced settings can affect layout or third-party integrations. Change them only when needed.</p>}
   </div>;

@@ -88,10 +88,13 @@ export async function Reviews({ ctx, bundle, props }: BlockComponentProps<"revie
             </aside>
             {items.length > 0 && <div className="micks-review-carousel">
               {items.slice(0, 3).map((t) => <figure key={t.id} className="micks-review-card">
-                <figcaption><span className="micks-review-avatar">{t.author.charAt(0)}</span><strong>{t.author}</strong><b className="micks-google-mark">G</b></figcaption>
-                {t.reviewDate && <small>{t.reviewDate}</small>}
-                <Stars value={t.rating} />
-                <blockquote>{globalText(t.body, bundle)}</blockquote>
+                <figcaption>
+                  <span className="micks-review-avatar">{t.author.charAt(0)}</span>
+                  <div className="micks-review-author"><strong>{t.author}</strong>{t.reviewDate && <small>{t.reviewDate}</small>}</div>
+                  <svg className="micks-google-mark" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285f4" d="M43.61 24.46c0-1.36-.12-2.66-.35-3.92H24v7.43h11a9.4 9.4 0 0 1-4.08 6.18v5.14h6.61c3.87-3.56 6.08-8.81 6.08-14.83Z"/><path fill="#34a853" d="M24 44c5.51 0 10.13-1.83 13.51-4.96l-6.61-5.14c-1.83 1.23-4.17 1.97-6.9 1.97-5.32 0-9.84-3.59-11.46-8.43H5.7v5.3A20.4 20.4 0 0 0 24 44Z"/><path fill="#fbbc05" d="M12.54 27.44a12.3 12.3 0 0 1 0-7.88v-5.3H5.7a20 20 0 0 0 0 18.48l6.84-5.3Z"/><path fill="#ea4335" d="M24 11.13c3.01 0 5.69 1.03 7.82 3.05l5.86-5.86A19.64 19.64 0 0 0 24 3a20.4 20.4 0 0 0-18.3 11.26l6.84 5.3c1.62-4.84 6.14-8.43 11.46-8.43Z"/></svg>
+                </figcaption>
+                <Stars value={t.rating} className="h-[18px] w-[18px]" />
+                <blockquote tabIndex={0} aria-label={`Review by ${t.author}`}>{globalText(t.body, bundle)}</blockquote>
               </figure>)}
             </div>}
           </div>
@@ -148,8 +151,8 @@ export async function CaseStudies({ ctx, bundle, props }: BlockComponentProps<"c
           {items.map((c, index) => (
             <article key={c.id} className={micks ? "micks-case-card" : "rounded-site bg-white/5 p-6 ring-1 ring-white/10"}>
               {micks && <p className="micks-case-label">{props.labels[index] ?? "Repair result"}</p>}
-              {micks && c.imageUrl && <div className="micks-case-image">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={c.imageUrl} alt="" /></div>}
               <div className={micks ? "micks-case-body" : ""}>
+              {micks && c.imageUrl && <div className="micks-case-image">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={c.imageUrl} alt="" /></div>}
               <h3 className="mb-4 text-xl font-bold uppercase leading-tight text-[var(--color-accent)]">{globalText(c.title, bundle)}</h3>
               {micks ? <p className="micks-case-summary">{globalText([c.problem, c.diagnosis, c.fix].filter(Boolean).join(" "), bundle)}</p> : <dl className="space-y-3 text-sm text-white/85">
                 <div><dt className="font-bold uppercase text-white">Problem</dt><dd>{globalText(c.problem, bundle)}</dd></div>
@@ -220,9 +223,10 @@ export function ContactMap({ bundle, props }: BlockComponentProps<"contact_map">
         {addr && (
           <iframe
             title={`Map to ${s?.businessName ?? "us"}`}
-            src={`https://maps.google.com/maps?q=${encodeURIComponent(addr)}&z=15&output=embed`}
+            src={`https://www.google.com/maps?q=${encodeURIComponent(addr)}&z=15&output=embed`}
             className="min-h-80 w-full rounded-site border-0 shadow"
-            loading="lazy"
+            loading="eager"
+            allowFullScreen
             referrerPolicy="no-referrer-when-downgrade"
           />
         )}
