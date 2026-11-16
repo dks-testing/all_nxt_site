@@ -69,7 +69,9 @@ async function MicksServices({ bundle, ctx }: { bundle: SiteBundle; ctx: SiteCtx
       return <article key={service.id} style={{ backgroundImage: `linear-gradient(180deg,#0002 10%,#000e 100%),url(${JSON.stringify(image)})` }}>
         <h3>{service.name}</h3>
         {service.summary && <p>{globalText(service.summary, bundle)}</p>}
-        <Link href={localSiteHref(bundle.site.slug, `/${service.slug}/`)}><span>Read More</span></Link>
+        <Link href={localSiteHref(bundle.site.slug, `/${service.slug}/`)} style={{ transform: "skewX(var(--button-skew))" }}>
+          <span style={{ transform: "skewX(var(--button-text-skew))" }}>Read More</span>
+        </Link>
       </article>;
     })}</div>
   </div></section>;

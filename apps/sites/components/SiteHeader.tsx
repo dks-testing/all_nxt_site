@@ -5,6 +5,7 @@ import { PhoneIcon, MenuIcon, ChevronIcon } from "./Icons";
 import { getDesign } from "@platform/db/theme";
 import { localSiteHref } from "@/lib/url";
 import { globalText } from "@/lib/global-content";
+import { ActiveNavLink } from "./ActiveNavLink";
 
 export function SiteHeader({ bundle, topBar }: { bundle: SiteBundle; topBar?: { heading: string; ctaLabel: string | null; ctaUrl: string | null } | null }) {
   const { settings, theme, headerMenu } = bundle;
@@ -105,8 +106,8 @@ function AngledHeader({ bundle }: { bundle: SiteBundle }) {
         </Link>
         <nav className="micks-primary-nav" aria-label="Main navigation">
           {links.map((item) => <div key={item.label + item.href} className="micks-nav-entry">
-            <Link href={localSiteHref(bundle.site.slug, item.href)} className="micks-nav-link">{globalText(item.label, bundle)}{item.children?.length ? <ChevronIcon className="h-4 w-4" /> : null}</Link>
-            {item.children?.length ? <div className="micks-dropdown">{item.children.map((child) => <Link key={child.href} href={localSiteHref(bundle.site.slug, child.href)} className="block px-3 py-2 text-sm hover:bg-slate-100">{globalText(child.label, bundle)}</Link>)}</div> : null}
+            <ActiveNavLink href={localSiteHref(bundle.site.slug, item.href)} siteSlug={bundle.site.slug} childHrefs={item.children?.map((child) => child.href)}>{globalText(item.label, bundle)}{item.children?.length ? <ChevronIcon className="h-4 w-4" /> : null}</ActiveNavLink>
+            {item.children?.length ? <div className="micks-dropdown">{item.children.map((child) => <Link key={child.href} href={localSiteHref(bundle.site.slug, child.href)} className="micks-dropdown-link">{globalText(child.label, bundle)}</Link>)}</div> : null}
           </div>)}
         </nav>
         {settings?.phone && <a href={telHref(settings.phone)} className="micks-phone-panel" aria-label={`Call ${settings.phone}`}>

@@ -93,7 +93,8 @@ export default async function Page({ params, searchParams }: Props) {
         // The live About page ends with its crew/diagnostics content. Its old
         // CMS reviews and CTA blocks must not be appended after that template.
         "about-us": new Set(["hero", "about", "reviews", "cta"]),
-        services: new Set(["hero", "services_grid"]),
+        // The services template ends with the service cards; omit its legacy CTA banner.
+        services: new Set(["hero", "services_grid", "cta"]),
         specials: new Set(["hero", "specials"]),
         testimonials: new Set(["hero", "reviews"]),
         "make-an-appointment": new Set(["hero", "booking_form", "contact_map"]),
