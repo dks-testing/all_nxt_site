@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "./tires-smart-intro.css";
+@import "./diagnostics-smart-intro.css";
 
 /* Defaults; each site's theme overrides these at runtime via an injected :root block. */
 @theme {
@@ -2208,7 +2210,7 @@ details>summary::-webkit-details-marker {
 .micks-smart-support {
   margin: 24px auto 0;
   text-align: center;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .micks-smart-feature-experience .micks-smart-feature-grid>img {
@@ -2841,6 +2843,7 @@ details>summary::-webkit-details-marker {
   font-size: 12px;
   line-height: 23px;
 }
+.micks-smart-feature.section.micks-smart-feature-page-tires,
 .micks-smart-feature.section.micks-smart-feature-page-diagnostics{
   padding-top:30px;
 }
@@ -5609,6 +5612,10 @@ details>summary::-webkit-details-marker {
   gap: 65px;
   min-width: 0;
   margin-right: 50px;
+}
+.micks-smart-feature.section .micks-certification-group {
+    margin-right: 0;
+    gap: 150px;
 }
 
 .micks-certification-group>.micks-cert-badge,
