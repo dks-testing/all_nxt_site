@@ -86,7 +86,9 @@ export function SmartFeature({ bundle, props, pageSlug }: BlockComponentProps<"s
           {props.supportText && <p className="micks-smart-support">{props.supportText}</p>}
           {props.showCertifications && <CertificationBadges design={design} className="micks-smart-feature-certifications" />}
         </div>
-        {props.imageUrl && <img src={props.imageUrl} alt={imageAlt} />}
+        {props.imageUrl && (props.variant === "cta"
+          ? <div className="micks-smart-feature-media"><img src={props.imageUrl} alt={imageAlt} /></div>
+          : <img src={props.imageUrl} alt={imageAlt} />)}
       </div>
       {(props.calloutHeading || props.calloutBody) && <aside className="micks-smart-feature-callout">
         {props.calloutHeading && <strong>{props.calloutHeading}</strong>}

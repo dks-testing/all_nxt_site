@@ -2110,6 +2110,7 @@ details>summary::-webkit-details-marker {
   font-weight: 800;
 }
 
+.micks-smart-feature-copy-wrap>a>span,
 .micks-smart-tool-panel-copy>a>span {
   display: inline-block;
   transform: skewX(var(--button-text-skew, 9deg));
@@ -2220,9 +2221,9 @@ details>summary::-webkit-details-marker {
   grid-row: 1;
 }
 
-.micks-smart-feature-trust {
+/* .micks-smart-feature-trust {
   background: linear-gradient(180deg, #fff 0%, #dbe6f2 100%);
-}
+} */
 
 .micks-smart-feature-cta {
   padding-inline: 16px;
@@ -2409,7 +2410,7 @@ details>summary::-webkit-details-marker {
    these rules reproduce the current Elementor reference without tenant-wide
    overrides. */
 .micks-smart-feature.section {
-  padding-block: 34px;
+  padding-block: 0px;
 }
 
 .micks-smart-feature>.container-site {
@@ -2420,6 +2421,7 @@ details>summary::-webkit-details-marker {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0;
   align-items: stretch;
+  padding: 10px 0;
 }
 
 .micks-smart-feature h2 {
@@ -2445,40 +2447,58 @@ details>summary::-webkit-details-marker {
   line-height: 28px;
 }
 
-.micks-smart-feature-intro {
-  padding-top: 0;
+.micks-smart-feature-intro.section {
+  padding-block: 0 16px;
+}
+
+.micks-smart-feature-intro>.container-site {
+  padding-inline: 10px;
+}
+
+.micks-smart-feature-intro .micks-smart-feature-grid {
+  grid-template-columns: minmax(0, 1.03fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
 }
 
 .micks-smart-feature-intro .micks-smart-kicker {
-  width: 90%;
-  margin: 20px auto;
+  width: 100%;
+  margin: 0 auto 20px;
   color: #000;
   text-align: center;
   font-family: var(--font-heading);
   font-size: 52px;
   font-weight: 400;
-  line-height: 52px;
+  line-height: 60px;
   letter-spacing: 0;
 }
 
 .micks-smart-feature-intro .micks-smart-feature-copy-wrap {
-  padding-right: 5px;
+  padding-right: 0;
 }
 
 .micks-smart-feature-intro .micks-smart-feature-copy-wrap>h2 {
-  width: 89%;
+  width: min(100%, 360px);
+}
+
+.micks-smart-feature-intro .micks-smart-feature-copy p {
+  font-size: 16px;
+  line-height: 23px;
 }
 
 .micks-smart-feature-intro .micks-smart-feature-copy-wrap>a {
   display: flex;
   width: max-content;
-  margin: 8px auto 10px;
+  max-width: calc(100% - 16px);
+  margin: 8px auto 14px;
+  text-align: center;
 }
 
 .micks-smart-feature-intro .micks-smart-feature-grid>img {
   width: 100%;
   height: auto;
   aspect-ratio: 835 / 1024;
+  margin-top: 35px;
   border-radius: 40px;
   object-fit: cover;
 }
@@ -2486,8 +2506,8 @@ details>summary::-webkit-details-marker {
 .micks-smart-feature-intro .micks-smart-feature-callout {
   display: block;
   width: 90%;
-  margin: 0 auto;
-  padding: 15px 25px;
+  margin: 0;
+  padding: 20px 25px;
   border-radius: 10px;
   color: #fff;
   background: #6a8fb5;
@@ -2495,7 +2515,7 @@ details>summary::-webkit-details-marker {
 
 .micks-smart-feature-intro .micks-smart-feature-callout strong {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 16px;
   font-size: 24px;
   font-weight: 600;
   line-height: 34px;
@@ -2510,7 +2530,8 @@ details>summary::-webkit-details-marker {
 
 .micks-smart-feature-intro .micks-smart-support {
   width: 90%;
-  margin: 7px auto 0;
+  margin: 20px 0 0;
+  text-align: center;
   font-size: 14px;
   font-weight: 500;
   line-height: 23px;
@@ -2594,11 +2615,20 @@ details>summary::-webkit-details-marker {
   line-height: 23px;
 }
 
-.micks-smart-feature-experience {
-  padding-top: 4px;
+.micks-smart-feature-experience.section,
+.micks-smart-feature-cta.section {
+  /* padding-block: 0 10px; */
+}
+
+.micks-smart-feature-experience+.micks-smart-feature-cta+.micks-smart-feature-trust.section {
+  padding-top: 0;
 }
 
 .micks-smart-feature-experience .micks-smart-feature-grid {
+  grid-template-columns: minmax(0, 1.04fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: center;
+  padding: 20px;
   overflow: hidden;
   border-radius: 40px;
   background: linear-gradient(180deg, #fff 0%, rgb(106 143 181 / 30%) 100%);
@@ -2607,36 +2637,42 @@ details>summary::-webkit-details-marker {
 .micks-smart-feature-experience .micks-smart-feature-copy-wrap {
   grid-column: 1;
   grid-row: 1;
-  padding: 50px 30px 30px;
+  padding: 30px 20px 30px 0;
 }
 
 .micks-smart-feature-experience .micks-smart-feature-grid>img {
   grid-column: 2;
   grid-row: 1;
   width: 100%;
-  height: 100%;
-  min-height: 360px;
+  height: 340px;
+  min-height: 0;
   border-radius: 40px;
   object-fit: cover;
 }
 
 .micks-smart-feature-experience .micks-smart-support {
-  margin: 5px 0 0;
+  margin: 20px 0 0;
   text-align: left;
   font-size: 12px;
   font-weight: 500;
   line-height: 23px;
 }
 
+.micks-smart-feature-experience .micks-smart-feature-copy p,
+.micks-smart-feature-cta .micks-smart-feature-copy p {
+  font-size: 17px;
+  line-height: 23px;
+}
+
 .micks-smart-feature-cta .micks-smart-feature-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 20px;
 }
 
 .micks-smart-feature-cta>.container-site {
   max-width: 1140px;
-  padding: 0 16px;
+  padding: 0;
   color: #0c0c0c;
   background: transparent;
 }
@@ -2649,13 +2685,13 @@ details>summary::-webkit-details-marker {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 25px 25px;
+  padding: 40px 25px;
   border-radius: 40px;
   background: #f0f0f0;
   text-align: center;
 }
 
-.micks-smart-feature-cta .micks-smart-feature-grid>img {
+.micks-smart-feature-cta .micks-smart-feature-media {
   box-sizing: border-box;
   grid-column: 1;
   grid-row: 1;
@@ -2664,6 +2700,13 @@ details>summary::-webkit-details-marker {
   padding: 25px;
   border-radius: 40px;
   background: #f0f0f0;
+}
+
+.micks-smart-feature-media>img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 40px;
   object-fit: cover;
 }
 
@@ -2672,8 +2715,17 @@ details>summary::-webkit-details-marker {
   margin-inline: 0;
 }
 
+.micks-smart-feature-cta .micks-smart-feature-copy p:last-child {
+  margin-bottom: 0;
+}
+
+.micks-smart-feature-cta .micks-smart-feature-copy-wrap>a {
+  max-width: calc(100% - 16px);
+  margin-top: 12px;
+}
+
 .micks-smart-feature-cta .micks-smart-support {
-  margin: 8px 0 0;
+  margin: 18px 0 0;
   font-size: 12px;
   line-height: 23px;
 }
@@ -2734,6 +2786,7 @@ details>summary::-webkit-details-marker {
 .micks-smart-feature-testimonial .micks-smart-feature-grid {
   align-items: center;
   gap: 20px;
+  padding:40px 0;
 }
 
 .micks-smart-feature-testimonial .micks-smart-feature-copy-wrap {
@@ -2788,7 +2841,12 @@ details>summary::-webkit-details-marker {
   font-size: 12px;
   line-height: 23px;
 }
-
+.micks-smart-feature.section.micks-smart-feature-page-diagnostics{
+  padding-top:30px;
+}
+.micks-smart-feature-cta.section.micks-smart-feature-page-diagnostics{
+  padding-top:0px;
+}
 @media (max-width: 1024px) {
   .micks-smart-feature-intro .micks-smart-kicker,
   .micks-smart-feature-tool .micks-smart-feature-heading h2 {
@@ -2866,7 +2924,7 @@ details>summary::-webkit-details-marker {
   }
 
   .micks-smart-feature-experience .micks-smart-feature-grid>img,
-  .micks-smart-feature-cta .micks-smart-feature-grid>img,
+  .micks-smart-feature-cta .micks-smart-feature-media,
   .micks-smart-feature-final .micks-smart-feature-grid>img {
     grid-column: 1;
     grid-row: 1;
@@ -2899,7 +2957,7 @@ details>summary::-webkit-details-marker {
   min-height: 390px;
 }
 
-.micks-smart-feature-page-tires.micks-smart-feature-cta .micks-smart-feature-grid>img {
+.micks-smart-feature-page-tires.micks-smart-feature-cta .micks-smart-feature-media {
   height: 390px;
 }
 
@@ -2908,7 +2966,7 @@ details>summary::-webkit-details-marker {
     min-height: 0;
   }
 
-  .micks-smart-feature-page-tires.micks-smart-feature-cta .micks-smart-feature-grid>img {
+  .micks-smart-feature-page-tires.micks-smart-feature-cta .micks-smart-feature-media {
     height: auto;
   }
 }
@@ -3312,7 +3370,7 @@ details>summary::-webkit-details-marker {
   transform: skewX(var(--button-skew, -9deg));
   text-decoration: none;
   text-transform: uppercase;
-  font-size: 14px;
+  font-size: 18px;
   font-style: italic;
   font-weight: 800;
 }
@@ -3450,7 +3508,7 @@ details>summary::-webkit-details-marker {
 }
 
 .micks-crew-gallery>div {
-  max-width: 900px;
+  max-width: 1140px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
@@ -3459,7 +3517,7 @@ details>summary::-webkit-details-marker {
 .micks-crew-gallery img {
   display: block;
   width: 100%;
-  height: 360px;
+  height: 450px;
   object-fit: cover;
 }
 
@@ -3528,7 +3586,7 @@ details>summary::-webkit-details-marker {
 
 .micks-know-cta>div,
 .micks-smart-cta>div {
-  max-width: 910px;
+  max-width: 1140px;
   margin: auto;
   padding: 55px 30px;
   border-radius: 31px;
@@ -5899,6 +5957,42 @@ details>summary::-webkit-details-marker {
   }
 }
 
+@media (max-width: 850px) {
+  .micks-owner {
+    padding-top: 32px;
+  }
+
+  .micks-owner .micks-live-title {
+    margin-bottom: 30px;
+  }
+
+  .micks-owner-grid {
+    gap: 30px;
+  }
+}
+
+@media (max-width: 560px) {
+  .micks-owner .micks-live-title {
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .micks-owner .micks-about-quote,
+  .micks-owner .micks-about-quote.micks-quote-svg {
+    flex-basis: 72px;
+    width: 72px;
+    height: 58px;
+  }
+
+  .micks-owner .micks-live-title h2 {
+    font-size: 36px;
+  }
+
+  .micks-owner-grid p {
+    font-size: 15px;
+  }
+}
+
 /* Special offers: live-site inspired featured-first layout, populated from each site's Specials collection. */
 .micks-specials-page {
   padding-block: clamp(44px, 5vw, 78px);
@@ -6019,10 +6113,12 @@ details>summary::-webkit-details-marker {
    /diagnostics/ so shared SmartFeature variants on other pages are unchanged. */
 .micks-smart-feature-final.micks-smart-feature-page-diagnostics {
   background: #fff;
+  margin-bottom:10px;
 }
 
 .micks-smart-feature-final.micks-smart-feature-page-diagnostics .micks-smart-feature-grid {
   background: linear-gradient(180deg, #fff 0%, #d2dfee 100%);
+  padding:20px;
 }
 
 .micks-smart-feature-final.micks-smart-feature-page-diagnostics .micks-smart-feature-copy-wrap > a {
