@@ -3457,9 +3457,68 @@ details>summary::-webkit-details-marker {
 }
 
 .micks-crew-gallery img {
+  display: block;
   width: 100%;
   height: 360px;
   object-fit: cover;
+}
+
+.micks-crew-card {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  background: #303133;
+  outline: none;
+}
+
+.micks-crew-card-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  color: #fff;
+  background: rgba(24, 25, 27, .88);
+  text-align: center;
+  transform: translateY(100%);
+  transition: transform .4s ease;
+}
+
+.micks-crew-card:hover .micks-crew-card-overlay,
+.micks-crew-card:focus .micks-crew-card-overlay,
+.micks-crew-card:focus-within .micks-crew-card-overlay {
+  transform: translateY(0);
+}
+
+.micks-crew-card:focus-visible {
+  outline: 3px solid #6a8fb5;
+  outline-offset: 3px;
+}
+
+.micks-crew-card-overlay h3 {
+  margin: 0 0 10px;
+  font-family: var(--font-body);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.micks-crew-card-overlay p {
+  max-width: 245px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .micks-crew-card-overlay {
+    transition: none;
+  }
 }
 
 .micks-know-cta {

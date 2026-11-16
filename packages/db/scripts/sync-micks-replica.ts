@@ -279,7 +279,7 @@ async function main() {
       aboutVehicleImageUrl: `${WP}/2026/04/blue-car.webp`,
       aboutCrewImageOneUrl: `${WP}/2026/04/micks-repair-worthington-mn-kelly-eggers.jpeg`,
       aboutCrewImageTwoUrl: `${WP}/2026/04/micks-repair-worthington-mn-terry-eggers.jpeg`,
-      aboutCrewImageThreeUrl: `${WP}/2026/04/micks-repair-worthington-mn-customer-checkout.jpeg`,
+      aboutCrewImageThreeUrl: `${WP}/2026/04/micks-repair-worthington-mn-cory-probst.jpeg`,
       aboutWorkItems: [
         { title: "Straight-Talk Quotes", body: "No surprise add-ons; you approve every line before we touch a bolt." },
         { title: "Speed With Integrity", body: "Same-day turnaround on most jobs; never at the cost of quality." },

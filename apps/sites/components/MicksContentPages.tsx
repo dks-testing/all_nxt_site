@@ -84,10 +84,41 @@ function MicksAbout({ bundle }: { bundle: SiteBundle }) {
   const owner = design.aboutOwnerImageUrl || `${WP}/2026/04/micks-repair-worthington-mn-mick-eggers.jpeg`;
   const team = design.aboutTeamImageUrl || `${WP}/2026/04/micks-repair-worthington-mn-team.jpeg`;
   const car = design.aboutVehicleImageUrl || `${WP}/2026/04/blue-car.webp`;
+  const legacyThirdCrewImage = `${WP}/2026/04/micks-repair-worthington-mn-customer-checkout.jpeg`;
+  const configuredThirdCrewImage = design.aboutCrewImageThreeUrl;
   const crew = [
-    design.aboutCrewImageOneUrl || `${WP}/2026/04/micks-repair-worthington-mn-kelly-eggers.jpeg`,
-    design.aboutCrewImageTwoUrl || `${WP}/2026/04/micks-repair-worthington-mn-terry-eggers.jpeg`,
-    design.aboutCrewImageThreeUrl || `${WP}/2026/04/micks-repair-worthington-mn-customer-checkout.jpeg`,
+    {
+      name: "Kelly Eggers",
+      description: "A second-generation member of the family business, carrying forward Mick’s commitment to honest, dependable service.",
+      imageUrl: design.aboutCrewImageOneUrl || `${WP}/2026/04/micks-repair-worthington-mn-kelly-eggers.jpeg`,
+    },
+    {
+      name: "Terry Eggers",
+      description: "Part of the next generation leading the shop with straightforward advice and a focus on doing every job right.",
+      imageUrl: design.aboutCrewImageTwoUrl || `${WP}/2026/04/micks-repair-worthington-mn-terry-eggers.jpeg`,
+    },
+    {
+      name: "Cory Probst",
+      description: "A trusted member of the crew focused on careful workmanship and reliable automotive service.",
+      imageUrl: !configuredThirdCrewImage || configuredThirdCrewImage === legacyThirdCrewImage
+        ? `${WP}/2026/04/micks-repair-worthington-mn-cory-probst.jpeg`
+        : configuredThirdCrewImage,
+    },
+    {
+      name: "Service Team",
+      description: "Helping customers with clear communication from check-in through pickup.",
+      imageUrl: `${WP}/2026/06/team-3.png`,
+    },
+    {
+      name: "Repair Team",
+      description: "Skilled technicians committed to quality repairs and ongoing training.",
+      imageUrl: `${WP}/2026/06/team-1.png`,
+    },
+    {
+      name: "Shop Team",
+      description: "Hands-on care supported by modern tools, experience, and attention to detail.",
+      imageUrl: `${WP}/2026/06/team-2.png`,
+    },
   ];
   const workItems = design.aboutWorkItems?.length ? design.aboutWorkItems : [
     { title: "Straight-Talk Quotes", body: "No surprise add-ons; you approve every line before we touch a bolt." },
@@ -110,7 +141,7 @@ function MicksAbout({ bundle }: { bundle: SiteBundle }) {
     <section className="micks-mission section"><div className="container-site micks-mission-grid"><div><h2>One Shop, One Mission</h2><h3>Keep our neighbors rolling with honest,<br />high-quality auto care.</h3><div className="micks-mission-table"><b>Location</b><b>Phone</b><b>Hours</b><span>{address}</span><a href={telHref(settings?.phone)}>{settings?.phone}</a><span>{groupHours(settings?.hours)[0]?.days}: {groupHours(settings?.hours)[0]?.time}</span></div><div className="micks-live-buttons">{settings?.phone && <a href={telHref(settings.phone)}><span>Call Now</span></a>}<Link href={localSiteHref(bundle.site.slug, design.scheduleCtaHref || "/make-an-appointment/")}><span>Schedule Service</span></Link></div></div><img src={car} alt="Vehicle" /></div></section>
     <section className="micks-how-we-work section"><div className="container-site"><h2>How We Work</h2><img src={team} alt={`The ${name} team`} /><div className="micks-work-grid">{workItems.map(({ title, body }) => <div key={title}><StepListIcon design={design} label={title} /><b>{title}</b><span>{body}</span></div>)}</div></div></section>
     <section className="micks-owner section"><div className="container-site"><div className="micks-live-title"><QuoteMark design={design} className="micks-about-quote" /><h2>Meet the Crew</h2></div><div className="micks-owner-grid"><img src={owner} alt="Mick Eggers" /><div><p><strong>Mick Eggers</strong><br />Founder of {name}, Mick Eggers has spent his entire life building a reputation in the Worthington automotive community. For over 35 years, he has led a shop grounded in honesty, transparency, and long-term customer relationships. Today, he’s joined by his two sons, Kelly and Terry, continuing a tradition that has become a trusted name for generations of local families.</p><p>Spend a few minutes in the lobby and you’ll see what sets this place apart. It’s not uncommon to hear a technician, or Mick himself, advising a customer not to move forward with a repair when the cost doesn’t make sense for the vehicle.</p><p>Mick Eggers represents a rare combination of technical expertise, relentless work ethic, and unwavering integrity. It’s what defines {name} and why it continues to earn the trust of the community year after year.</p></div></div></div></section>
-    <section className="micks-crew-gallery"><div className="container-site">{crew.map((src, index) => <img key={src} src={src} alt={["Kelly Eggers", "Terry Eggers", `${name} technician`][index]} />)}</div></section>
+    <section className="micks-crew-gallery"><div className="container-site">{crew.map((member) => <article className="micks-crew-card" key={member.name} tabIndex={0} aria-label={`${member.name}: ${member.description}`}><img src={member.imageUrl} alt={member.name} /><div className="micks-crew-card-overlay"><h3>{member.name}</h3><p>{member.description}</p></div></article>)}</div></section>
     <section className="micks-know-cta section"><div><h2>Know Before You Go.</h2><p>Describe what you’re seeing and get a clear answer in seconds.</p><Link href={localSiteHref(bundle.site.slug, design.diagnosticsCtaHref || "/diagnostics/")}><span>Start Diagnosis</span></Link></div></section>
   </>;
 }

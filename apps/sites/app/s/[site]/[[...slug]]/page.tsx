@@ -90,7 +90,9 @@ export default async function Page({ params, searchParams }: Props) {
       // Keep the reference-design page template, but render any additional CMS
       // sections instead of silently dropping them on these legacy routes.
       const templateSections: Record<string, ReadonlySet<string>> = {
-        "about-us": new Set(["hero", "about"]),
+        // The live About page ends with its crew/diagnostics content. Its old
+        // CMS reviews and CTA blocks must not be appended after that template.
+        "about-us": new Set(["hero", "about", "reviews", "cta"]),
         services: new Set(["hero", "services_grid"]),
         specials: new Set(["hero", "specials"]),
         testimonials: new Set(["hero", "reviews"]),

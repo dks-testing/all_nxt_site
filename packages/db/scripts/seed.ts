@@ -116,7 +116,7 @@ async function main() {
       aboutVehicleImageUrl: `${WP}/2026/04/blue-car.webp`,
       aboutCrewImageOneUrl: `${WP}/2026/04/micks-repair-worthington-mn-kelly-eggers.jpeg`,
       aboutCrewImageTwoUrl: `${WP}/2026/04/micks-repair-worthington-mn-terry-eggers.jpeg`,
-      aboutCrewImageThreeUrl: `${WP}/2026/04/micks-repair-worthington-mn-customer-checkout.jpeg`,
+      aboutCrewImageThreeUrl: `${WP}/2026/04/micks-repair-worthington-mn-cory-probst.jpeg`,
       aboutWorkItems: [
         { title: "Straight-Talk Quotes", body: "No surprise add-ons; you approve every line before we touch a bolt." },
         { title: "Speed With Integrity", body: "Same-day turnaround on most jobs; never at the cost of quality." },
@@ -291,8 +291,6 @@ async function main() {
       sections: [
         ["hero", { heading: "About Mick's Repair", subheading: "Family owned in downtown Worthington for over 35 years.", showRating: true, badges: [] }],
         ["about", { heading: "Run by Mick Eggers and his sons, Kelly and Terry", body: "We focus on accurate diagnosis, plain-language explanations and repairs done right the first time. No pressure and no unnecessary work.\n\nYou approve every line of your quote before we start. Our ASE-certified technicians use factory-level diagnostic tools, and we aim for same-day turnaround on most jobs.\n\nEvery qualifying repair is backed by a 12-month/12,000-mile nationwide warranty, and pickup and delivery is always free in town.", highlights: ["ASE-certified technicians", "Factory-level diagnostics", "Same-day turnaround on most jobs", "Free pickup and delivery"] }],
-        ["reviews", { heading: "Reviews", limit: 6 }],
-        ["cta", { heading: "Ready when you are", body: "Book online or call the shop.", cta: { label: "Schedule Service", href: "/make-an-appointment/" }, variant: "dark" }],
       ],
     },
     {
