@@ -2286,7 +2286,7 @@ details>summary::-webkit-details-marker {
 }
 
 .micks-footer-bottom>div {
-  min-height: 50px;
+  min-height: 62px;
 }
 
 .micks-footer-powered,
@@ -2296,15 +2296,27 @@ details>summary::-webkit-details-marker {
   gap: 9px;
 }
 
+.micks-footer-legal {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .micks-footer-powered img {
   width: auto;
-  max-width: 128px;
-  height: 30px;
+  max-width: 150px;
+  height: 24px;
   object-fit: contain;
 }
 
-.micks-footer-facebook b {
-  margin-left: 0;
+.micks-footer-facebook-icon {
+  width: 48px;
+  height: 48px;
+  fill: #050505;
+}
+
+.micks-footer-facebook {
+  justify-content: flex-end;
 }
 
 @media (max-width: 850px) {
@@ -2333,8 +2345,12 @@ details>summary::-webkit-details-marker {
   }
 
   .micks-footer-bottom>div {
-    flex-wrap: wrap;
+    grid-template-columns: 1fr;
     padding-block: 12px;
+  }
+
+  .micks-footer-facebook {
+    justify-content: flex-start;
   }
 }
 
@@ -2956,22 +2972,23 @@ details>summary::-webkit-details-marker {
 }
 
 .micks-footer-main {
-  background-position: center;
+  background-position: bottom center;
   background-size: cover;
 }
 
 .micks-footer-main-grid {
   min-height: 295px;
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
-  gap: 60px;
+  grid-template-columns: 456px 342px;
+  justify-content: space-between;
+  gap: 0;
   align-items: center;
   max-width: 1140px;
 }
 
 .micks-footer-main h2 {
   margin: 0 0 24px;
-  font: 800 36px/1.1 var(--font-heading), sans-serif;
+  font: 400 36px/46px var(--font-heading), sans-serif;
   text-transform: uppercase;
 }
 
@@ -3033,13 +3050,13 @@ details>summary::-webkit-details-marker {
 }
 
 .micks-footer-bottom>div {
-  min-height: 48px;
-  display: flex;
+  min-height: 62px;
+  display: grid;
+  grid-template-columns: 3fr 1fr;
   align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  font-size: 13px;
-  font-weight: 600;
+  gap: 0;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 .micks-footer-bottom a {
@@ -5632,7 +5649,7 @@ details>summary::-webkit-details-marker {
 }
 
 .micks-footer-bottom>div {
-  min-height: 50px;
+  min-height: 62px;
 }
 
 @media (max-width: 850px) {
@@ -5642,6 +5659,15 @@ details>summary::-webkit-details-marker {
 
   .micks-work-grid>div>span:last-child {
     grid-column: 2;
+  }
+
+  .micks-footer-bottom>div {
+    grid-template-columns: 1fr;
+    padding-block: 12px;
+  }
+
+  .micks-footer-facebook {
+    justify-content: flex-start;
   }
 }
 
