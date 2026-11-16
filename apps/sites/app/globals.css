@@ -1181,10 +1181,12 @@ details>summary::-webkit-details-marker {
   align-items: center;
   gap: 24px 40px;
   margin-top: 12px;
+  justify-content:space-between;
 }
 
 .micks-about-actions .btn {
   background: #d1272c;
+  padding:1.0625rem 2rem;
 }
 
 .micks-about-cert {
@@ -2913,14 +2915,16 @@ details>summary::-webkit-details-marker {
 
 /* Mick's shared inner-page shell and live-page layouts. */
 .micks-shared-banner {
-  min-height: 0;
-  padding-top: 148px;
+  box-sizing: border-box;
+  min-height: 498px;
+  padding: 190px 0 54px;
   background-position: center;
 }
 
 .micks-shared-banner .micks-inner-hero-content h1 {
   margin-bottom: 18px;
-  font-size: clamp(48px, 5vw, 72px);
+  font-size: clamp(58px, 5vw, 80px);
+  line-height: 1.05;
 }
 
 .micks-shared-banner-actions {
@@ -2929,12 +2933,52 @@ details>summary::-webkit-details-marker {
   gap: 22px;
 }
 
+.micks-shared-banner-actions .micks-hero-button {
+  min-height: 53px;
+  padding: 12px 28px;
+}
+
 .micks-shared-banner .micks-contact-strips {
-  margin-top: 15px;
+  gap: 16px;
+  margin: 19px 0 0;
 }
 
 .micks-shared-banner .micks-contact-strip {
-  min-width: 230px;
+  min-width: 0;
+}
+
+.micks-shared-banner .micks-contact-strip:first-child {
+  min-width: 310px;
+}
+
+.micks-shared-banner .micks-contact-strip:last-child {
+  min-width: 180px;
+}
+
+@media (max-width: 1024px) {
+  .micks-shared-banner {
+    min-height: 0;
+    padding: 155px 0 35px;
+  }
+
+  .micks-shared-banner .micks-inner-hero-content h1 {
+    font-size: clamp(48px, 7vw, 68px);
+  }
+}
+
+@media (max-width: 700px) {
+  .micks-shared-banner {
+    padding: 125px 0 25px;
+  }
+
+  .micks-shared-banner .micks-inner-hero-content h1 {
+    font-size: clamp(40px, 12vw, 58px);
+  }
+
+  .micks-shared-banner .micks-contact-strip:first-child,
+  .micks-shared-banner .micks-contact-strip:last-child {
+    min-width: 0;
+  }
 }
 
 .micks-site-footer {
@@ -3096,46 +3140,75 @@ details>summary::-webkit-details-marker {
 }
 
 .micks-about-page-intro {
+  padding: 46px 0 20px;
   color: #050505;
   background: #fff;
 }
 
 .micks-about-page-grid {
-  max-width: 1050px;
+  max-width: 1140px;
   display: grid;
-  grid-template-columns: 46% 54%;
-  gap: 34px;
+  grid-template-columns: minmax(0, 45fr) minmax(0, 51fr);
+  gap: 44px;
   align-items: center;
 }
 
 .micks-about-page-grid>img {
+  display: block;
   width: 100%;
-  height: 530px;
+  height: 665px;
   border-radius: 31px;
   object-fit: cover;
   object-position: center top;
 }
 
+.micks-about-page-grid>div {
+  min-width: 0;
+}
+
+.micks-about-page-intro .micks-live-title {
+  gap: 22px;
+  margin-bottom: 12px;
+}
+
+.micks-about-page-intro .micks-about-quote {
+  flex: 0 0 115px;
+  width: 115px;
+  height: 74px;
+  font-size: 105px;
+}
+
+.micks-about-page-intro .micks-about-quote.micks-quote-svg {
+  flex-basis: 115px;
+  width: 115px;
+  height: 74px;
+}
+
+.micks-about-page-intro .micks-live-title h2 {
+  font-size: clamp(42px, 4vw, 52px);
+  line-height: 1;
+}
+
 .micks-about-page-grid h3 {
-  margin-bottom: 18px;
-  font-size: 29px;
-  line-height: 1.1;
+  margin: 0 0 22px;
+  font-size: 31px;
+  line-height: 1.12;
   text-transform: uppercase;
 }
 
 .micks-about-page-grid p {
-  margin-bottom: 12px;
-  font-size: 14px;
+  margin: 0 0 16px;
+  font-size: 17px;
   font-weight: 500;
-  line-height: 1.45;
+  line-height: 1.42;
 }
 
 .micks-about-badges {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 28px 50px;
-  margin-top: 15px;
+  gap: 28px 72px;
+  margin: 18px 0 0;
 }
 
 .micks-about-badges img {
@@ -3145,48 +3218,66 @@ details>summary::-webkit-details-marker {
 }
 
 .micks-mission {
+  padding: 56px 0 24px;
   color: #050505;
   background: linear-gradient(#fff, #dbe6f2);
 }
 
 .micks-mission-grid {
-  max-width: 980px;
+  width: calc(100% - 30px);
+  max-width: 1140px;
   display: grid;
-  grid-template-columns: 55% 45%;
+  grid-template-columns: minmax(0, 628px) minmax(0, 1fr);
   align-items: center;
+}
+
+.micks-mission-grid>div {
+  min-width: 0;
 }
 
 .micks-mission h2,
 .micks-how-we-work h2 {
-  font-size: clamp(38px, 4vw, 48px);
+  font-size: clamp(40px, 4vw, 52px);
+  line-height: 1;
   text-transform: uppercase;
 }
 
 .micks-mission h3 {
-  margin: 8px 0 12px;
-  font-size: 28px;
-  line-height: 1.15;
+  margin: 14px 0 14px;
+  font-size: 31px;
+  line-height: 1.35;
   text-transform: uppercase;
 }
 
 .micks-mission-grid>img {
   width: 100%;
+  max-width: 470px;
+  margin-left: 14px;
+  justify-self: start;
   object-fit: contain;
 }
 
 .micks-mission-table {
+  width: 100%;
+  max-width: 628px;
   display: grid;
-  grid-template-columns: 1.6fr .9fr 1.2fr;
+  grid-template-columns: 1.55fr .8fr 1.05fr;
   border: 1px solid #aeb5bc;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .micks-mission-table>* {
-  min-height: 53px;
-  padding: 14px 12px;
+  min-height: 66px;
+  display: flex;
+  align-items: center;
+  padding: 14px 15px;
   border-right: 1px solid #aeb5bc;
   border-bottom: 1px solid #aeb5bc;
   color: #050505;
+}
+
+.micks-mission-table> :nth-child(n+4) {
+  white-space: nowrap;
 }
 
 .micks-mission-table> :nth-child(3n) {
@@ -3195,8 +3286,15 @@ details>summary::-webkit-details-marker {
 
 .micks-live-buttons {
   display: flex;
-  gap: 24px;
-  margin-top: 20px;
+  gap: 27px;
+  margin-top: 25px;
+}
+
+.micks-mission .micks-live-buttons a {
+  min-height: 53px;
+  padding: 14px 28px;
+  font-size: 18px;
+  line-height: 1.1;
 }
 
 .micks-live-buttons a,
@@ -3207,6 +3305,7 @@ details>summary::-webkit-details-marker {
 .micks-know-cta a {
   display: inline-flex;
   justify-content: center;
+  align-items: center;
   padding: 13px 25px;
   color: #fff;
   background: var(--button-bg, #d1272c);
@@ -3244,7 +3343,7 @@ details>summary::-webkit-details-marker {
 }
 
 .micks-how-we-work>div {
-  max-width: 910px;
+  max-width: 1140px;
 }
 
 .micks-how-we-work h2 {
@@ -3262,61 +3361,87 @@ details>summary::-webkit-details-marker {
 .micks-work-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px 10px;
-  margin-top: 15px;
+  gap: 20px 10px;
+  margin-top: 20px;
 }
 
 .micks-work-grid>div {
-  min-height: 88px;
+  min-height: 113px;
   display: grid;
-  grid-template-columns: 1fr 2.3fr;
+  grid-template-columns: 57px minmax(0, 1fr);
+  grid-template-rows: auto auto;
   align-items: center;
-  gap: 15px;
-  padding: 13px 28px;
+  column-gap: 14px;
+  row-gap: 10px;
+  padding: 12px 16px;
   border-radius: 40px;
   color: #fff;
-  background: #cf282d;
+  background: #c93232;
 }
 
 .micks-work-grid b {
-  font: 800 19px/1.1 var(--font-heading), sans-serif;
+  font: 800 24px/1.05 var(--font-heading), sans-serif;
   text-transform: uppercase;
 }
 
 .micks-work-grid span {
-  font-size: 13px;
+  font-size: 17px;
   font-weight: 600;
+  line-height: 1.4;
 }
 
 .micks-owner {
+  padding: 37px 0 20px;
   color: #050505;
   background: #fff;
 }
 
 .micks-owner>div {
-  max-width: 930px;
+  max-width: 1140px;
+}
+
+.micks-owner .micks-live-title {
+  justify-content: center;
+  gap: 28px;
+  margin-bottom: 40px;
+}
+
+.micks-owner .micks-about-quote,
+.micks-owner .micks-about-quote.micks-quote-svg {
+  flex: 0 0 115px;
+  width: 115px;
+  height: 74px;
+}
+
+.micks-owner .micks-live-title h2 {
+  font-size: clamp(42px, 4vw, 52px);
+  line-height: 1;
 }
 
 .micks-owner-grid {
   display: grid;
-  grid-template-columns: 46% 54%;
-  gap: 45px;
+  grid-template-columns: minmax(0, 513px) minmax(0, 1fr);
+  gap: 57px;
   align-items: center;
 }
 
 .micks-owner-grid>img {
   width: 100%;
-  height: 535px;
+  height: 665px;
   border-radius: 30px;
   object-fit: cover;
   object-position: center top;
 }
 
 .micks-owner-grid p {
-  margin-bottom: 17px;
-  font-size: 14px;
+  margin: 0 0 16px;
+  font-size: 16px;
   font-weight: 500;
-  line-height: 1.45;
+  line-height: 1.48;
+}
+
+.micks-owner-grid p:last-child {
+  margin-bottom: 0;
 }
 
 .micks-crew-gallery {
@@ -5217,6 +5342,11 @@ details>summary::-webkit-details-marker {
 
   .micks-mission-grid>img {
     grid-row: 1;
+    margin: 0 auto;
+  }
+
+  .micks-mission-grid>div {
+    grid-row: 2;
   }
 }
 
@@ -5271,6 +5401,7 @@ details>summary::-webkit-details-marker {
 
   .micks-mission-table>* {
     border-right: 0;
+    white-space: normal;
   }
 
   .micks-work-grid>div {
@@ -5358,8 +5489,9 @@ details>summary::-webkit-details-marker {
   align-items: center;
   justify-content: flex-start;
   flex-wrap: wrap;
-  gap: 14px;
+  gap: 65px;
   min-width: 0;
+  margin-right: 50px;
 }
 
 .micks-certification-group>.micks-cert-badge,
@@ -5418,8 +5550,10 @@ details>summary::-webkit-details-marker {
 }
 
 .micks-about-badges {
-  --certification-badge-size: 91px;
+  --certification-badge-size: 112px;
   justify-content: flex-start;
+  gap: 28px 72px;
+  margin-right: 0;
 }
 
 .micks-service-badges {
@@ -5634,12 +5768,28 @@ details>summary::-webkit-details-marker {
 /* Final cascade overrides for elements whose legacy replica rules appear later
    in this stylesheet. */
 .micks-work-grid>div {
-  grid-template-columns: 57px minmax(115px, .9fr) minmax(0, 1.6fr);
+  grid-template-columns: 57px minmax(0, 1fr);
+  grid-template-rows: auto auto;
 }
 
 .micks-work-grid .micks-step-icon {
   width: 57px;
   height: 57px;
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+.micks-work-grid>div>b {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: end;
+}
+
+.micks-work-grid>div>span:last-child {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: start;
 }
 
 .micks-footer-main-grid {
@@ -5679,6 +5829,14 @@ details>summary::-webkit-details-marker {
   .micks-work-grid .micks-step-icon {
     width: 46px;
     height: 46px;
+  }
+
+  .micks-work-grid b {
+    font-size: 20px;
+  }
+
+  .micks-work-grid span {
+    font-size: 15px;
   }
 }
 
