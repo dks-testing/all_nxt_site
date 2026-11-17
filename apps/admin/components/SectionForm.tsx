@@ -11,7 +11,7 @@ function get(obj: Record<string, unknown>, path: string): unknown {
 type Group = "Content" | "Design" | "Images" | "Buttons" | "Advanced";
 function fieldGroup(field: Field): Group {
   if (field.kind === "image") return "Images";
-  if (/cta|button/i.test(field.path)) return "Buttons";
+  if (/cta|button|reviewUrl/i.test(field.path)) return "Buttons";
   if (/variant|layout|showRating|badges/i.test(field.path) || field.kind === "boolean" || field.kind === "select") return "Design";
   if (field.kind === "url" || /integration|height/i.test(field.path)) return "Advanced";
   return "Content";
@@ -52,6 +52,7 @@ export function SectionFields({ type, props, siteId, media, publicOrigin, onChan
   const [active, setActive] = useState<Group>(groups[0] ?? "Content");
   const changed = onChange ?? (() => undefined);
   return <div>
+    {type === "reviews" && <p className="mb-4 rounded-lg border border-indigo-100 bg-indigo-50 px-3 py-2 text-xs text-indigo-800">Manage the Testimonials page Facebook and Google review links in the <strong>Buttons</strong> tab. A badge with an empty URL stays visible but is inactive.</p>}
     {(type === "hero" || type === "about") && <p className="mb-4 rounded-lg border border-indigo-100 bg-indigo-50 px-3 py-2 text-xs text-indigo-800">Certification logos are shared across this website. Change or hide them in <a href={`/sites/${siteId}/branding`} className="font-semibold underline">Branding → Certification badges</a>.</p>}
     <div className="mb-4 flex flex-wrap gap-1 rounded-xl bg-slate-100 p-1" role="tablist" aria-label="Section settings">
       {groups.map((group) => <button key={group} type="button" role="tab" aria-selected={active === group} onClick={() => setActive(group)} className={`rounded-lg px-3 py-2 text-xs font-semibold transition ${active === group ? "bg-white text-indigo-700 shadow-sm" : "text-slate-500 hover:text-slate-900"}`}>{group}</button>)}

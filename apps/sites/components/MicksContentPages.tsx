@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { SiteBundle } from "@platform/db";
 import { buildSlots } from "@platform/db/booking";
 import { getDesign } from "@platform/db/theme";
-import { getServices, getTestimonials, type SiteCtx } from "@/lib/data";
+import { getServices, type SiteCtx } from "@/lib/data";
 import { formatAddress, groupHours, telHref } from "@/lib/format";
 import { localSiteHref } from "@/lib/url";
 import { Stars } from "./Icons";
@@ -13,10 +13,12 @@ import { QuoteMark } from "./QuoteMark";
 import { getOwnerName, globalText, sharedToolConfig } from "@/lib/global-content";
 import { StepListIcon } from "./TrustListIcon";
 import { MicksSpecials } from "./MicksSpecials";
+import { MicksTestimonials } from "./MicksTestimonials";
+import type { BlockProps } from "@platform/db/blocks";
 
 const WP = "https://www.micksrepair.com/wp-content/uploads";
 
-export async function MicksContentPage({ pageSlug, bundle, ctx }: { pageSlug: string; bundle: SiteBundle; ctx: SiteCtx }) {
+export async function MicksContentPage({ pageSlug, bundle, ctx, reviewsProps }: { pageSlug: string; bundle: SiteBundle; ctx: SiteCtx; reviewsProps?: BlockProps<"reviews"> }) {
   const headings: Record<string, string> = {
     "about-us": "About Us",
     diagnostics: "Diagnostics",
@@ -33,7 +35,7 @@ export async function MicksContentPage({ pageSlug, bundle, ctx }: { pageSlug: st
     {pageSlug === "diagnostics" && <MicksSmartTool bundle={bundle} kind="diagnostics" />}
     {pageSlug === "tires" && <MicksSmartTool bundle={bundle} kind="tires" />}
     {pageSlug === "specials" && <MicksSpecials bundle={bundle} ctx={ctx} />}
-    {pageSlug === "testimonials" && <MicksTestimonials bundle={bundle} ctx={ctx} />}
+    {pageSlug === "testimonials" && <MicksTestimonials bundle={bundle} ctx={ctx} props={reviewsProps} />}
     {pageSlug === "make-an-appointment" && <MicksAppointment bundle={bundle} />}
   </>;
 }
@@ -162,17 +164,6 @@ function MicksSmartTool({ bundle, kind }: { bundle: SiteBundle; kind: "diagnosti
     <section className="micks-smart-experience section"><div className="container-site micks-smart-grid"><img src={image} alt="" /><div><h2>Experience You Trust.<br />Technology That Delivers.</h2><p>For Worthington drivers, smart car care means combining local expertise with the best technology available.</p><p>At {bundle.settings?.businessName ?? bundle.site.name}, we make it simple to understand your car, plan repairs, and choose the right tires—all from one trusted shop.</p></div></div></section>
     <section className="micks-smart-cta section"><div><h2>{diagnostics ? "Something Feels Off? Start Your Free Diagnosis." : "Find the Perfect Tires. Fast."}</h2><p>{diagnostics ? "Describe your vehicle’s symptoms and get quick, accurate insights from real repair estimates and trusted local professionals." : "Match your driving style, vehicle, and budget with the right tires at competitive prices."}</p><a href={href}><span>{cta}</span></a></div></section>
   </>;
-}
-
-async function MicksTestimonials({ bundle, ctx }: { bundle: SiteBundle; ctx: SiteCtx }) {
-  const stored = await getTestimonials(ctx);
-  const items = stored.length ? stored : [
-    { id: "r1", author: "Rachel Backes", rating: 5, reviewDate: "7 months ago", body: "What a hometown hero! Our check engine light went on Friday afternoon on our way to a gymnastics tournament. These guys were phenomenal and got us back on the road." },
-    { id: "r2", author: "Concert on the Lake Thibault", rating: 5, reviewDate: "8 months ago", body: "Our van broke down on our way across southern Minnesota. Mick’s diagnosed the problem and went out of the way to get us back on the road." },
-    { id: "r3", author: "Michael Petersen", rating: 5, reviewDate: "5 months ago", body: "They did a great job at a very reasonable rate. Best shop in town!" },
-  ];
-  const settings = bundle.settings;
-  return <section className="micks-testimonials-page section"><div className="container-site"><h2>What Our Customers are Saying About {settings?.businessName ?? bundle.site.name}</h2><div className="micks-testimonial-summary"><strong>{settings?.businessName}</strong>{settings?.ratingValue && <span><b>{settings.ratingValue}</b><Stars value={Number(settings.ratingValue)} /></span>}{settings?.ratingCount && <small>Based on {settings.ratingCount} reviews</small>}{settings?.social?.google && <a href={settings.social.google}>Review us on Google</a>}</div><div className="micks-testimonial-grid">{items.map((item) => <article key={item.id}><div><span>{item.author.charAt(0)}</span><strong>{item.author}</strong><b>G</b></div>{item.reviewDate && <small>{item.reviewDate}</small>}<Stars value={item.rating} /><p>{globalText(item.body, bundle)}</p></article>)}</div></div></section>;
 }
 
 function MicksAppointment({ bundle }: { bundle: SiteBundle }) {
