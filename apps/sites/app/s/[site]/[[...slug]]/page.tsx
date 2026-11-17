@@ -95,7 +95,8 @@ export default async function Page({ params, searchParams }: Props) {
         "about-us": new Set(["hero", "about", "reviews", "cta"]),
         // The services template ends with the service cards; omit its legacy CTA banner.
         services: new Set(["hero", "services_grid", "cta"]),
-        specials: new Set(["hero", "specials"]),
+        // The specials page ends with its offers; omit the legacy booking form.
+        specials: new Set(["hero", "specials", "booking_form"]),
         testimonials: new Set(["hero", "reviews"]),
         "make-an-appointment": new Set(["hero", "booking_form", "contact_map"]),
       };
