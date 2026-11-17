@@ -4031,7 +4031,7 @@ details>summary::-webkit-details-marker {
   box-shadow: 0 0 0 1px var(--book-accent);
 }
 
-.book-field:has(input:not(:placeholder-shown))>span {
+.book-field:not(.book-field--plate):has(input:not(:placeholder-shown))>span {
   opacity: 0;
 }
 
@@ -6318,13 +6318,36 @@ details>summary::-webkit-details-marker {
 .book-tool .book-contact-preferences label:has(input:checked) .book-selection-indicator svg { display: block; }
 .book-tool .book-vehicle-mode button:focus-visible { outline: 2px solid var(--book-accent); outline-offset: 3px; }
 .micks-contact-page .book-plate-fields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.book-field--plate {
+.book-tool--appointment .book-field--plate,
+.book-tool--landing .book-field--plate {
   grid-template-columns: 42px minmax(0, 1fr);
   grid-template-rows: auto auto;
-  column-gap: 14px;
-  row-gap: 2px;
+  column-gap: 21px;
+  row-gap: 0;
   align-content: center;
+  min-height: 66px;
   padding: 10px 18px;
+}
+.book-tool--landing .book-field--plate {
+  grid-template-columns: 20px minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  column-gap: 8px;
+  min-height: 58px;
+  padding: 0 12px;
+}
+.book-tool--landing .book-field--plate > svg {
+  grid-column: 1;
+  grid-row: 1;
+  width: 20px;
+  height: 20px;
+}
+.book-tool--landing .book-field--plate > span {
+  display: none;
+}
+.book-tool--landing .book-field--plate > input {
+  grid-column: 2;
+  grid-row: 1;
+  font-size: 14px;
 }
 .book-field--plate > svg {
   grid-column: 1;
@@ -6336,9 +6359,9 @@ details>summary::-webkit-details-marker {
   display: block;
   grid-column: 2;
   grid-row: 1;
-  color: #312d3b;
-  font-size: 13px;
-  font-weight: 400;
+  color: #5e596e;
+  font-size: 12px;
+  font-weight: 500;
   line-height: 1.2;
 }
 .book-field--plate > input {
@@ -6346,12 +6369,12 @@ details>summary::-webkit-details-marker {
   grid-row: 2;
   min-height: 16px;
   padding: 0;
-  color: #111;
-  font-size: 13px;
+  color: #312d3b;
+  font-size: 14px;
   font-weight: 400;
   line-height: 1.2;
 }
-.book-field--plate > input::placeholder { color: #68647a; opacity: 1; }
+.book-field--plate > input::placeholder { color: #312d3b; opacity: 1; }
 .micks-contact-page .book-appointment-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .micks-contact-page .book-appointment-grid > section { padding: 18px 16px; }
 .micks-contact-page .book-issue textarea {
