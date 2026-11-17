@@ -37,7 +37,7 @@ export function SmartFeature({ bundle, props, pageSlug }: BlockComponentProps<"s
       <div className="container-site">
         {props.eyebrow && <p className="micks-smart-kicker">{props.eyebrow}</p>}
         <div className="micks-smart-feature-grid">
-          <div className="micks-smart-feature-copy-wrap">
+          <div className="micks-smart-feature-copy-wrap flex flex-col justify-center h-full">
             <h2>{props.heading}</h2>
             <RichText text={props.body} className="micks-smart-feature-copy" />
             {cta}
