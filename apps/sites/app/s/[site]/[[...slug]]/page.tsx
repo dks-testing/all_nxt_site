@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { parseBlock } from "@platform/db/blocks";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getBundle, getPage, getPageDraft, getService, getServices, parseSiteParam, type SiteCtx } from "@/lib/data";
@@ -102,7 +103,7 @@ export default async function Page({ params, searchParams }: Props) {
       };
       const extraSections = sections.filter((section) => !templateSections[r.slug]?.has(section.type));
       return <>
-        <MicksContentPage pageSlug={r.slug} bundle={bundle} ctx={ctx} />
+        <MicksContentPage pageSlug={r.slug} bundle={bundle} ctx={ctx} reviewsProps={r.slug === "testimonials" ? parseBlock("reviews", sections.find((section) => section.type === "reviews")?.props ?? {}) ?? undefined : undefined} />
         {extraSections.length > 0 && <RenderSections sections={extraSections} ctx={ctx} bundle={bundle} pageSlug={r.slug} />}
       </>;
     }

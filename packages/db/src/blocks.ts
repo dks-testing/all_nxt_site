@@ -46,6 +46,8 @@ export const blockSchemas = {
   reviews: z.object({
     heading: z.string().default("What our customers say"),
     limit: z.number().int().min(1).max(30).default(6),
+    facebookReviewUrl: z.string().trim().refine((value) => !value || /^https?:\/\//i.test(value), "Enter a full http:// or https:// URL").optional(),
+    googleReviewUrl: z.string().trim().refine((value) => !value || /^https?:\/\//i.test(value), "Enter a full http:// or https:// URL").optional(),
     variant: z.enum(["default", "micks-home"]).default("default"),
   }),
   case_studies: z.object({
@@ -170,6 +172,8 @@ export const blockFields: Record<BlockType, Field[]> = {
   reviews: [
     { path: "heading", label: "Heading", kind: "text" },
     { path: "limit", label: "Number of reviews", kind: "number" },
+    { path: "facebookReviewUrl", label: "Facebook review button URL", kind: "text" },
+    { path: "googleReviewUrl", label: "Google review button URL", kind: "text" },
     { path: "variant", label: "Layout", kind: "select", options: ["default", "micks-home"] },
   ],
   case_studies: [
