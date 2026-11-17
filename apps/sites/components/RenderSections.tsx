@@ -9,6 +9,7 @@ import { getDesign } from "@platform/db/theme";
 import { globalizeContent } from "@/lib/global-content";
 import { SmartFeature } from "./blocks/SmartFeature";
 import { MicksTestimonials } from "./MicksTestimonials";
+import { MicksContactDetails } from "./MicksContactDetails";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const registry: Record<BlockType, (p: any) => React.ReactNode | Promise<React.ReactNode>> = {
@@ -53,6 +54,10 @@ export function RenderSections({ sections, ctx, bundle, pageSlug }: { sections: 
           return null;
         }
         const C = registry[s.type];
+        if (s.type === "contact_map" && pageSlug === "make-an-appointment" && design.headerStyle === "angled") {
+          const contactProps = parseBlock("contact_map", globalizeContent(s.props, bundle));
+          return contactProps ? <MicksContactDetails key={s.id} bundle={bundle} props={contactProps} /> : null;
+        }
         if (s.type === "reviews" && pageSlug === "testimonials" && design.headerStyle === "angled") {
           const reviewProps = parseBlock("reviews", globalizeContent(s.props, bundle));
           return reviewProps ? <MicksTestimonials key={s.id} ctx={ctx} bundle={bundle} props={reviewProps} /> : null;

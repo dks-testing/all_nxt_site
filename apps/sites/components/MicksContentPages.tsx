@@ -14,6 +14,7 @@ import { globalText, sharedToolConfig } from "@/lib/global-content";
 import { StepListIcon } from "./TrustListIcon";
 import { MicksSpecials } from "./MicksSpecials";
 import { MicksTestimonials } from "./MicksTestimonials";
+import { MicksContactDetails } from "./MicksContactDetails";
 import type { BlockProps } from "@platform/db/blocks";
 import { parseBlock } from "@platform/db/blocks";
 
@@ -42,6 +43,7 @@ export async function MicksContentPage({ pageSlug, bundle, ctx, sections }: { pa
   const specialsProps = parseBlock("specials", section("specials") ?? {});
   const reviewsProps = parseBlock("reviews", section("reviews") ?? {});
   const bookingProps = parseBlock("booking_form", section("booking_form") ?? {});
+  const contactProps = parseBlock("contact_map", section("contact_map") ?? {});
   const heroHeading = heroProps?.heading || (pageSlug === "make-an-appointment" ? bookingProps?.heading : undefined) || headings[pageSlug] || pageSlug;
   return <>
     {(heroProps || pageSlug === "make-an-appointment") && <MicksInnerHero bundle={bundle} heading={heroHeading} imageUrl={heroProps?.imageUrl} variant={pageSlug === "services" ? "service" : "page"} />}
@@ -51,7 +53,7 @@ export async function MicksContentPage({ pageSlug, bundle, ctx, sections }: { pa
     {pageSlug === "tires" && <MicksSmartTool bundle={bundle} kind="tires" />}
     {pageSlug === "specials" && specialsProps && <MicksSpecials bundle={bundle} ctx={ctx} props={specialsProps} />}
     {pageSlug === "testimonials" && reviewsProps && <MicksTestimonials bundle={bundle} ctx={ctx} props={reviewsProps} />}
-    {pageSlug === "make-an-appointment" && bookingProps && <MicksAppointment bundle={bundle} props={bookingProps} />}
+    {pageSlug === "make-an-appointment" && <MicksAppointment bundle={bundle} props={bookingProps ?? undefined} contactProps={contactProps ?? undefined} />}
   </>;
 }
 
@@ -119,8 +121,11 @@ function MicksSmartTool({ bundle, kind }: { bundle: SiteBundle; kind: "diagnosti
   </>;
 }
 
-function MicksAppointment({ bundle, props }: { bundle: SiteBundle; props: BlockProps<"booking_form"> }) {
+function MicksAppointment({ bundle, props, contactProps }: { bundle: SiteBundle; props?: BlockProps<"booking_form">; contactProps?: BlockProps<"contact_map"> }) {
   const booking = bundle.booking;
   const rules = { slotMinutes: booking?.slotMinutes ?? 30, openTime: booking?.openTime ?? "07:30", closeTime: booking?.closeTime ?? "17:00", closedDays: booking?.closedDays ?? [0, 6] };
-  return <section className="micks-appointment-page section" id="book"><div className="container-site"><BookingFormClient siteSlug={bundle.site.slug} slots={buildSlots(rules)} closedDays={rules.closedDays} disabledDates={booking?.disabledDates ?? []} leadDays={booking?.leadDays ?? 0} confirmation={booking?.confirmationMessage ?? "Thanks! We'll be in touch shortly to confirm."} fields={booking?.formFields ?? []} variant="appointment" appearance={booking?.appearance} heading={props.heading} subheading={props.subheading} /></div></section>;
+  return <>
+    {props && <section className="micks-appointment-page micks-contact-page section" id="book"><div className="container-site"><BookingFormClient siteSlug={bundle.site.slug} slots={buildSlots(rules)} closedDays={rules.closedDays} disabledDates={booking?.disabledDates ?? []} leadDays={booking?.leadDays ?? 0} confirmation={booking?.confirmationMessage ?? "Thanks! We'll be in touch shortly to confirm."} fields={booking?.formFields ?? []} variant="appointment" appearance={booking?.appearance} heading={props.heading} subheading={props.subheading} initialSlotCount={4} /></div></section>}
+    {contactProps && <MicksContactDetails bundle={bundle} props={contactProps} />}
+  </>;
 }

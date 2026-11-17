@@ -71,6 +71,7 @@ export const blockSchemas = {
   faq: z.object({ heading: z.string().default("Frequently asked questions") }),
   contact_map: z.object({
     heading: z.string().default("Visit us"),
+    imageUrl: z.string().optional(),
     variant: z.enum(["default", "micks-home"]).default("default"),
   }),
   booking_form: z.object({
@@ -211,6 +212,7 @@ export const blockFields: Record<BlockType, Field[]> = {
   ],
   faq: [{ path: "heading", label: "Heading", kind: "text" }],
   contact_map: [
+    { path: "imageUrl", label: "Contact page photo", kind: "image" },
     { path: "heading", label: "Heading", kind: "text" },
     { path: "variant", label: "Layout", kind: "select", options: ["default", "micks-home"] },
   ],
