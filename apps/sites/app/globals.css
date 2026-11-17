@@ -207,7 +207,7 @@ details>summary::-webkit-details-marker {
   position: absolute;
   z-index: -1;
   inset: 0;
-  border-radius: 9px;
+  /* border-radius: 9px; */
   background: #eee;
   transform: skewX(-11deg);
 }
@@ -721,7 +721,7 @@ details>summary::-webkit-details-marker {
   }
 
   .micks-home-title {
-    font-size: clamp(33px, 9vw, 48px);
+    font-size: clamp(40px, 9vw, 48px);
     line-height: 1.13;
   }
 
@@ -739,7 +739,7 @@ details>summary::-webkit-details-marker {
   }
 
   .micks-home-trust-grid {
-    gap: 10px;
+    gap: 20px;
     margin-top: 22px;
   }
 
@@ -750,16 +750,16 @@ details>summary::-webkit-details-marker {
   }
 
   .micks-home-trust-card h2 {
-    min-height: 76px;
-    font-size: 19px;
+    min-height: auto;
+    font-size: 26px;
   }
 
   .micks-home-trust-card p {
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .micks-home-closing {
-    font-size: 18px;
+    font-size: 16px; line-height: 1.5; margin-bottom:0
   }
 }
 
@@ -3010,6 +3010,7 @@ details>summary::-webkit-details-marker {
   margin-bottom: 18px;
   font-size: clamp(58px, 5vw, 80px);
   line-height: 1.05;
+  text-align: center;
 }
 
 .micks-shared-banner-actions {
@@ -6217,10 +6218,10 @@ details>summary::-webkit-details-marker {
   .micks-offer-secondary-grid { grid-template-columns: 1fr; }
   .micks-offer-card, .micks-offer-featured { min-height: 0; border-radius: 19px; }
   .micks-offer-content, .micks-offer-compact .micks-offer-content { padding: 23px 22px; }
-  .micks-offer-included ul { column-count: 1; width: fit-content; max-width: 100%; margin: 16px auto 0; font-size: 15px; }
+  .micks-offer-included ul { column-count: 1; width: fit-content; max-width: 100%; margin: 16px auto 0; font-size: 14px; }
   .micks-offer-compact .micks-offer-included { margin-inline: -22px; padding-inline: 22px; }
   .micks-offer-compact .micks-offer-included ul { margin-top: 8px; }
-  .micks-offer-intro, .micks-offer-note { font-size: 15px; }
+  .micks-offer-intro, .micks-offer-note { font-size: 14px; }
   .micks-offer-actions { padding-top: 16px; }
   .micks-offer-call, .micks-offer-code { min-width: 0; min-height: 44px; padding-inline: 18px; font-size: 13px; }
 }
@@ -6515,4 +6516,155 @@ details>summary::-webkit-details-marker {
 @media (max-width: 600px) {
   .faq-question { gap: 14px; padding: 12px 20px; font-size: 16px; }
   .faq-answer { padding: 14px 20px 16px; font-size: 15px; }
+}
+
+@media (max-width: 767px) {
+  .micks-home-social-proof{
+    justify-content: space-between;width: 85%; margin: 0 auto; gap: 10px
+  }
+  .micks-home-social-proof .micks-home-logos{
+    margin:auto; gap:20px
+  }
+  .micks-footer-powered img{
+    height:20px
+  }
+  .micks-footer-bottom>div {
+    font-size: 14px;
+  }
+  .micks-footer-facebook {
+    justify-content: center;
+    margin-top: 10px;
+  }
+  .micks-footer-facebook-icon{
+    width: 26px;
+    height: 26px;
+  }
+  .micks-site-footer {
+    z-index: 100;
+    position: relative;
+  }
+
+  .micks-specials-page > .container-site > h2 {
+    font-size: 28px;
+  }
+
+  .micks-footer-legal {
+    flex-direction: column;
+    text-align: center;
+    gap:2px;
+  }
+  .micks-home-copy .micks-contact-strips,
+  .micks-shared-banner .micks-contact-strips {
+    gap: 10px;
+  }
+
+  main > section.micks-inner-hero {
+    padding-inline: 0;
+  }
+  .micks-hero-button,
+  .micks-inner-hero .micks-inner-action-primary,
+  .micks-inner-hero .micks-hero-button {
+    min-height: 46px;
+    font-size: 16px;
+    padding: 10px 20px;
+  }
+  .micks-contact-strip,
+  .micks-inner-hero .micks-inner-actions > .micks-inner-action,
+  .micks-inner-hero .micks-contact-strips > .micks-contact-strip {
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  .micks-inner-hero > .micks-inner-hero-content {
+    padding-inline: 20px;
+  }
+
+  main > section.micks-home-hero {
+    padding-inline: 0; padding-bottom: 0;
+  }
+
+  .micks-home-hero > .container-site {
+    padding-inline: 20px;
+  }
+
+  .micks-home-actions {
+    width: 100%;
+  }
+
+  .micks-hero-button {
+    width: 100%;
+  }
+
+  .container-site {
+    padding-inline: 20px;
+    padding-block:30px;
+  }
+
+  main > section {
+    padding-inline: 20px;
+  }
+
+  main > section .container-site {
+    padding-inline: 0;
+  }
+
+  main > section + section {
+    margin-top: 20px;
+  }
+
+  .section {
+    padding-block: 20px;
+  }
+
+  .micks-contact-page.section,
+  .micks-testimonials-page.section {
+    padding-inline: 20px;
+  }
+
+  .btn-primary {
+    min-height: 46px;
+    font-size: 16px;
+  }
+
+  header .container-site > a > img {
+    width: auto;
+    max-width: 220px;
+    height: 56px;
+  }
+
+  .micks-header-outer {
+    padding: 0px;
+  }
+
+  .micks-header-shape {
+    max-height: 80px;
+    padding: 8px 20px;
+  }
+
+  .micks-header-shape::before {
+    transform: none;
+  }
+
+  .micks-logo {
+    flex: 0 1 165px;
+    /* width: min(52vw, 165px); */
+    max-width: 165px;
+    height: auto;
+    padding-right: 0;
+  }
+
+  .micks-mobile-menu {
+    margin-left: auto;
+  }
+
+  .micks-mobile-menu > summary {
+    box-sizing: border-box;
+    display: flex;
+    width: 60px;
+    height: 48px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--button-bg, #c62828);
+    padding: 8px;
+  }
 }
