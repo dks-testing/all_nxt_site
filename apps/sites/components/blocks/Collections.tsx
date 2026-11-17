@@ -178,17 +178,19 @@ export async function Faq({ ctx, bundle, props }: BlockComponentProps<"faq">) {
     mainEntity: items.map((f) => ({ "@type": "Question", name: globalText(f.question, bundle), acceptedAnswer: { "@type": "Answer", text: globalText(f.answer, bundle) } })),
   };
   return (
-    <section className="section">
-      <div className="container-site max-w-3xl">
-        <h1 className="mb-8 text-center text-3xl font-bold uppercase md:text-4xl">{props.heading}</h1>
-        <div className="divide-y divide-gray-200 rounded-site border border-gray-200">
+    <section className="section faq-section">
+      <div className="container-site faq-container">
+        <h1 className="faq-heading">{props.heading}</h1>
+        <div className="faq-list">
           {items.map((f) => (
-            <details key={f.id} className="group p-5">
-              <summary className="flex items-center justify-between gap-4 text-lg font-semibold">
-                {globalText(f.question, bundle)}
-                <span className="text-2xl text-[var(--color-primary)] transition group-open:rotate-45">+</span>
+            <details key={f.id} className="faq-item">
+              <summary className="faq-question">
+                <span className="faq-question-content">
+                  <span className="faq-question-text">{globalText(f.question, bundle)}</span>
+                  <span className="faq-toggle" aria-hidden="true" />
+                </span>
               </summary>
-              <p className="mt-3 text-[var(--color-muted)]">{globalText(f.answer, bundle)}</p>
+              <p className="faq-answer">{globalText(f.answer, bundle)}</p>
             </details>
           ))}
         </div>
