@@ -126,6 +126,7 @@ async function main() {
       diagnosticsImageUrl: `${WP}/2026/06/Pre-Diagnostic-Tool-2.png`,
       tiresImageUrl: `${WP}/2026/04/tire-ai-2048x1365.jpg`,
       scheduleCtaHref: "/make-an-appointment/", diagnosticsCtaHref: "/diagnostics/", tiresCtaHref: "/tires/#tire-finder",
+      scheduleCtaLabel: "Schedule Service", diagnosticsCtaLabel: "Start Diagnostics", tiresCtaLabel: "Find the Right Tires",
     },
   });
 
@@ -163,6 +164,24 @@ async function main() {
     ["preventative-maintenance", "Preventative Maintenance", "Scheduled maintenance that catches problems early and extends vehicle life.", undefined],
     ["vehicle-inspections", "Vehicle & Pre-Purchase Inspections", "Thorough inspections for buyers and current owners before a big decision.", undefined],
   ];
+  const serviceImages: Record<string, string> = {
+    "diagnostics-check-engine-light": `${WP}/2026/04/dnd-services-check-engine-light.webp`,
+    "brake-repair-safety-checks": `${WP}/2026/04/dnd-services-brake-repair.webp`,
+    "engine-repair": `${WP}/2026/04/dnd-services-tune-up-service.webp`,
+    "transmission-service-repair": `${WP}/2026/04/dnd-services-transmission-service.webp`,
+    "steering-suspension-service": `${WP}/2026/04/dnd-services-steering-suspension.webp`,
+    "a-c-repair-recharge": `${WP}/2026/04/dnd-services-ac-repair.webp`,
+    "electrical-systems": `${WP}/2026/04/dnd-services-starting-charging.webp`,
+    "quick-change-oil-service": `${WP}/2026/04/dnd-services-oil-change-fluid.webp`,
+    "tire-services-alignment": `${WP}/2026/03/Micks-Repair-Worthington-MN-4-of-4.jpeg`,
+    "cooling-system-repair": `${WP}/2026/04/dnd-services-cooling-system.webp`,
+    "battery-alternator-starter": `${WP}/2026/04/Battery-Alternator-Starter-scaled.jpg`,
+    "exhaust-emissions": `${WP}/2026/04/Exhaust-Emissions-scaled.jpg`,
+    "fuel-system-repair": `${WP}/2026/04/Fuel-System-Repair-scaled.jpg`,
+    "drivetrain-axles": `${WP}/2026/04/Drivetrain-Axles-scaled.jpg`,
+    "preventative-maintenance": `${WP}/2026/04/Preventative-Maintenance-scaled.jpg`,
+    "vehicle-inspections": `${WP}/2026/04/Vehicle-Inspections-Pre-Purchase-scaled.jpg`,
+  };
   await db.insert(s.services).values(
     svc.map(([slug, name, summary, bullets], i) => ({
       siteId,
@@ -171,9 +190,18 @@ async function main() {
       summary,
       bullets: bullets ?? [],
       body: `# ${name}\n\n${summary}\n\nAt Mick's Repair, every repair starts with an accurate diagnosis and a clear explanation. You approve every line of the quote before work begins, and our ASE-certified technicians stand behind the work.\n\n## What we can help with\n\nCan't get away from work? We offer free pickup and delivery in the Worthington area.`,
-      imageUrl: `${WP}/2026/04/micks-repair-worthington-mn-terry-eggers.jpeg`,
+      imageUrl: serviceImages[slug],
       seoTitle: `${name} in Worthington, MN | Mick's Repair`,
       seoDescription: `${summary} Serving Worthington, MN with free pickup and delivery. Call (507) 376-3095.`,
+      processHeading: `Our 4-Step ${name} Service`,
+      processSteps: ["Complete Inspection | We inspect the system and document what we find.", "Digital Report | Clear photos and findings sent directly to you.", "Repair Plan & Approval | You approve every line before work begins.", "Final Test & Warranty | We verify the repair before returning your vehicle."],
+      showVehicleCallout: false,
+      trustHeading: "Why Drivers Trust {{businessName}}",
+      trustItems: ["ASE Certified Techs | who diagnose daily, not ‘once in a while.’", "Same Day Service | on most check engine repairs.", "Pickup - Repair - Return | We’ll pick up and return your vehicle for free.", "Conveniently Located | Downtown Worthington next to the Courthouse.", "Family Owned Since 1993 | Our name rides on every repair."],
+      finalHeading: "Know Before You Go.",
+      finalBody: "Describe what you’re seeing and get a clear answer in seconds.",
+      finalCtaLabel: "Start Diagnosis",
+      finalCtaHref: "/diagnostics/",
       sortOrder: i,
     })),
   );

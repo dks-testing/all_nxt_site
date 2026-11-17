@@ -30,6 +30,9 @@ export async function saveGlobalSettings(fd: FormData) {
     const scheduleCtaHref = str(fd, "scheduleCtaHref").trim() || "/make-an-appointment/";
     const diagnosticsCtaHref = str(fd, "diagnosticsCtaHref").trim() || "/diagnostics/";
     const tiresCtaHref = str(fd, "tiresCtaHref").trim() || "/tires/";
+    const scheduleCtaLabel = str(fd, "scheduleCtaLabel").trim() || "Schedule Service";
+    const diagnosticsCtaLabel = str(fd, "diagnosticsCtaLabel").trim() || "Start Diagnostics";
+    const tiresCtaLabel = str(fd, "tiresCtaLabel").trim() || "Find the Right Tires";
     const toolUrl = str(fd, "toolEmbedUrl").trim();
     const toolEnabled = bool(fd, "toolEnabled");
 
@@ -40,7 +43,7 @@ export async function saveGlobalSettings(fd: FormData) {
     const [themeRow] = await db.select().from(themes).where(eq(themes.siteId, siteId));
     if (!themeRow) throw new Error("Set up branding before saving global links");
     await db.update(themes).set({
-      design: { ...(themeRow.design ?? {}), scheduleCtaHref, diagnosticsCtaHref, tiresCtaHref },
+      design: { ...(themeRow.design ?? {}), scheduleCtaHref, diagnosticsCtaHref, tiresCtaHref, scheduleCtaLabel, diagnosticsCtaLabel, tiresCtaLabel },
     }).where(eq(themes.siteId, siteId));
 
     for (const type of ["tire_finder", "ai_diagnostic"] as const) {

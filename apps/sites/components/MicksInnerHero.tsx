@@ -17,9 +17,9 @@ export function MicksInnerHero({ bundle, heading, primaryCta, imageUrl, variant 
   const schedule = { ...scheduleSource, href: globalCtaHref(design, scheduleSource.href, scheduleSource.label) };
   if (variant === "page") {
     const actions = [
-      { label: "Schedule Service", href: design.scheduleCtaHref || "/make-an-appointment/" },
-      { label: "Start Diagnostics", href: design.diagnosticsCtaHref || "/diagnostics/" },
-      { label: "Find the Right Tires", href: design.tiresCtaHref || "/tires/" },
+      { label: design.scheduleCtaLabel || "Schedule Service", href: design.scheduleCtaHref || "/make-an-appointment/" },
+      { label: design.diagnosticsCtaLabel || "Start Diagnostics", href: design.diagnosticsCtaHref || "/diagnostics/" },
+      { label: design.tiresCtaLabel || "Find the Right Tires", href: design.tiresCtaHref || "/tires/" },
     ];
     return <section className="micks-inner-hero micks-shared-banner" style={background ? { backgroundImage: `linear-gradient(rgba(0,0,0,.68),rgba(0,0,0,.68)),url(${JSON.stringify(background)})` } : undefined}>
       <div className="container-site micks-inner-hero-content">

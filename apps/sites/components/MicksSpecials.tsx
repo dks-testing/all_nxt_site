@@ -1,7 +1,8 @@
 import type { CSSProperties } from "react";
 import type { SiteBundle } from "@platform/db";
 import { getDesign } from "@platform/db/theme";
-import { getPage, getSpecials, type SiteCtx } from "@/lib/data";
+import type { BlockProps } from "@platform/db/blocks";
+import { getSpecials, type SiteCtx } from "@/lib/data";
 import { telHref } from "@/lib/format";
 import { localSiteHref } from "@/lib/url";
 import { globalText } from "@/lib/global-content";
@@ -88,10 +89,9 @@ function OfferCard({ item, bundle, featured, fallbackImage }: { item: Offer; bun
   );
 }
 
-export async function MicksSpecials({ bundle, ctx }: { bundle: SiteBundle; ctx: SiteCtx }) {
-  const [offers, page] = await Promise.all([getSpecials(ctx), getPage(ctx, "specials")]);
-  const section = page?.sections.find((s) => s.type === "specials");
-  const sourceHeading = (section?.props as { heading?: string } | undefined)?.heading?.trim();
+export async function MicksSpecials({ bundle, ctx, props }: { bundle: SiteBundle; ctx: SiteCtx; props: BlockProps<"specials"> }) {
+  const offers = await getSpecials(ctx);
+  const sourceHeading = props.heading?.trim();
   // Treat legacy seeded copy as the template default, but respect a custom CMS heading.
   const heading = globalText(!sourceHeading || ["current specials", "this month's deals"].includes(sourceHeading.toLowerCase())
     ? "Featured Offers & Specials" : sourceHeading, bundle);
@@ -102,7 +102,7 @@ export async function MicksSpecials({ bundle, ctx }: { bundle: SiteBundle; ctx: 
     <section className="micks-specials-page section">
       <div className="container-site">
         <h2>{heading}</h2>
-        <p className="micks-specials-subtitle">Stay ahead of the road (and the weather) with these deals designed to keep your car in top shape.</p>
+        <p className="micks-specials-subtitle">{props.subheading}</p>
         {featured ? (
           <div className="micks-specials-offers">
             <OfferCard item={featured} bundle={bundle} featured fallbackImage={fallbackImage} />

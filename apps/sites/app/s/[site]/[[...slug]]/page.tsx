@@ -103,7 +103,7 @@ export default async function Page({ params, searchParams }: Props) {
       };
       const extraSections = sections.filter((section) => !templateSections[r.slug]?.has(section.type));
       return <>
-        <MicksContentPage pageSlug={r.slug} bundle={bundle} ctx={ctx} reviewsProps={r.slug === "testimonials" ? parseBlock("reviews", sections.find((section) => section.type === "reviews")?.props ?? {}) ?? undefined : undefined} />
+        <MicksContentPage pageSlug={r.slug} bundle={bundle} ctx={ctx} sections={sections} />
         {extraSections.length > 0 && <RenderSections sections={extraSections} ctx={ctx} bundle={bundle} pageSlug={r.slug} />}
       </>;
     }
@@ -118,47 +118,22 @@ export default async function Page({ params, searchParams }: Props) {
     const serviceImage = svc.imageUrl || design.serviceDefaultImageUrl;
     const blocks = globalText(svc.body, bundle).replace(/\r/g, "").split(/\n{2,}/).filter(Boolean);
     const markedHeading = blocks[0]?.match(/^#\s+(.+)/);
-    const detailCopy: Record<string, { heading: string; intro: string[]; bulletHeading: string; bullets: string[]; closing: string }> = {
-      "brake-repair-safety-checks": {
-        heading: "Your Brakes Matter",
-        intro: ["Your brakes are the single most important safety system on your vehicle—no debate. They’re what stand between you and a potential accident, giving you control when it matters most.", "Ignoring early warning signs like squealing, grinding, or reduced response can quickly turn small, affordable fixes into major repairs. Even worse, it can lead to longer stopping distances and serious safety risks on the road."],
-        bulletHeading: "Red-Flag Symptoms",
-        bullets: ["Car pulls left or right when you brake", "Pedal feels soft or sinks toward the floor", "Vibration or steering wheel shake at stoplights", "Squealing, grinding, or metal on metal noises"],
-        closing: "Feel any of these? Book a quick check before the problem snowballs.",
-      },
-      "engine-repair": {
-        heading: "Love Your Engine",
-        intro: ["Your engine is the heart of your vehicle, powering every journey with smooth, reliable performance and efficiency. When it’s in good condition, your car responds better, runs stronger, and gives you confidence on the road.", "Ignoring early warning signs like strange noises, reduced power, or dashboard alerts can quickly turn minor issues into major, costly breakdowns. Regular maintenance helps prevent damage, extends engine life, and keeps your vehicle safe and dependable."],
-        bulletHeading: "Trouble Signs to Catch Early",
-        bullets: ["Knocking, ticking, or unusual engine noises", "Loss of power or poor acceleration", "Excessive smoke from exhaust", "Engine overheating or temperature spikes", "Check engine light staying on", "Rough idling or stalling"],
-        closing: "If you notice any of these, it’s best to get it checked before it leads to major damage.",
-      },
-      "diagnostics-check-engine-light": {
-        heading: "Engine Light On?",
-        intro: ["Sometimes it’s whispering like a loose gas cap; other times it’s yelling like a misfire that needs immediate attention. Either way, your vehicle is trying to tell you something important about its condition.", "Ignoring those signals or guessing the problem can quickly lead to bigger damage and higher repair costs. Getting a proper diagnosis ensures you know exactly what’s wrong, so issues can be fixed early, accurately, and affordably."],
-        bulletHeading: "Quick List of Usual Suspects",
-        bullets: ["Faulty oxygen sensor", "Loose or damaged gas cap", "Catalytic converter trouble", "Misfiring spark plugs or coils", "Evap system leaks", "Failing mass airflow sensor"],
-        closing: "Seen the light flash or stay solid? Flashing means ‘park it now.’ Solid means ‘schedule soon.’",
-      },
-    };
-    const exact = detailCopy[svc.slug];
-    const leadHeading = exact?.heading ?? markedHeading?.[1] ?? svc.name;
+    const leadHeading = markedHeading?.[1] ?? svc.name;
     const contentBlocks = markedHeading ? blocks.slice(1) : blocks;
     const sectionHeadingIndex = contentBlocks.findIndex((block) => /^##\s+/.test(block));
-    const introBlocks = exact?.intro ?? (sectionHeadingIndex >= 0 ? contentBlocks.slice(0, sectionHeadingIndex) : contentBlocks);
-    const bulletHeading = exact?.bulletHeading ?? (sectionHeadingIndex >= 0 ? contentBlocks[sectionHeadingIndex].replace(/^##\s+/, "") : "What we can help with");
-    const serviceBullets = exact?.bullets ?? svc.bullets ?? [];
-    const closingBlocks = exact ? [exact.closing] : (sectionHeadingIndex >= 0 ? contentBlocks.slice(sectionHeadingIndex + 1) : []);
+    const introBlocks = sectionHeadingIndex >= 0 ? contentBlocks.slice(0, sectionHeadingIndex) : contentBlocks;
+    const bulletHeading = sectionHeadingIndex >= 0 ? contentBlocks[sectionHeadingIndex].replace(/^##\s+/, "") : "What we can help with";
+    const serviceBullets = svc.bullets ?? [];
+    const closingBlocks = sectionHeadingIndex >= 0 ? contentBlocks.slice(sectionHeadingIndex + 1) : [];
     const processImage = design.serviceProcessImageUrl || "https://www.micksrepair.com/wp-content/uploads/2026/03/micks-repair-worthington-mn-sign.jpeg";
     const trustImage = design.serviceTrustImageUrl || "https://www.micksrepair.com/wp-content/uploads/2026/04/555799130_25292959790311872_8516031389215206101_n.jpg";
     const vehicleImage = design.serviceVehicleImageUrl || "https://www.micksrepair.com/wp-content/uploads/2026/04/blue-car.webp";
-    const processBySlug: Record<string, { heading: string; steps: [string, string][] }> = {
-      "brake-repair-safety-checks": { heading: "Our 4-Step Brake Service", steps: [["Precision Inspection", "Pads, rotors, calipers, lines, and fluid."], ["Digital Report", "Photos and videos texted to your phone."], ["OEM Grade Parts", "Top-tier components only; safety first."], ["Road Test & Warranty", "Final road test plus a nationwide guarantee."]] },
-      "engine-repair": { heading: "Our 5-Step No-Guess Process", steps: [["Full Diagnostic Scan", "We scan your vehicle to identify error codes and engine faults."], ["Visual & Performance Check", "We inspect key components and test engine performance."], ["Root Cause Analysis", "No guesswork—we pinpoint the exact issue."], ["Repair Plan & Approval", "Clear explanation and upfront pricing before work begins."], ["Final Test & Quality Check", "We verify everything runs smoothly before handoff."]] },
-      "diagnostics-check-engine-light": { heading: "Our 3-Step No-Guess Routine", steps: [["Code Pull & Freeze Frame Data", "We capture stored trouble codes and the exact conditions when they appeared."], ["Pinpoint Testing", "Voltage, smoke, and component tests locate the real culprit."], ["Straight Talk Fix Plan", "You get a clear report with photos, videos, and repair options."]] },
-    };
-    const process = processBySlug[svc.slug] ?? { heading: `Our 4-Step ${svc.name} Service`, steps: [["Complete Inspection", "We inspect the system and document what we find."], ["Digital Report", "Clear photos and findings sent directly to you."], ["Repair Plan & Approval", "You approve every line before work begins."], ["Final Test & Warranty", "We verify the repair before returning your vehicle."]] as [string, string][] };
-    const showVehicleCallout = ["engine-repair", "diagnostics-check-engine-light"].includes(svc.slug);
+    const pairs = (items?: string[] | null) => (items ?? []).map((item) => {
+      const [title, ...body] = item.split("|");
+      return [title.trim(), body.join("|").trim()] as [string, string];
+    }).filter(([title, body]) => title && body);
+    const process = { heading: globalText(svc.processHeading || `Our 4-Step ${svc.name} Service`, bundle), steps: pairs(svc.processSteps) };
+    const trustItems = pairs(svc.trustItems);
     return (
       <>
         <MicksInnerHero bundle={bundle} heading={svc.name} variant="service" />
@@ -176,16 +151,16 @@ export default async function Page({ params, searchParams }: Props) {
               </>}
               {closingBlocks.map((block, i) => <RichText key={i} text={block} className="micks-service-prose" />)}
               <div className="micks-service-bottom-actions">
-                <Link href={localSiteHref(bundle.site.slug, globalCtaHref(design, "/make-an-appointment/#book", "Schedule Service"))} className="micks-hero-button"><span>Schedule Service</span></Link>
+                <Link href={localSiteHref(bundle.site.slug, globalCtaHref(design, "/make-an-appointment/#book", design.scheduleCtaLabel || "Schedule Service"))} className="micks-hero-button"><span>{design.scheduleCtaLabel || "Schedule Service"}</span></Link>
                 <CertificationBadges design={design} className="micks-service-badges" />
               </div>
             </div>
           </div>
         </section>
         <section className="micks-service-process"><div className="container-site micks-service-live-grid"><img src={processImage} alt={`${bundle.settings?.businessName ?? bundle.site.name} storefront`} /><div><h2>{process.heading}</h2><div className="micks-service-step-list">{process.steps.map(([title, body]) => <div key={title}><StepListIcon design={design} label={title} /><p><strong>{title}</strong>{body}</p></div>)}</div></div></div></section>
-        {showVehicleCallout && <section className="micks-service-vehicle-callout"><div className="container-site"><div><h2>{svc.slug === "engine-repair" ? "Services We Handle" : "Ignore the Light? Here’s What Happens."}</h2><p>{svc.slug === "engine-repair" ? "From diagnostics and troubleshooting to timing, cooling, ignition, and complete engine repair." : "Small warning lights can become large repairs. Don’t let a solvable problem snowball."}</p><div><a href={telHref(bundle.settings?.phone)}><span>Call Now</span></a><Link href={localSiteHref(bundle.site.slug, globalCtaHref(design, "/make-an-appointment/", "Schedule Service"))}><span>Schedule Service</span></Link></div></div><img src={vehicleImage} alt="Vehicle" /></div></section>}
-        <section className="micks-service-live-trust"><div className="container-site micks-service-live-grid"><div><h2>Why Drivers Trust {bundle.settings?.businessName ?? bundle.site.name}</h2><div className="micks-service-step-list micks-service-trust-list">{[["ASE Certified Techs", "who diagnose daily, not ‘once in a while.’"], ["Same Day Service", "on most check engine repairs."], ["Pickup - Repair - Return", "We’ll pick up and return your vehicle for free."], ["Conveniently Located", "Downtown Worthington next to the Courthouse."], ["Family Owned Since 1993", "Our name rides on every repair."]].map(([title, body]) => <div key={title}><StepListIcon design={design} label={title} /><p><strong>{title}</strong>{body}</p></div>)}</div></div><img src={trustImage} alt={`${bundle.settings?.businessName ?? bundle.site.name} in the community`} /></div></section>
-        <section className="micks-know-cta section"><div><h2>Know Before You Go.</h2><p>Describe what you’re seeing and get a clear answer in seconds.</p><Link href={localSiteHref(bundle.site.slug, design.diagnosticsCtaHref || "/diagnostics/")}><span>Start Diagnosis</span></Link></div></section>
+        {svc.showVehicleCallout && <section className="micks-service-vehicle-callout"><div className="container-site"><div><h2>{globalText(svc.vehicleCalloutHeading, bundle)}</h2><p>{globalText(svc.vehicleCalloutBody, bundle)}</p><div><a href={telHref(bundle.settings?.phone)}><span>Call Now</span></a><Link href={localSiteHref(bundle.site.slug, globalCtaHref(design, "/make-an-appointment/", design.scheduleCtaLabel || "Schedule Service"))}><span>{design.scheduleCtaLabel || "Schedule Service"}</span></Link></div></div><img src={vehicleImage} alt="Vehicle" /></div></section>}
+        <section className="micks-service-live-trust"><div className="container-site micks-service-live-grid"><div><h2>{globalText(svc.trustHeading, bundle)}</h2><div className="micks-service-step-list micks-service-trust-list">{trustItems.map(([title, body]) => <div key={title}><StepListIcon design={design} label={title} /><p><strong>{globalText(title, bundle)}</strong>{globalText(body, bundle)}</p></div>)}</div></div><img src={trustImage} alt={`${bundle.settings?.businessName ?? bundle.site.name} in the community`} /></div></section>
+        <section className="micks-know-cta section"><div><h2>{globalText(svc.finalHeading, bundle)}</h2><p>{globalText(svc.finalBody, bundle)}</p><Link href={localSiteHref(bundle.site.slug, svc.finalCtaHref || design.diagnosticsCtaHref || "/diagnostics/")}><span>{svc.finalCtaLabel}</span></Link></div></section>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "Service", name: svc.name, description: svc.summary, provider: { "@type": bundle.settings?.businessType ?? "LocalBusiness", name: bundle.settings?.businessName } }).replace(/</g, "\\u003c") }} />
       </>
     );

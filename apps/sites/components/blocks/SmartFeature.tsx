@@ -64,7 +64,7 @@ export function SmartFeature({ bundle, props, pageSlug }: BlockComponentProps<"s
         <div className="micks-smart-tool-panel">
           {props.secondaryImageUrl && <img className="micks-smart-tool-photo" src={props.secondaryImageUrl} alt="Vehicle diagnostic scan" />}
           <div className="micks-smart-tool-panel-copy">
-            {props.imageUrl && <img className="micks-smart-tool-icon" src={props.imageUrl} alt="" />}
+            {(props.iconUrl || props.imageUrl) && <img className="micks-smart-tool-icon" src={props.iconUrl || props.imageUrl} alt="" />}
             {props.calloutHeading && <h3>{props.calloutHeading}</h3>}
             {props.calloutBody && <RichText text={props.calloutBody} />}
             {cta}

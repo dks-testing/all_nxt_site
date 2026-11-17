@@ -38,6 +38,9 @@ export default async function GlobalSettingsPage({ params }: { params: Promise<{
 
         <Card title="Global button destinations" description="All buttons recognized as the same action use these links, including heroes, service pages, callouts and content blocks.">
           <div className="grid gap-4 lg:grid-cols-3">
+            <Input label="Schedule service label" name="scheduleCtaLabel" defaultValue={design.scheduleCtaLabel ?? "Schedule Service"} required />
+            <Input label="Diagnostics label" name="diagnosticsCtaLabel" defaultValue={design.diagnosticsCtaLabel ?? "Start Diagnostics"} required />
+            <Input label="Tire finder label" name="tiresCtaLabel" defaultValue={design.tiresCtaLabel ?? "Find the Right Tires"} required />
             <Input label="Schedule service link" name="scheduleCtaHref" defaultValue={design.scheduleCtaHref ?? "/make-an-appointment/"} required />
             <Input label="Diagnostics link" name="diagnosticsCtaHref" defaultValue={design.diagnosticsCtaHref ?? "/diagnostics/"} required />
             <Input label="Tire finder link" name="tiresCtaHref" defaultValue={design.tiresCtaHref ?? "/tires/"} required />

@@ -103,6 +103,9 @@ export type DesignOptions = {
   scheduleCtaHref?: string;
   diagnosticsCtaHref?: string;
   tiresCtaHref?: string;
+  scheduleCtaLabel?: string;
+  diagnosticsCtaLabel?: string;
+  tiresCtaLabel?: string;
   buttonBackground?: string;
   buttonText?: string;
   buttonHoverBackground?: string;
@@ -284,6 +287,17 @@ export const services = mysqlTable(
     seoTitle: varchar("seo_title", { length: 255 }),
     seoDescription: varchar("seo_description", { length: 512 }),
     seoKeywords: text("seo_keywords"),
+    processHeading: varchar("process_heading", { length: 255 }),
+    processSteps: json("process_steps").$type<string[]>(),
+    vehicleCalloutHeading: varchar("vehicle_callout_heading", { length: 255 }),
+    vehicleCalloutBody: text("vehicle_callout_body"),
+    showVehicleCallout: boolean("show_vehicle_callout").notNull().default(false),
+    trustHeading: varchar("trust_heading", { length: 255 }),
+    trustItems: json("trust_items").$type<string[]>(),
+    finalHeading: varchar("final_heading", { length: 255 }),
+    finalBody: text("final_body"),
+    finalCtaLabel: varchar("final_cta_label", { length: 64 }),
+    finalCtaHref: varchar("final_cta_href", { length: 1024 }),
     sortOrder: int("sort_order").notNull().default(0),
     isActive: boolean("is_active").notNull().default(true),
   },

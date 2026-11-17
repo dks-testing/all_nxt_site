@@ -1,7 +1,8 @@
 /**
- * Applies the verified Mick's Repair homepage reference data to an existing
- * tenant without touching services, bookings, users, domains, or other pages.
- * Safe to rerun: the same theme and section values are written each time.
+ * Applies the verified Mick's Repair reference content to its existing tenant.
+ * This includes page-section JSON, theme settings, and public service content;
+ * bookings, users, domains, and customer records are never changed.
+ * Safe to rerun: the same content values are written each time.
  */
 import { and, eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
@@ -85,6 +86,66 @@ const tireFeature = {
   variant: "micks-tires",
   imageUrl: `${WP}/2026/06/wheel-alignment-micks-repair-home.webp`,
   cta: { label: "Find my tires", href: "/tires/" },
+};
+
+const aboutPage = {
+  eyebrow: "About Us",
+  heading: "Straight answers. Expert guidance.\nRepairs you can trust.",
+  body: "At {{businessName}}, we’ve built our reputation by doing things the right way. For over 35 years, local families in Worthington have trusted us to diagnose issues accurately, explain what’s going on in plain language, and make sure every repair is done right the first time.\n\nConveniently located in historic downtown Worthington, right across from the courthouse, {{ownerName}} has been part of the community for decades. During Turkey Days, people fill our sidewalk, parking lot, and even the front doorway to watch the parade go by.\n\nToday, {{ownerName}} is run by Mick Eggers and his two sons, Kelly and Terry, carrying forward the same commitment to honest work and doing things the right way. No pressure. No unnecessary repairs. Just straightforward recommendations you can trust.\n\nWe know your time matters. That’s why we offer free pickup and delivery, making it easier to get your vehicle serviced without disrupting your day.\n\nEvery decision we make is based on what we would do if it were our own vehicle. That means focusing on what truly needs to be done and helping you move forward with confidence.",
+  imageUrl: `${WP}/2026/04/micks-repair-worthington-mn-mick-eggers.jpeg`,
+  highlights: [],
+  variant: "default",
+  missionHeading: "One Shop, One Mission",
+  missionBody: "Keep our neighbors rolling with honest,\nhigh-quality auto care.",
+  workHeading: "How We Work",
+  ownerHeading: "Meet the Crew",
+  ownerBody: "Mick Eggers\nFounder of {{businessName}}, Mick Eggers has spent his entire life building a reputation in the Worthington automotive community. For over 35 years, he has led a shop grounded in honesty, transparency, and long-term customer relationships. Today, he’s joined by his two sons, Kelly and Terry, continuing a tradition that has become a trusted name for generations of local families.\n\nSpend a few minutes in the lobby and you’ll see what sets this place apart. It’s not uncommon to hear a technician, or Mick himself, advising a customer not to move forward with a repair when the cost doesn’t make sense for the vehicle.\n\nMick Eggers represents a rare combination of technical expertise, relentless work ethic, and unwavering integrity. It’s what defines {{businessName}} and why it continues to earn the trust of the community year after year.",
+  crew: [
+    { title: "Kelly Eggers", body: "A second-generation member of the family business, carrying forward Mick’s commitment to honest, dependable service." },
+    { title: "Terry Eggers", body: "Part of the next generation leading the shop with straightforward advice and a focus on doing every job right." },
+    { title: "Cory Probst", body: "A trusted member of the crew focused on careful workmanship and reliable automotive service." },
+    { title: "Service Team", body: "Helping customers with clear communication from check-in through pickup." },
+    { title: "Repair Team", body: "Skilled technicians committed to quality repairs and ongoing training." },
+    { title: "Shop Team", body: "Hands-on care supported by modern tools, experience, and attention to detail." },
+  ],
+  crewImageUrls: [
+    `${WP}/2026/04/micks-repair-worthington-mn-kelly-eggers.jpeg`,
+    `${WP}/2026/04/micks-repair-worthington-mn-terry-eggers.jpeg`,
+    `${WP}/2026/04/micks-repair-worthington-mn-cory-probst.jpeg`,
+    `${WP}/2026/06/team-3.png`,
+    `${WP}/2026/06/team-1.png`,
+    `${WP}/2026/06/team-2.png`,
+  ],
+  finalHeading: "Know Before You Go.",
+  finalBody: "Describe what you’re seeing and get a clear answer in seconds.",
+  finalCta: { label: "Start Diagnosis", href: "/diagnostics/" },
+};
+
+const commonTrustItems = [
+  "ASE Certified Techs | who diagnose daily, not ‘once in a while.’",
+  "Same Day Service | on most check engine repairs.",
+  "Pickup - Repair - Return | We’ll pick up and return your vehicle for free.",
+  "Conveniently Located | Downtown Worthington next to the Courthouse.",
+  "Family Owned Since 1993 | Our name rides on every repair.",
+];
+
+const serviceCardImages: Record<string, string> = {
+  "diagnostics-check-engine-light": `${WP}/2026/04/dnd-services-check-engine-light.webp`,
+  "brake-repair-safety-checks": `${WP}/2026/04/dnd-services-brake-repair.webp`,
+  "engine-repair": `${WP}/2026/04/dnd-services-tune-up-service.webp`,
+  "transmission-service-repair": `${WP}/2026/04/dnd-services-transmission-service.webp`,
+  "steering-suspension-service": `${WP}/2026/04/dnd-services-steering-suspension.webp`,
+  "a-c-repair-recharge": `${WP}/2026/04/dnd-services-ac-repair.webp`,
+  "electrical-systems": `${WP}/2026/04/dnd-services-starting-charging.webp`,
+  "quick-change-oil-service": `${WP}/2026/04/dnd-services-oil-change-fluid.webp`,
+  "tire-services-alignment": `${WP}/2026/03/Micks-Repair-Worthington-MN-4-of-4.jpeg`,
+  "cooling-system-repair": `${WP}/2026/04/dnd-services-cooling-system.webp`,
+  "battery-alternator-starter": `${WP}/2026/04/Battery-Alternator-Starter-scaled.jpg`,
+  "exhaust-emissions": `${WP}/2026/04/Exhaust-Emissions-scaled.jpg`,
+  "fuel-system-repair": `${WP}/2026/04/Fuel-System-Repair-scaled.jpg`,
+  "drivetrain-axles": `${WP}/2026/04/Drivetrain-Axles-scaled.jpg`,
+  "preventative-maintenance": `${WP}/2026/04/Preventative-Maintenance-scaled.jpg`,
+  "vehicle-inspections": `${WP}/2026/04/Vehicle-Inspections-Pre-Purchase-scaled.jpg`,
 };
 
 const diagnosticsSections: [string, Record<string, unknown>][] = [
@@ -289,6 +350,7 @@ async function main() {
       diagnosticsImageUrl: `${WP}/2026/06/Pre-Diagnostic-Tool-2.png`,
       tiresImageUrl: `${WP}/2026/04/tire-ai-2048x1365.jpg`,
       scheduleCtaHref: "/make-an-appointment/", diagnosticsCtaHref: "/diagnostics/", tiresCtaHref: "/tires/#tire-finder",
+      scheduleCtaLabel: "Schedule Service", diagnosticsCtaLabel: "Start Diagnostics", tiresCtaLabel: "Find the Right Tires",
     },
   }).where(eq(s.themes.siteId, site.id));
 
@@ -331,6 +393,36 @@ async function main() {
     if (props) await db.update(s.pageSections).set({ props, sortOrder: order[section.type] ?? 0, isVisible: true }).where(eq(s.pageSections.id, section.id));
   }
   if (!hasTireFeature) await db.insert(s.pageSections).values({ id: randomUUID(), siteId: site.id, pageId: home.id, type: "embed", props: tireFeature, sortOrder: 4, isVisible: true });
+
+  async function writePageSection(slug: string, type: string, props: Record<string, unknown>, sortOrder: number) {
+    const [page] = await db.select({ id: s.pages.id }).from(s.pages).where(and(eq(s.pages.siteId, site.id), eq(s.pages.slug, slug)));
+    if (!page) throw new Error(`The micks-repair ${slug || "home"} page does not exist.`);
+    const [section] = await db.select({ id: s.pageSections.id }).from(s.pageSections)
+      .where(and(eq(s.pageSections.siteId, site.id), eq(s.pageSections.pageId, page.id), eq(s.pageSections.type, type)));
+    if (section) await db.update(s.pageSections).set({ props, sortOrder, isVisible: true }).where(eq(s.pageSections.id, section.id));
+    else await db.insert(s.pageSections).values({ id: randomUUID(), siteId: site.id, pageId: page.id, type, props, sortOrder, isVisible: true });
+  }
+
+  await writePageSection("about-us", "hero", { heading: "About Us", showRating: true, badges: [] }, 0);
+  await writePageSection("about-us", "about", aboutPage, 1);
+  await writePageSection("services", "hero", { heading: "Yea, We Can Fix That", showRating: false, badges: [] }, 0);
+  await writePageSection("services", "services_grid", {
+    heading: "Comprehensive Automotive Solutions at {{businessName}}\nin Worthington",
+    subheading: "At {{businessName}} in Worthington, we provide a complete range of automotive maintenance and repair services to keep your vehicle performing at its best. Our skilled technicians handle everything from routine upkeep to complex repairs with accuracy and care.",
+    ctaLabel: "Read More",
+  }, 1);
+  await writePageSection("specials", "hero", { heading: "Specials", showRating: false, badges: [] }, 0);
+  await writePageSection("specials", "specials", {
+    heading: "Featured Offers & Specials",
+    subheading: "Stay ahead of the road (and the weather) with these deals designed to keep your car in top shape.",
+  }, 1);
+  await writePageSection("testimonials", "hero", { heading: "Testimonials", showRating: true, badges: [] }, 0);
+  await writePageSection("testimonials", "reviews", { heading: "What Our Customers Are Saying About {{businessName}}", limit: 30, variant: "default" }, 1);
+  await writePageSection("make-an-appointment", "hero", { heading: "Make an Appointment", showRating: false, badges: [] }, 0);
+  await writePageSection("make-an-appointment", "booking_form", {
+    heading: "Schedule Your Service Online",
+    subheading: "Fast, easy, and always free.\nA real advisor will confirm everything with you.",
+  }, 1);
 
   const [diagnosticsPage] = await db.select({ id: s.pages.id }).from(s.pages)
     .where(and(eq(s.pages.siteId, site.id), eq(s.pages.slug, "diagnostics")));
@@ -392,11 +484,58 @@ async function main() {
       bullets: ["Knocking, ticking, or unusual engine noises", "Loss of power or poor acceleration", "Excessive smoke from exhaust", "Engine overheating or temperature spikes", "Check engine light staying on", "Rough idling or stalling"],
       closing: "If you notice any of these, it’s best to get it checked before it leads to major damage.",
     },
+    "diagnostics-check-engine-light": {
+      heading: "Engine light on?",
+      intro: [
+        "Sometimes it’s whispering like a loose gas cap; other times it’s yelling like a misfire that needs immediate attention. Either way, your vehicle is trying to tell you something important about its condition.",
+        "Ignoring those signals or guessing the problem can quickly lead to bigger damage and higher repair costs. Getting a proper diagnosis ensures you know exactly what’s wrong, so issues can be fixed early, accurately, and affordably.",
+      ],
+      listHeading: "Quick list of usual suspects",
+      bullets: ["Faulty oxygen sensor", "Loose or damaged gas cap", "Catalytic converter trouble", "Misfiring spark plugs or coils", "Evap system leaks", "Failing mass airflow sensor"],
+      closing: "Seen the light flash or stay solid? Flashing means ‘park it now.’ Solid means ‘schedule soon.’",
+    },
+  };
+  const processBySlug: Record<string, { heading: string; steps: string[] }> = {
+    "brake-repair-safety-checks": {
+      heading: "Our 4-Step Brake Service",
+      steps: ["Precision Inspection | Pads, rotors, calipers, lines, and fluid.", "Digital Report | Photos and videos texted to your phone.", "OEM Grade Parts | Top-tier components only; safety first.", "Road Test & Warranty | Final road test plus a nationwide guarantee."],
+    },
+    "engine-repair": {
+      heading: "Our 5-Step No-Guess Process",
+      steps: ["Full Diagnostic Scan | We scan your vehicle to identify error codes and engine faults.", "Visual & Performance Check | We inspect key components and test engine performance.", "Root Cause Analysis | No guesswork—we pinpoint the exact issue.", "Repair Plan & Approval | Clear explanation and upfront pricing before work begins.", "Final Test & Quality Check | We verify everything runs smoothly before handoff."],
+    },
+    "diagnostics-check-engine-light": {
+      heading: "Our 3-Step No-Guess Routine",
+      steps: ["Code Pull & Freeze Frame Data | We capture stored trouble codes and the exact conditions when they appeared.", "Pinpoint Testing | Voltage, smoke, and component tests locate the real culprit.", "Straight Talk Fix Plan | You get a clear report with photos, videos, and repair options."],
+    },
+  };
+  const calloutBySlug: Record<string, { heading: string; body: string }> = {
+    "engine-repair": { heading: "Services We Handle", body: "From diagnostics and troubleshooting to timing, cooling, ignition, and complete engine repair." },
+    "diagnostics-check-engine-light": { heading: "Ignore the Light? Here’s What Happens.", body: "Small warning lights can become large repairs. Don’t let a solvable problem snowball." },
   };
   for (const service of serviceRows) {
     const copy = exactCopy[service.slug];
     const body = copy ? `# ${copy.heading}\n\n${copy.intro.join("\n\n")}\n\n## ${copy.listHeading}\n\n${copy.closing}` : service.body;
-    await db.update(s.services).set({ imageUrl: service.imageUrl || `${WP}/2026/04/micks-repair-worthington-mn-terry-eggers.jpeg`, ...(copy ? { body, bullets: copy.bullets } : {}) }).where(eq(s.services.id, service.id));
+    const process = processBySlug[service.slug] ?? {
+      heading: `Our 4-Step ${service.name} Service`,
+      steps: ["Complete Inspection | We inspect the system and document what we find.", "Digital Report | Clear photos and findings sent directly to you.", "Repair Plan & Approval | You approve every line before work begins.", "Final Test & Warranty | We verify the repair before returning your vehicle."],
+    };
+    const callout = calloutBySlug[service.slug];
+    await db.update(s.services).set({
+      imageUrl: serviceCardImages[service.slug] || service.imageUrl || `${WP}/2026/04/dnd-services-tune-up-service.webp`,
+      ...(copy ? { body, bullets: copy.bullets } : {}),
+      processHeading: process.heading,
+      processSteps: process.steps,
+      vehicleCalloutHeading: callout?.heading ?? null,
+      vehicleCalloutBody: callout?.body ?? null,
+      showVehicleCallout: Boolean(callout),
+      trustHeading: "Why Drivers Trust {{businessName}}",
+      trustItems: commonTrustItems,
+      finalHeading: "Know Before You Go.",
+      finalBody: "Describe what you’re seeing and get a clear answer in seconds.",
+      finalCtaLabel: "Start Diagnosis",
+      finalCtaHref: "/diagnostics/",
+    }).where(eq(s.services.id, service.id));
   }
   await revalidateSite(site.id);
   console.log("Synchronized the complete Mick's Repair landing page, theme, and service assets.");

@@ -5,7 +5,7 @@ import type { BookingAppearance, BookingField } from "@platform/db";
 
 const STATES = "AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY".split(" ");
 type Variant = "default" | "landing" | "appointment" | "micks";
-type Props = { siteSlug: string; slots: string[]; closedDays: number[]; disabledDates?: string[]; leadDays: number; confirmation: string; fields: BookingField[]; variant?: Variant; appearance?: BookingAppearance | null };
+type Props = { siteSlug: string; slots: string[]; closedDays: number[]; disabledDates?: string[]; leadDays: number; confirmation: string; fields: BookingField[]; variant?: Variant; appearance?: BookingAppearance | null; heading?: string; subheading?: string };
 
 function Icon({ name }: { name: "user" | "phone" | "mail" | "message" | "car" | "pin" | "calendar" | "clock" | "shield" | "lock" }) {
   const paths: Record<typeof name, ReactNode> = {
@@ -71,7 +71,7 @@ function ExtraFields({ fields }: { fields: BookingField[] }) {
   return <div className="book-extra-fields">{fields.map((field) => <label key={field.key}>{field.label}{field.type === "textarea" ? <textarea name={`extra:${field.key}`} required={field.required} placeholder={field.placeholder} /> : field.type === "select" ? <select name={`extra:${field.key}`} required={field.required}><option value="">Select</option>{field.options?.map((option) => <option key={option}>{option}</option>)}</select> : field.type === "checkbox" ? <input type="checkbox" name={`extra:${field.key}`} required={field.required} /> : <input type={field.type} name={`extra:${field.key}`} required={field.required} placeholder={field.placeholder} />}</label>)}</div>;
 }
 
-export function BookingFormClient({ siteSlug, slots, closedDays, disabledDates = [], leadDays, confirmation, fields, variant = "default", appearance }: Props) {
+export function BookingFormClient({ siteSlug, slots, closedDays, disabledDates = [], leadDays, confirmation, fields, variant = "default", appearance, heading, subheading }: Props) {
   const normalizedVariant = variant === "micks" ? "landing" : variant;
   const [mode, setMode] = useState<"plate" | "manual">("plate");
   const [contact, setContact] = useState<"phone" | "text" | "email">("phone");
@@ -83,6 +83,8 @@ export function BookingFormClient({ siteSlug, slots, closedDays, disabledDates =
   const [error, setError] = useState("");
   const [issueLen, setIssueLen] = useState(0);
   const minDate = useMemo(() => { const date = new Date(); date.setDate(date.getDate() + leadDays); return dateKey(date); }, [leadDays]);
+  const [appointmentLead, ...appointmentDetailParts] = (subheading ?? "").split("\n");
+  const appointmentDetail = appointmentDetailParts.join("\n");
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -117,7 +119,7 @@ export function BookingFormClient({ siteSlug, slots, closedDays, disabledDates =
 
   const visibleSlots = showAllSlots ? slots : slots.slice(0, 6);
   return <form onSubmit={onSubmit} className={`book-tool book-tool--${normalizedVariant}`} style={styleFor(appearance)}>
-    {normalizedVariant === "appointment" && <header className="book-appointment-header"><div><h2>{appearance?.appointmentHeading || "Schedule Your Service Online"}</h2><p><strong>Fast, easy, and always free.</strong><span>A real advisor will confirm everything with you.</span></p></div><BookingBenefits /></header>}
+    {normalizedVariant === "appointment" && <header className="book-appointment-header"><div><h2>{heading || appearance?.appointmentHeading || "Schedule Your Service Online"}</h2><p>{subheading ? <><strong>{appointmentLead}</strong>{appointmentDetail && <span>{appointmentDetail}</span>}</> : <><strong>Fast, easy, and always free.</strong><span>A real advisor will confirm everything with you.</span></>}</p></div><BookingBenefits /></header>}
     {normalizedVariant === "landing" && <BookingBenefits />}
     <div className="book-contact-fields"><Field icon="user" label="Full Name"><input name="customerName" autoComplete="name" placeholder="Full Name" required /></Field><Field icon="phone" label="Phone Number"><input name="phone" type="tel" autoComplete="tel" placeholder="Phone Number" required /></Field><Field icon="mail" label="Email (optional)"><input name="email" type="email" autoComplete="email" placeholder="Email (optional)" /></Field>{normalizedVariant === "landing" ? <Field icon="message" label="Preferred contact"><select name="contactPref" defaultValue="phone" aria-label="Preferred contact"><option value="phone">Phone Call</option><option value="text">Text Message</option><option value="email">Email</option></select></Field> : null}</div>
     {normalizedVariant === "appointment" && <div className="book-contact-preferences">{(["phone", "text", "email"] as const).map((value) => <label key={value}><span>Prefer {value === "phone" ? "phone call" : value === "text" ? "text messages" : "email"}</span><input type="radio" name="contactPreferenceDisplay" checked={contact === value} onChange={() => setContact(value)} /><i><svg viewBox="0 0 24 24"><path d="m5 12.4 4.1 4.1L19.4 6.8" /></svg></i></label>)}</div>}

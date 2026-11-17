@@ -10,15 +10,22 @@ import { MicksInnerHero } from "./MicksInnerHero";
 import { BookingFormClient } from "./BookingFormClient";
 import { CertificationBadges } from "./CertificationBadge";
 import { QuoteMark } from "./QuoteMark";
-import { getOwnerName, globalText, sharedToolConfig } from "@/lib/global-content";
+import { globalText, sharedToolConfig } from "@/lib/global-content";
 import { StepListIcon } from "./TrustListIcon";
 import { MicksSpecials } from "./MicksSpecials";
 import { MicksTestimonials } from "./MicksTestimonials";
 import type { BlockProps } from "@platform/db/blocks";
+import { parseBlock } from "@platform/db/blocks";
 
 const WP = "https://www.micksrepair.com/wp-content/uploads";
 
-export async function MicksContentPage({ pageSlug, bundle, ctx, reviewsProps }: { pageSlug: string; bundle: SiteBundle; ctx: SiteCtx; reviewsProps?: BlockProps<"reviews"> }) {
+type PageSection = { type: string; props: Record<string, unknown> };
+
+function LineBreakText({ text }: { text: string }) {
+  return <>{text.split("\n").map((line, index) => <span key={`${line}-${index}`}>{index > 0 && <br />}{line}</span>)}</>;
+}
+
+export async function MicksContentPage({ pageSlug, bundle, ctx, sections }: { pageSlug: string; bundle: SiteBundle; ctx: SiteCtx; sections: PageSection[] }) {
   const headings: Record<string, string> = {
     "about-us": "About Us",
     diagnostics: "Diagnostics",
@@ -28,125 +35,71 @@ export async function MicksContentPage({ pageSlug, bundle, ctx, reviewsProps }: 
     "make-an-appointment": "Make an Appointment",
     services: "Yea, We Can Fix That",
   };
+  const section = (type: string) => sections.find((item) => item.type === type)?.props;
+  const heroProps = parseBlock("hero", section("hero") ?? {});
+  const aboutProps = parseBlock("about", section("about") ?? {});
+  const servicesProps = parseBlock("services_grid", section("services_grid") ?? {});
+  const specialsProps = parseBlock("specials", section("specials") ?? {});
+  const reviewsProps = parseBlock("reviews", section("reviews") ?? {});
+  const bookingProps = parseBlock("booking_form", section("booking_form") ?? {});
+  const heroHeading = heroProps?.heading || (pageSlug === "make-an-appointment" ? bookingProps?.heading : undefined) || headings[pageSlug] || pageSlug;
   return <>
-    <MicksInnerHero bundle={bundle} heading={headings[pageSlug] ?? pageSlug} variant={pageSlug === "services" ? "service" : "page"} />
-    {pageSlug === "services" && <MicksServices bundle={bundle} ctx={ctx} />}
-    {pageSlug === "about-us" && <MicksAbout bundle={bundle} />}
+    {(heroProps || pageSlug === "make-an-appointment") && <MicksInnerHero bundle={bundle} heading={heroHeading} imageUrl={heroProps?.imageUrl} variant={pageSlug === "services" ? "service" : "page"} />}
+    {pageSlug === "services" && servicesProps && <MicksServices bundle={bundle} ctx={ctx} props={servicesProps} />}
+    {pageSlug === "about-us" && aboutProps && <MicksAbout bundle={bundle} props={aboutProps} />}
     {pageSlug === "diagnostics" && <MicksSmartTool bundle={bundle} kind="diagnostics" />}
     {pageSlug === "tires" && <MicksSmartTool bundle={bundle} kind="tires" />}
-    {pageSlug === "specials" && <MicksSpecials bundle={bundle} ctx={ctx} />}
-    {pageSlug === "testimonials" && <MicksTestimonials bundle={bundle} ctx={ctx} props={reviewsProps} />}
-    {pageSlug === "make-an-appointment" && <MicksAppointment bundle={bundle} />}
+    {pageSlug === "specials" && specialsProps && <MicksSpecials bundle={bundle} ctx={ctx} props={specialsProps} />}
+    {pageSlug === "testimonials" && reviewsProps && <MicksTestimonials bundle={bundle} ctx={ctx} props={reviewsProps} />}
+    {pageSlug === "make-an-appointment" && bookingProps && <MicksAppointment bundle={bundle} props={bookingProps} />}
   </>;
 }
 
-const serviceCardImages: Record<string, string> = {
-  "diagnostics-check-engine-light": `${WP}/2026/04/dnd-services-check-engine-light.webp`,
-  "brake-repair-safety-checks": `${WP}/2026/04/dnd-services-brake-repair.webp`,
-  "engine-repair": `${WP}/2026/04/dnd-services-tune-up-service.webp`,
-  "transmission-service-repair": `${WP}/2026/04/dnd-services-transmission-service.webp`,
-  "steering-suspension-service": `${WP}/2026/04/dnd-services-steering-suspension.webp`,
-  "a-c-repair-recharge": `${WP}/2026/04/dnd-services-ac-repair.webp`,
-  "electrical-systems": `${WP}/2026/04/dnd-services-starting-charging.webp`,
-  "quick-change-oil-service": `${WP}/2026/04/dnd-services-oil-change-fluid.webp`,
-  "tire-services-alignment": `${WP}/2026/03/Micks-Repair-Worthington-MN-4-of-4.jpeg`,
-  "cooling-system-repair": `${WP}/2026/04/dnd-services-cooling-system.webp`,
-  "battery-alternator-starter": `${WP}/2026/04/Battery-Alternator-Starter-scaled.jpg`,
-  "exhaust-emissions": `${WP}/2026/04/Exhaust-Emissions-scaled.jpg`,
-  "fuel-system-repair": `${WP}/2026/04/Fuel-System-Repair-scaled.jpg`,
-  "drivetrain-axles": `${WP}/2026/04/Drivetrain-Axles-scaled.jpg`,
-  "preventative-maintenance": `${WP}/2026/04/Preventative-Maintenance-scaled.jpg`,
-  "vehicle-inspections-pre-purchase": `${WP}/2026/04/Vehicle-Inspections-Pre-Purchase-scaled.jpg`,
-};
-
-async function MicksServices({ bundle, ctx }: { bundle: SiteBundle; ctx: SiteCtx }) {
+async function MicksServices({ bundle, ctx, props }: { bundle: SiteBundle; ctx: SiteCtx; props: BlockProps<"services_grid"> }) {
   const services = await getServices(ctx);
-  const name = bundle.settings?.businessName ?? bundle.site.name;
+  const visibleServices = props.limit ? services.slice(0, props.limit) : services;
   return <section className="micks-services-index section"><div className="container-site">
-    <h2>Comprehensive Automotive Solutions at {name}<br />in Worthington</h2>
-    <p className="micks-services-intro">At {name} in Worthington, we provide a complete range of automotive maintenance and repair services to keep your vehicle performing at its best. Our skilled technicians handle everything from routine upkeep to complex repairs with accuracy and care.</p>
-    <div className="micks-services-grid">{services.map((service) => {
-      const configuredImage = service.imageUrl && !service.imageUrl.includes("terry-eggers") ? service.imageUrl : undefined;
-      const image = configuredImage || serviceCardImages[service.slug] || `${WP}/2026/04/dnd-services-tune-up-service.webp`;
+    <h2><LineBreakText text={globalText(props.heading, bundle)} /></h2>
+    {props.subheading && <p className="micks-services-intro">{globalText(props.subheading, bundle)}</p>}
+    <div className="micks-services-grid">{visibleServices.map((service) => {
+      const image = service.imageUrl;
       return <article key={service.id} style={{ backgroundImage: `linear-gradient(180deg,#0002 10%,#000e 100%),url(${JSON.stringify(image)})` }}>
         <h3>{service.name}</h3>
         {service.summary && <p>{globalText(service.summary, bundle)}</p>}
         <Link href={localSiteHref(bundle.site.slug, `/${service.slug}/`)} style={{ transform: "skewX(var(--button-skew))" }}>
-          <span style={{ transform: "skewX(var(--button-text-skew))" }}>Read More</span>
+          <span style={{ transform: "skewX(var(--button-text-skew))" }}>{props.ctaLabel}</span>
         </Link>
       </article>;
     })}</div>
   </div></section>;
 }
 
-function MicksAbout({ bundle }: { bundle: SiteBundle }) {
+function MicksAbout({ bundle, props }: { bundle: SiteBundle; props: BlockProps<"about"> }) {
   const design = getDesign(bundle.theme ?? {});
   const settings = bundle.settings;
   const name = settings?.businessName ?? bundle.site.name;
-  const ownerName = getOwnerName(bundle);
   const address = formatAddress(settings?.address);
-  const owner = design.aboutOwnerImageUrl || `${WP}/2026/04/micks-repair-worthington-mn-mick-eggers.jpeg`;
-  const team = design.aboutTeamImageUrl || `${WP}/2026/04/micks-repair-worthington-mn-team.jpeg`;
-  const car = design.aboutVehicleImageUrl || `${WP}/2026/04/blue-car.webp`;
-  const legacyThirdCrewImage = `${WP}/2026/04/micks-repair-worthington-mn-customer-checkout.jpeg`;
-  const configuredThirdCrewImage = design.aboutCrewImageThreeUrl;
-  const crew = [
-    {
-      name: "Kelly Eggers",
-      description: "A second-generation member of the family business, carrying forward Mick’s commitment to honest, dependable service.",
-      imageUrl: design.aboutCrewImageOneUrl || `${WP}/2026/04/micks-repair-worthington-mn-kelly-eggers.jpeg`,
-    },
-    {
-      name: "Terry Eggers",
-      description: "Part of the next generation leading the shop with straightforward advice and a focus on doing every job right.",
-      imageUrl: design.aboutCrewImageTwoUrl || `${WP}/2026/04/micks-repair-worthington-mn-terry-eggers.jpeg`,
-    },
-    {
-      name: "Cory Probst",
-      description: "A trusted member of the crew focused on careful workmanship and reliable automotive service.",
-      imageUrl: !configuredThirdCrewImage || configuredThirdCrewImage === legacyThirdCrewImage
-        ? `${WP}/2026/04/micks-repair-worthington-mn-cory-probst.jpeg`
-        : configuredThirdCrewImage,
-    },
-    {
-      name: "Service Team",
-      description: "Helping customers with clear communication from check-in through pickup.",
-      imageUrl: `${WP}/2026/06/team-3.png`,
-    },
-    {
-      name: "Repair Team",
-      description: "Skilled technicians committed to quality repairs and ongoing training.",
-      imageUrl: `${WP}/2026/06/team-1.png`,
-    },
-    {
-      name: "Shop Team",
-      description: "Hands-on care supported by modern tools, experience, and attention to detail.",
-      imageUrl: `${WP}/2026/06/team-2.png`,
-    },
-  ];
-  const workItems = design.aboutWorkItems?.length ? design.aboutWorkItems : [
-    { title: "Straight-Talk Quotes", body: "No surprise add-ons; you approve every line before we touch a bolt." },
-    { title: "Speed With Integrity", body: "Same-day turnaround on most jobs; never at the cost of quality." },
-    { title: "Tools & Talent", body: "ASE-certified techs + factory-level diagnostics." },
-    { title: "Neighbors First", body: "We live where we work, and our name rides on every repair." },
-  ];
+  const owner = props.imageUrl || design.aboutOwnerImageUrl;
+  const team = design.aboutTeamImageUrl;
+  const car = design.aboutVehicleImageUrl;
+  const crew = props.crew.map((member, index) => ({ name: member.title, description: member.body, imageUrl: props.crewImageUrls[index] }));
+  const workItems = design.aboutWorkItems ?? [];
+  const ownerParagraphs = globalText(props.ownerBody, bundle).split(/\n{2,}/).filter(Boolean);
+  const [ownerLabel, ...ownerIntroParts] = (ownerParagraphs[0] ?? "").split("\n");
+  const ownerIntro = ownerIntroParts.join("\n");
   return <>
     <section className="micks-about-page-intro section"><div className="container-site micks-about-page-grid">
       <img src={owner} alt={`Mick Eggers at ${name}`} />
-      <div><div className="micks-live-title"><QuoteMark design={design} className="micks-about-quote" /><h2>About Us</h2></div><h3>Straight answers. Expert guidance.<br />Repairs you can trust.</h3>
-        <p>At {name}, we’ve built our reputation by doing things the right way. For over 35 years, local families in Worthington have trusted us to diagnose issues accurately, explain what’s going on in plain language, and make sure every repair is done right the first time.</p>
-        <p>Conveniently located in historic downtown Worthington, right across from the courthouse, {ownerName} has been part of the community for decades. During Turkey Days, people fill our sidewalk, parking lot, and even the front doorway to watch the parade go by.</p>
-        <p>Today, {ownerName} is run by Mick Eggers and his two sons, Kelly and Terry, carrying forward the same commitment to honest work and doing things the right way. No pressure. No unnecessary repairs. Just straightforward recommendations you can trust.</p>
-        <p>We know your time matters. That’s why we offer free pickup and delivery, making it easier to get your vehicle serviced without disrupting your day.</p>
-        <p>Every decision we make is based on what we would do if it were our own vehicle. That means focusing on what truly needs to be done and helping you move forward with confidence.</p>
+      <div><div className="micks-live-title"><QuoteMark design={design} className="micks-about-quote" /><h2>{props.eyebrow}</h2></div><h3><LineBreakText text={globalText(props.heading, bundle)} /></h3>
+        {globalText(props.body, bundle).split(/\n{2,}/).filter(Boolean).map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
         <CertificationBadges design={design} className="micks-about-badges" />
       </div>
     </div></section>
-    <section className="micks-mission section"><div className="container-site micks-mission-grid"><div><h2>One Shop, One Mission</h2><h3>Keep our neighbors rolling with honest,<br />high-quality auto care.</h3><div className="micks-mission-table"><b>Location</b><b>Phone</b><b>Hours</b><span>{address}</span><a href={telHref(settings?.phone)}>{settings?.phone}</a><span>{groupHours(settings?.hours)[0]?.days}: {groupHours(settings?.hours)[0]?.time}</span></div><div className="micks-live-buttons">{settings?.phone && <a href={telHref(settings.phone)}><span>Call Now</span></a>}<Link href={localSiteHref(bundle.site.slug, design.scheduleCtaHref || "/make-an-appointment/")}><span>Schedule Service</span></Link></div></div><img src={car} alt="Vehicle" /></div></section>
-    <section className="micks-how-we-work section"><div className="container-site"><h2>How We Work</h2><img src={team} alt={`The ${name} team`} /><div className="micks-work-grid">{workItems.map(({ title, body }) => <div key={title}><StepListIcon design={design} label={title} /><b>{title}</b><span>{body}</span></div>)}</div></div></section>
-    <section className="micks-owner section"><div className="container-site"><div className="micks-live-title"><QuoteMark design={design} className="micks-about-quote" /><h2>Meet the Crew</h2></div><div className="micks-owner-grid"><img src={owner} alt="Mick Eggers" /><div><p><strong>Mick Eggers</strong><br />Founder of {name}, Mick Eggers has spent his entire life building a reputation in the Worthington automotive community. For over 35 years, he has led a shop grounded in honesty, transparency, and long-term customer relationships. Today, he’s joined by his two sons, Kelly and Terry, continuing a tradition that has become a trusted name for generations of local families.</p><p>Spend a few minutes in the lobby and you’ll see what sets this place apart. It’s not uncommon to hear a technician, or Mick himself, advising a customer not to move forward with a repair when the cost doesn’t make sense for the vehicle.</p><p>Mick Eggers represents a rare combination of technical expertise, relentless work ethic, and unwavering integrity. It’s what defines {name} and why it continues to earn the trust of the community year after year.</p></div></div></div></section>
+    <section className="micks-mission section"><div className="container-site micks-mission-grid"><div><h2>{props.missionHeading}</h2><h3><LineBreakText text={props.missionBody || ""} /></h3><div className="micks-mission-table"><b>Location</b><b>Phone</b><b>Hours</b><span>{address}</span><a href={telHref(settings?.phone)}>{settings?.phone}</a><span>{groupHours(settings?.hours)[0]?.days}: {groupHours(settings?.hours)[0]?.time}</span></div><div className="micks-live-buttons">{settings?.phone && <a href={telHref(settings.phone)}><span>Call Now</span></a>}<Link href={localSiteHref(bundle.site.slug, design.scheduleCtaHref || "/make-an-appointment/")}><span>{design.scheduleCtaLabel}</span></Link></div></div><img src={car} alt="Vehicle" /></div></section>
+    <section className="micks-how-we-work section"><div className="container-site"><h2>{props.workHeading}</h2><img src={team} alt={`The ${name} team`} /><div className="micks-work-grid">{workItems.map(({ title, body }) => <div key={title}><StepListIcon design={design} label={title} /><b>{title}</b><span>{body}</span></div>)}</div></div></section>
+    <section className="micks-owner section"><div className="container-site"><div className="micks-live-title"><QuoteMark design={design} className="micks-about-quote" /><h2>{props.ownerHeading}</h2></div><div className="micks-owner-grid"><img src={owner} alt="Mick Eggers" /><div>{ownerLabel && <p><strong>{ownerLabel}</strong>{ownerIntro && <><br />{ownerIntro}</>}</p>}{ownerParagraphs.slice(1).map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div></div></div></section>
     <section className="micks-crew-gallery"><div className="container-site">{crew.map((member) => <article className="micks-crew-card" key={member.name} tabIndex={0} aria-label={`${member.name}: ${member.description}`}><img src={member.imageUrl} alt={member.name} /><div className="micks-crew-card-overlay"><h3>{member.name}</h3><p>{member.description}</p></div></article>)}</div></section>
-    <section className="micks-know-cta section"><div><h2>Know Before You Go.</h2><p>Describe what you’re seeing and get a clear answer in seconds.</p><Link href={localSiteHref(bundle.site.slug, design.diagnosticsCtaHref || "/diagnostics/")}><span>Start Diagnosis</span></Link></div></section>
+    <section className="micks-know-cta section"><div><h2>{props.finalHeading}</h2><p>{props.finalBody}</p><Link href={localSiteHref(bundle.site.slug, props.finalCta?.href || design.diagnosticsCtaHref || "/diagnostics/")}><span>{props.finalCta?.label}</span></Link></div></section>
   </>;
 }
 
@@ -166,8 +119,8 @@ function MicksSmartTool({ bundle, kind }: { bundle: SiteBundle; kind: "diagnosti
   </>;
 }
 
-function MicksAppointment({ bundle }: { bundle: SiteBundle }) {
+function MicksAppointment({ bundle, props }: { bundle: SiteBundle; props: BlockProps<"booking_form"> }) {
   const booking = bundle.booking;
   const rules = { slotMinutes: booking?.slotMinutes ?? 30, openTime: booking?.openTime ?? "07:30", closeTime: booking?.closeTime ?? "17:00", closedDays: booking?.closedDays ?? [0, 6] };
-  return <section className="micks-appointment-page section" id="book"><div className="container-site"><BookingFormClient siteSlug={bundle.site.slug} slots={buildSlots(rules)} closedDays={rules.closedDays} disabledDates={booking?.disabledDates ?? []} leadDays={booking?.leadDays ?? 0} confirmation={booking?.confirmationMessage ?? "Thanks! We'll be in touch shortly to confirm."} fields={booking?.formFields ?? []} variant="appointment" appearance={booking?.appearance} /></div></section>;
+  return <section className="micks-appointment-page section" id="book"><div className="container-site"><BookingFormClient siteSlug={bundle.site.slug} slots={buildSlots(rules)} closedDays={rules.closedDays} disabledDates={booking?.disabledDates ?? []} leadDays={booking?.leadDays ?? 0} confirmation={booking?.confirmationMessage ?? "Thanks! We'll be in touch shortly to confirm."} fields={booking?.formFields ?? []} variant="appointment" appearance={booking?.appearance} heading={props.heading} subheading={props.subheading} /></div></section>;
 }
