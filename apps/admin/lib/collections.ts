@@ -70,7 +70,12 @@ export const collections: Record<string, CollectionDef> = {
       { name: "discount", label: "Offer price and savings", kind: "text", help: "For example: $149 (a $350+ value, save 60%). The price headline is generated automatically." },
       { name: "couponCode", label: "Coupon code", kind: "text" },
       { name: "validUntil", label: "Valid until", kind: "date" },
-      { name: "description", label: "What is included", kind: "textarea", wide: true, help: "One included service per line. Existing descriptions with commas also work. To add a short intro, enter it as the first paragraph, leave a blank line, then list the included services." },
+      { name: "includedHeading", label: "Included items heading", kind: "text", wide: true, help: "Defaults to “What's Included”." },
+      { name: "description", label: "Included bullet points", kind: "textarea", wide: true, help: "Enter one item per line; each line appears as a bullet on the offer card. Existing comma-separated descriptions remain supported." },
+      { name: "ctaLabel", label: "Primary button label", kind: "text", help: "Defaults to Call Us (or Book Now if no phone is set)." },
+      { name: "ctaHref", label: "Primary button link", kind: "text", help: "Optional. Use a /page path or an http(s), tel:, or mailto: URL. If blank, the phone or booking link is used." },
+      { name: "couponButtonLabel", label: "Coupon button label", kind: "text", help: "Text before the coupon code; defaults to CODE." },
+      { name: "couponButtonHref", label: "Coupon button link", kind: "text", help: "Optional link for the coupon button. Leave blank to show it as a non-clickable code." },
       { name: "imageUrl", label: "Card background image", kind: "image", help: "A dark overlay keeps text readable; if empty, the website’s inner banner is used." },
       { name: "isActive", label: "Visible on site", kind: "boolean" },
     ],
@@ -179,6 +184,9 @@ export function parseCollectionForm(def: CollectionDef, fd: FormData) {
         out[f.name] = f.options?.includes(raw) ? (f.name === "code" ? Number(raw) : raw) : f.options?.[0];
         break;
       default:
+        if (raw && ["ctaHref", "couponButtonHref"].includes(f.name) && !/^(?:https?:\/\/|tel:|mailto:|\/(?!\/)|#)/i.test(raw)) {
+          throw new Error(`${f.label} must be a site path or an http(s), tel:, or mailto: link`);
+        }
         out[f.name] = raw || null;
     }
     if (f.required && (out[f.name] === null || out[f.name] === "")) throw new Error(`${f.label} is required`);

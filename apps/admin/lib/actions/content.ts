@@ -430,13 +430,23 @@ export async function reorderSections(fd: FormData) {
 
 /* ---------------- collections (services, specials, faqs, ...) ---------------- */
 
+function collectionReturnPath(siteId: string, key: string, fd: FormData) {
+  const requested = str(fd, "returnTo");
+  const prefix = `/sites/${siteId}/pages/`;
+  const suffix = requested.startsWith(prefix) ? requested.slice(prefix.length) : "";
+  return /^[a-f0-9-]{36}(?:\?open=[a-f0-9-]{36})?$/i.test(suffix)
+    ? requested
+    : `/sites/${siteId}/c/${key}`;
+}
+
 export async function saveCollectionItem(fd: FormData) {
   const siteId = str(fd, "siteId");
   const key = str(fd, "collection");
   const itemId = str(fd, "itemId");
   const def = collections[key];
   const { user } = await requireSiteAccess(siteId);
-  return run(`/sites/${siteId}/c/${key}`, async () => {
+  const returnPath = collectionReturnPath(siteId, key, fd);
+  return run(returnPath, async () => {
     if (!def) throw new Error("Unknown collection");
     const values = parseCollectionForm(def, fd);
     const db = getDb();
@@ -447,7 +457,7 @@ export async function saveCollectionItem(fd: FormData) {
       await db.insert(def.table).values({ ...values, siteId, ...(def.sortable ? { sortOrder: count } : {}) });
     }
     await afterChange(siteId, user.id, `${key}.${itemId ? "update" : "create"}`);
-    return { ok: `${def.singular.charAt(0).toUpperCase() + def.singular.slice(1)} saved`, to: `/sites/${siteId}/c/${key}` };
+    return { ok: `${def.singular.charAt(0).toUpperCase() + def.singular.slice(1)} saved`, to: returnPath };
   });
 }
 
@@ -458,7 +468,7 @@ export async function collectionOp(fd: FormData) {
   const op = str(fd, "op");
   const def = collections[key];
   const { user } = await requireSiteAccess(siteId);
-  return run(`/sites/${siteId}/c/${key}`, async () => {
+  return run(collectionReturnPath(siteId, key, fd), async () => {
     if (!def) throw new Error("Unknown collection");
     const db = getDb();
     if (op === "delete") {

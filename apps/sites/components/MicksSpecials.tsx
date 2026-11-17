@@ -57,6 +57,10 @@ function OfferCard({ item, bundle, featured, fallbackImage }: { item: Offer; bun
   const phone = telHref(bundle.settings?.phone);
   const ctaHref = phone || localSiteHref(bundle.site.slug, "/make-an-appointment/");
   const image = item.imageUrl || fallbackImage;
+  const actionHref = item.ctaHref ? localSiteHref(bundle.site.slug, item.ctaHref) : ctaHref;
+  const actionLabel = globalText(item.ctaLabel, bundle).trim() || (phone ? "Call Us" : "Book Now");
+  const couponLabel = globalText(item.couponButtonLabel, bundle).trim() || "CODE";
+  const couponHref = item.couponButtonHref ? localSiteHref(bundle.site.slug, item.couponButtonHref) : null;
   return (
     <article className={`micks-offer-card ${featured ? "micks-offer-featured" : "micks-offer-compact"}`} style={backgroundStyle(image)}>
       <div className="micks-offer-shade" aria-hidden="true" />
@@ -74,14 +78,16 @@ function OfferCard({ item, bundle, featured, fallbackImage }: { item: Offer; bun
         </div>
         {copy.items.length > 0 && (
           <div className="micks-offer-included">
-            <h4>What&apos;s Included</h4>
+            <h4>{globalText(item.includedHeading, bundle).trim() || "What's Included"}</h4>
             <ul>{copy.items.map((part, index) => <li key={`${item.id}-included-${index}`}>{part}</li>)}</ul>
           </div>
         )}
         {copy.note && <p className="micks-offer-note">{copy.note}</p>}
         <div className="micks-offer-actions">
-          <a className="micks-offer-call" href={ctaHref}><span>{phone ? "Call Us" : "Book Now"}</span></a>
-          {item.couponCode && <span className="micks-offer-code"><span>CODE &ldquo;{item.couponCode}&rdquo;</span></span>}
+          <a className="micks-offer-call" href={actionHref}><span>{actionLabel}</span></a>
+          {item.couponCode && (couponHref
+            ? <a className="micks-offer-code" href={couponHref}><span>{couponLabel} &ldquo;{item.couponCode}&rdquo;</span></a>
+            : <span className="micks-offer-code"><span>{couponLabel} &ldquo;{item.couponCode}&rdquo;</span></span>)}
         </div>
         {item.validUntil && <p className="micks-offer-expiry">Valid until {item.validUntil}</p>}
       </div>
@@ -92,9 +98,7 @@ function OfferCard({ item, bundle, featured, fallbackImage }: { item: Offer; bun
 export async function MicksSpecials({ bundle, ctx, props }: { bundle: SiteBundle; ctx: SiteCtx; props: BlockProps<"specials"> }) {
   const offers = await getSpecials(ctx);
   const sourceHeading = props.heading?.trim();
-  // Treat legacy seeded copy as the template default, but respect a custom CMS heading.
-  const heading = globalText(!sourceHeading || ["current specials", "this month's deals"].includes(sourceHeading.toLowerCase())
-    ? "Featured Offers & Specials" : sourceHeading, bundle);
+  const heading = globalText(sourceHeading || "Featured Offers & Specials", bundle);
   const design = getDesign(bundle.theme ?? {});
   const fallbackImage = design.innerHeroImageUrl;
   const [featured, ...rest] = offers;

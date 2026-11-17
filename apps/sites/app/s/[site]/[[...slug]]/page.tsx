@@ -10,6 +10,7 @@ import { localSiteHref } from "@/lib/url";
 import { getDesign } from "@platform/db/theme";
 import { MicksInnerHero } from "@/components/MicksInnerHero";
 import { MicksContentPage } from "@/components/MicksContentPages";
+import { MicksSpecials } from "@/components/MicksSpecials";
 import { CertificationBadges } from "@/components/CertificationBadge";
 import { QuoteMark } from "@/components/QuoteMark";
 import { StepListIcon } from "@/components/TrustListIcon";
@@ -81,6 +82,13 @@ export default async function Page({ params, searchParams }: Props) {
       } catch {}
     }
     if (sectionPreview && query.sectionOnly === "1") {
+      const selectedSection = sections.find((section) => section.id === sectionPreview);
+      if (design.headerStyle === "angled" && r.slug === "specials" && selectedSection?.type === "specials") {
+        const props = parseBlock("specials", selectedSection.props);
+        if (props) {
+          return <div className="cms-section-preview"><style>{`body:has(.cms-section-preview)>header,body:has(.cms-section-preview)>footer,body:has(.cms-section-preview)>.sticky{display:none!important}body:has(.cms-section-preview){background:var(--color-background);overflow-x:hidden}.cms-section-preview{min-height:100vh}`}</style><MicksSpecials ctx={ctx} bundle={bundle} props={props} /></div>;
+        }
+      }
       return <div className="cms-section-preview"><style>{`body:has(.cms-section-preview)>header,body:has(.cms-section-preview)>footer,body:has(.cms-section-preview)>.sticky{display:none!important}body:has(.cms-section-preview){background:var(--color-background);overflow-x:hidden}.cms-section-preview{min-height:100vh}`}</style><RenderSections sections={sections.filter((section) => section.id === sectionPreview)} ctx={ctx} bundle={bundle} pageSlug={r.slug} /></div>;
     }
     // Diagnostics and Tires are composed from normal CMS sections so their

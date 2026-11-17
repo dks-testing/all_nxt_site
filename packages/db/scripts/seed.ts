@@ -371,7 +371,7 @@ async function main() {
       seoDescription: "Current auto repair specials at Mick's Repair in Worthington, MN: oil changes, alignment and service packages.",
       sections: [
         ["hero", { heading: "Current specials", subheading: "Mention the code when you book.", showRating: false, badges: [] }],
-        ["specials", { heading: "This month's deals" }],
+        ["specials", { heading: "Featured Offers & Specials" }],
         ["booking_form", { heading: "Book your special" }],
       ],
     },

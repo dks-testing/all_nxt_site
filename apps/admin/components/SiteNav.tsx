@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 
 const groups: { title: string; items: [string, string][] }[] = [
   { title: "Site", items: [["", "Dashboard"], ["global", "Global settings"], ["branding", "Branding"], ["business", "Business info"], ["media", "Media library"], ...(process.env.NODE_ENV === "development" ? [] : [["domains", "Domains"] as [string, string]])] },
-  { title: "Content", items: [["pages", "Pages"], ["c/services", "Services"], ["c/specials", "Specials"], ["c/banners", "Banners"], ["c/faqs", "FAQ"], ["c/testimonials", "Testimonials"], ["c/case-studies", "Case studies"], ["navigation", "Header & footer"]] },
+  { title: "Content", items: [["pages", "Pages"], ["c/services", "Services"], ["c/banners", "Banners"], ["c/faqs", "FAQ"], ["c/testimonials", "Testimonials"], ["c/case-studies", "Case studies"], ["navigation", "Header & footer"]] },
   { title: "Operations", items: [["booking", "Booking & appointments"], ["integrations", "Integrations"], ["c/redirects", "Redirects"], ["team", "Team"]] },
 ];
 

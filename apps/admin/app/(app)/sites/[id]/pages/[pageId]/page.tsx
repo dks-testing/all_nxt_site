@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getDb, pages, pageSections, media, themes, eq, and, asc, desc } from "@platform/db";
+import { getDb, pages, pageSections, media, themes, specials, eq, and, asc, desc } from "@platform/db";
 import { blockLabels, blockTypes, isBlockType } from "@platform/db/blocks";
 import { getDesign } from "@platform/db/theme";
 import { loadSite } from "@/lib/site";
@@ -9,13 +9,13 @@ import { savePageMeta, deletePage, addSection, saveSection, sectionOp, reorderSe
 import { Card, Input, Textarea, Checkbox } from "@/components/ui";
 import { SectionFields } from "@/components/SectionForm";
 import { SectionEditor } from "@/components/SectionEditor";
+import { SpecialsSectionManager } from "@/components/SpecialsSectionManager";
 import { SortableSections } from "@/components/SortableSections";
 import { SubmitButton } from "@/components/ConfirmButton";
 import { MediaPicker } from "@/components/MediaPicker";
 
 const collectionHint: Partial<Record<string, [string, string]>> = {
   services_grid: ["c/services", "Services"],
-  specials: ["c/specials", "Specials"],
   reviews: ["c/testimonials", "Testimonials"],
   case_studies: ["c/case-studies", "Case studies"],
   faq: ["c/faqs", "FAQ"],
@@ -24,8 +24,9 @@ const collectionHint: Partial<Record<string, [string, string]>> = {
   embed: ["integrations", "Integrations"],
 };
 
-export default async function PageEditor({ params }: { params: Promise<{ id: string; pageId: string }> }) {
+export default async function PageEditor({ params, searchParams }: { params: Promise<{ id: string; pageId: string }>; searchParams?: Promise<{ open?: string }> }) {
   const { id, pageId } = await params;
+  const { open: openSection } = searchParams ? await searchParams : {};
   const { site } = await loadSite(id, "EDITOR");
   const db = getDb();
   const [page] = await db.select().from(pages).where(and(eq(pages.id, pageId), eq(pages.siteId, id)));
@@ -33,6 +34,9 @@ export default async function PageEditor({ params }: { params: Promise<{ id: str
   const [theme] = await db.select({ design: themes.design }).from(themes).where(eq(themes.siteId, id)).limit(1);
   const angledInnerPage = page.slug !== "" && getDesign(theme ?? {}).headerStyle === "angled";
   const sections = await db.select().from(pageSections).where(and(eq(pageSections.pageId, pageId), eq(pageSections.siteId, id))).orderBy(asc(pageSections.sortOrder));
+  const specialOffers = sections.some((section) => section.type === "specials")
+    ? await db.select().from(specials).where(eq(specials.siteId, id)).orderBy(asc(specials.sortOrder))
+    : [];
   const assets = await db.select({ id: media.id, url: media.url, alt: media.alt, width: media.width, height: media.height }).from(media).where(eq(media.siteId, id)).orderBy(desc(media.createdAt));
   const publicOrigin = (process.env.SITES_APP_URL || "http://localhost:3000").replace(/\/$/, "");
   const pagePreviewUrl = await previewUrl(site, page.slug ? `/${page.slug}/` : "/");
@@ -76,10 +80,14 @@ export default async function PageEditor({ params }: { params: Promise<{ id: str
           {sections.map((s, i) => {
             if (!isBlockType(s.type)) return null;
             const sectionType = s.type;
-            const hint = collectionHint[s.type];
+            const hint = s.type === "specials" ? (
+              <p className="mb-4 rounded-md bg-indigo-50 px-3 py-2 text-xs text-indigo-800">Set the section heading and intro here. Edit the offer cards below.</p>
+            ) : collectionHint[s.type] ? (
+              <p className="mb-4 rounded-md bg-indigo-50 px-3 py-2 text-xs text-indigo-800">This section shows content from <Link className="font-semibold underline" href={`/sites/${id}/${collectionHint[s.type]![0]}`}>{collectionHint[s.type]![1]}</Link>.</p>
+            ) : undefined;
             const summary = (s.props as { heading?: string }).heading;
             return (
-              <details key={s.id} id={`s-${s.id}`} data-section-id={s.id} className={`card group ${s.isVisible ? "" : "opacity-60"}`}>
+              <details key={s.id} id={`s-${s.id}`} data-section-id={s.id} open={openSection === s.id} className={`card group ${s.isVisible ? "" : "opacity-60"}`}>
                 <summary className="flex items-center gap-3 p-4">
                   <button type="button" draggable data-drag-handle className="cursor-grab rounded-md px-1 text-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 active:cursor-grabbing" title="Drag to reorder" aria-label={`Drag ${blockLabels[s.type]} section to reorder`}>⋮⋮</button>
                   <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-slate-100 text-xs font-bold text-slate-600">{i + 1}</span>
@@ -99,9 +107,10 @@ export default async function PageEditor({ params }: { params: Promise<{ id: str
                     ))}
                   </span>
                 </summary>
-                <SectionEditor action={saveSection} type={sectionType} sectionId={s.id} previewBaseUrl={pagePreviewUrl} initialProps={s.props} visible={s.isVisible} hidden={hidden(s.id)} hint={hint && <p className="mb-4 rounded-md bg-indigo-50 px-3 py-2 text-xs text-indigo-800">This section shows content from <Link className="font-semibold underline" href={`/sites/${id}/${hint[0]}`}>{hint[1]}</Link>.</p>}>
+                <SectionEditor action={saveSection} type={sectionType} sectionId={s.id} previewBaseUrl={pagePreviewUrl} initialProps={s.props} visible={s.isVisible} hidden={hidden(s.id)} hint={hint}>
                   <SectionFields type={sectionType} props={s.props} siteId={id} media={assets} publicOrigin={publicOrigin} isHomePage={page.slug === ""} hideHeroDesign={angledInnerPage} />
                 </SectionEditor>
+                {sectionType === "specials" && <SpecialsSectionManager siteId={id} pageId={pageId} sectionId={s.id} offers={specialOffers} assets={assets} publicOrigin={publicOrigin} />}
               </details>
             );
           })}

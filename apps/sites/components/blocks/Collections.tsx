@@ -43,20 +43,34 @@ export async function Specials({ ctx, bundle, props }: BlockComponentProps<"spec
       <div className="container-site">
         <h2 className="mb-10 text-center text-3xl font-bold uppercase md:text-4xl">{props.heading}</h2>
         <div className="grid gap-6 md:grid-cols-3">
-          {items.map((sp) => (
-            <div key={sp.id} className="flex flex-col overflow-hidden rounded-site border-2 border-dashed border-[var(--color-primary)] bg-white">
-              <div className="bg-[var(--color-primary)] px-6 py-4 text-[var(--color-primary-foreground)]">
-                <h3 className="text-xl font-bold uppercase leading-tight">{globalText(sp.title, bundle)}</h3>
-                {sp.discount && <p className="mt-1 font-semibold">{globalText(sp.discount, bundle)}</p>}
+          {items.map((sp) => {
+            const paragraphs = (sp.description ?? "").split(/\r?\n\s*\r?\n/).map((part) => part.trim()).filter(Boolean);
+            const intro = paragraphs.length > 1 ? paragraphs[0] : "";
+            const included = paragraphs.length > 1 ? paragraphs.slice(1).join("\n") : paragraphs[0] ?? "";
+            const bulletItems = included.split(/\r?\n/).map((part) => part.trim()).filter(Boolean);
+            const actionHref = sp.ctaHref ? localSiteHref(bundle.site.slug, sp.ctaHref) : telHref(bundle.settings?.phone) ?? localSiteHref(bundle.site.slug, "/make-an-appointment/");
+            const couponHref = sp.couponButtonHref ? localSiteHref(bundle.site.slug, sp.couponButtonHref) : null;
+            return (
+              <div key={sp.id} className="flex flex-col overflow-hidden rounded-site border-2 border-dashed border-[var(--color-primary)] bg-white">
+                <div className="bg-[var(--color-primary)] px-6 py-4 text-[var(--color-primary-foreground)]">
+                  <h3 className="text-xl font-bold uppercase leading-tight">{globalText(sp.title, bundle)}</h3>
+                  {sp.discount && <p className="mt-1 font-semibold">{globalText(sp.discount, bundle)}</p>}
+                </div>
+                <div className="flex flex-1 flex-col p-6">
+                  {sp.description && <div className="flex-1 text-sm text-[var(--color-muted)]">
+                    {intro && <p className="mb-3">{globalText(intro, bundle)}</p>}
+                    <h4 className="mb-2 font-bold">{globalText(sp.includedHeading, bundle).trim() || "What's Included"}</h4>
+                    <ul className="list-disc space-y-1 pl-5">{bulletItems.map((item, index) => <li key={`${sp.id}-included-${index}`}>{globalText(item, bundle)}</li>)}</ul>
+                  </div>}
+                  {sp.couponCode && (couponHref
+                    ? <a href={couponHref} className="btn btn-secondary mt-4"><span>{globalText(sp.couponButtonLabel, bundle).trim() || "Code"}: {sp.couponCode}</span></a>
+                    : <p className="mt-4 text-sm">{globalText(sp.couponButtonLabel, bundle).trim() || "Code"}: <strong className="rounded bg-[var(--color-surface)] px-2 py-1 font-mono">{sp.couponCode}</strong></p>)}
+                  {sp.validUntil && <p className="mt-2 text-xs text-[var(--color-muted)]">Valid until {sp.validUntil}</p>}
+                  <a href={actionHref} className="btn btn-primary mt-5"><span>{globalText(sp.ctaLabel, bundle).trim() || "Claim offer"}</span></a>
+                </div>
               </div>
-              <div className="flex flex-1 flex-col p-6">
-                {sp.description && <p className="flex-1 text-sm text-[var(--color-muted)]">{globalText(sp.description, bundle)}</p>}
-                {sp.couponCode && <p className="mt-4 text-sm">Code: <strong className="rounded bg-[var(--color-surface)] px-2 py-1 font-mono">{sp.couponCode}</strong></p>}
-                {sp.validUntil && <p className="mt-2 text-xs text-[var(--color-muted)]">Valid until {sp.validUntil}</p>}
-                <a href={telHref(bundle.settings?.phone) ?? localSiteHref(bundle.site.slug, "/make-an-appointment/")} className="btn btn-primary mt-5"><span>Claim offer</span></a>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

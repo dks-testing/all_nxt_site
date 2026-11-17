@@ -53,7 +53,7 @@ export const blockSchemas = {
     limit: z.number().int().min(1).max(50).optional(),
     ctaLabel: z.string().optional(),
   }),
-  specials: z.object({ heading: z.string().default("Current specials"), subheading: z.string().optional() }),
+  specials: z.object({ heading: z.string().default("Featured Offers & Specials"), subheading: z.string().optional() }),
   reviews: z.object({
     heading: z.string().default("What our customers say"),
     limit: z.number().int().min(1).max(30).default(6),

@@ -2,34 +2,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDb, media, eq, asc, desc } from "@platform/db";
 import { loadSite } from "@/lib/site";
-import { collections, type CField } from "@/lib/collections";
+import { collections } from "@/lib/collections";
 import { saveCollectionItem, collectionOp } from "@/lib/actions/content";
 import { PageHeader, Card, Empty } from "@/components/ui";
 import { SubmitButton } from "@/components/ConfirmButton";
-import { MediaPicker, type MediaAsset } from "@/components/MediaPicker";
+import { CollectionFieldInput } from "@/components/CollectionFieldInput";
 
 type Row = Record<string, unknown> & { id: string };
-
-function toInput(f: CField, v: unknown) {
-  if (v === null || v === undefined) return "";
-  if (f.kind === "datetime" && (v instanceof Date || typeof v === "string")) return new Date(v).toISOString().slice(0, 16);
-  if (f.kind === "list" && Array.isArray(v)) return v.join("\n");
-  return String(v);
-}
-
-function FieldInput({ f, row, siteId, assets, publicOrigin }: { f: CField; row?: Row; siteId: string; assets: MediaAsset[]; publicOrigin: string }) {
-  const v = row?.[f.name];
-  const cls = f.wide || f.kind === "textarea" || f.kind === "list" ? "sm:col-span-2" : "";
-  const help = f.help && <p className="help">{f.help}</p>;
-  if (f.kind === "image") return <MediaPicker siteId={siteId} name={f.name} label={f.label} value={toInput(f, v)} assets={assets} publicOrigin={publicOrigin} maxWidth={collectionWidth(f.name)} className={cls} />;
-  if (f.kind === "boolean") return <label className="flex items-center gap-2 text-sm"><input type="checkbox" name={f.name} defaultChecked={row ? Boolean(v) : true} /> {f.label}</label>;
-  if (f.kind === "select") return <label className={`block ${cls}`}><span className="label">{f.label}</span><select name={f.name} defaultValue={toInput(f, v) || f.options?.[0]} className="input">{f.options?.map((o) => <option key={o}>{o}</option>)}</select>{help}</label>;
-  if (f.kind === "textarea" || f.kind === "list") return <label className={`block ${cls}`}><span className="label">{f.label}</span><textarea name={f.name} defaultValue={toInput(f, v)} rows={f.name === "body" ? 8 : 4} required={f.required} className="input" />{help}</label>;
-  const type = { number: "number", date: "date", datetime: "datetime-local", url: "url" }[f.kind as string] ?? "text";
-  return <label className={`block ${cls}`}><span className="label">{f.label}</span><input name={f.name} type={type} defaultValue={toInput(f, v)} required={f.required} className="input" />{help}</label>;
-}
-
-const collectionWidth = (name: string) => name.toLowerCase().includes("logo") ? 600 : 1400;
 
 export default async function CollectionPage({ params, searchParams }: { params: Promise<{ id: string; collection: string }>; searchParams: Promise<{ edit?: string; new?: string }> }) {
   const { id, collection } = await params;
@@ -55,7 +34,7 @@ export default async function CollectionPage({ params, searchParams }: { params:
             <input type="hidden" name="siteId" value={id} />
             <input type="hidden" name="collection" value={collection} />
             {editing && <input type="hidden" name="itemId" value={editing.id} />}
-            {def.fields.map((f) => <FieldInput key={f.name} f={f} row={editing} siteId={id} assets={assets} publicOrigin={publicOrigin} />)}
+            {def.fields.map((f) => <CollectionFieldInput key={f.name} field={f} row={editing} siteId={id} assets={assets} publicOrigin={publicOrigin} />)}
             <div className="flex gap-2 sm:col-span-2">
               <SubmitButton>Save</SubmitButton>
               <Link href={base} className="btn btn-secondary">Cancel</Link>
