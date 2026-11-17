@@ -6,6 +6,7 @@ import { getDesign } from "@platform/db/theme";
 import { localSiteHref } from "@/lib/url";
 import { globalText } from "@/lib/global-content";
 import { ActiveNavLink } from "./ActiveNavLink";
+import { MicksMobileMenu } from "./MicksMobileMenu";
 
 export function SiteHeader({ bundle, topBar }: { bundle: SiteBundle; topBar?: { heading: string; ctaLabel: string | null; ctaUrl: string | null } | null }) {
   const { settings, theme, headerMenu } = bundle;
@@ -113,15 +114,16 @@ function AngledHeader({ bundle }: { bundle: SiteBundle }) {
         {settings?.phone && <a href={telHref(settings.phone)} className="micks-phone-panel" aria-label={`Call ${settings.phone}`}>
           <strong>{settings.phone}</strong><span>{hours}</span>
         </a>}
-        <details className="micks-mobile-menu">
-          <summary className="p-3" aria-label="Open menu"><MenuIcon /></summary>
-          <nav aria-label="Mobile navigation" className="micks-mobile-menu-list">
-            {links.map((item) => <div key={item.href + item.label}>
-              <Link href={localSiteHref(bundle.site.slug, item.href)} className="block px-4 py-2 font-semibold">{globalText(item.label, bundle)}</Link>
-              {item.children?.map((child) => <Link href={localSiteHref(bundle.site.slug, child.href)} key={child.href} className="block px-7 py-1.5 text-sm">{globalText(child.label, bundle)}</Link>)}
-            </div>)}
-          </nav>
-        </details>
+        <MicksMobileMenu
+          name={name}
+          logoUrl={theme?.logoUrl}
+          homeHref={localSiteHref(bundle.site.slug, "/")}
+          links={links.map((item) => ({
+            label: globalText(item.label, bundle),
+            href: localSiteHref(bundle.site.slug, item.href),
+            children: item.children?.map((child) => ({ label: globalText(child.label, bundle), href: localSiteHref(bundle.site.slug, child.href) })),
+          }))}
+        />
       </div>
     </header>
   );

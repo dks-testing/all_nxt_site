@@ -181,6 +181,62 @@ details>summary::-webkit-details-marker {
   display: block;
 }
 
+.mobile-fixed-call {
+  box-sizing: border-box;
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 50;
+  min-height: 81px;
+  padding: 10px 20px calc(10px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  color: var(--button-text, #fff);
+  background: var(--button-bg, #c92f2f);
+  box-shadow: 0 -5px 18px rgb(0 0 0 / 18%);
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  transform: skewX(var(--button-skew, 0deg));
+  transform-origin: center bottom;
+  margin-inline: 20px;
+
+}
+
+.mobile-fixed-call > span {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 17px;
+  font-weight: 700;
+  /* font-style: italic; */
+  line-height: 1.1;
+  transform: skewX(var(--button-text-skew, 0deg));
+}
+
+.mobile-fixed-call > span svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.5;
+}
+
+.mobile-fixed-call > strong {
+  font-family: var(--font-body);
+  font-size: 20px;
+  font-weight: 700;
+  /* font-style: italic; */
+  line-height: 1.1;letter-spacing: .03em;
+  transform: skewX(var(--button-text-skew, 0deg));
+}
+
+.mobile-fixed-call:hover,
+.mobile-fixed-call:focus-visible {
+  color: var(--button-hover-text, #fff);
+  background: var(--button-hover-bg, #a91919);
+}
+
 /* Mick's angled header is a site-selectable theme, not a global tenant override. */
 .micks-header-outer {
   background: transparent;
@@ -345,18 +401,188 @@ details>summary::-webkit-details-marker {
   margin-left: auto;
 }
 
+.micks-mobile-menu-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.micks-mobile-submenu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.micks-mobile-menu-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+}
+
 .micks-mobile-menu-list {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  min-width: min(80vw, 320px);
-  max-height: 75vh;
+  box-sizing: border-box;
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: min(360px, calc(100vw - 16px));
+  height: 100dvh;
   overflow-y: auto;
+  background: #f1f1f1;
+  box-shadow: 8px 0 24px #0003;
+  z-index: 61;
+  padding: 10px 20px 32px;
+  will-change: transform, opacity;
+}
+
+.micks-mobile-menu-layer.is-opening .micks-mobile-menu-list {
+  animation: micks-menu-slide-in 360ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.micks-mobile-menu-layer.is-closing .micks-mobile-menu-list {
+  animation: micks-menu-slide-out 360ms cubic-bezier(.4, 0, .2, 1) both;
+}
+
+.micks-mobile-menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  border: 0;
+  background: rgb(0 0 0 / 58%);
+  cursor: default;
+}
+
+.micks-mobile-menu-layer.is-opening .micks-mobile-menu-overlay {
+  animation: micks-menu-overlay-in 220ms ease-out both;
+}
+
+.micks-mobile-menu-layer.is-closing .micks-mobile-menu-overlay {
+  animation: micks-menu-overlay-out 320ms ease-in both;
+}
+
+.micks-mobile-menu-close {
+  position: fixed;
+  top: 20px;
+  right: calc(100vw - min(360px, calc(100vw - 16px)) + 12px);
+  z-index: 62;
+  width: 45px;
+  height: 41px;
+  padding: 0;
+  border: 0;
+  background: var(--button-bg, #c62828);
+  color: transparent;
+  cursor: pointer;
+}
+
+.micks-mobile-menu-close::before,
+.micks-mobile-menu-close::after {
+  content: "";
+  position: absolute;
+  top: 19px;
+  left: 12px;
+  width: 21px;
+  height: 4px;
+  border-radius: 1px;
   background: #fff;
-  box-shadow: 0 8px 20px #0003;
-  border-radius: 6px;
-  z-index: 20;
-  padding: 12px 0;
+}
+
+.micks-mobile-menu-close::before { transform: rotate(45deg); }
+.micks-mobile-menu-close::after { transform: rotate(-45deg); }
+
+.micks-mobile-menu-head {
+  display: flex;
+  height: 61px;
+  align-items: flex-start;
+  padding-right: 58px;
+}
+
+.micks-mobile-menu-head a {
+  display: block;
+  width: 165px;
+  height: auto;
+}
+
+.micks-mobile-menu-head img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.micks-mobile-menu-links {
+  padding-top: 7px;
+}
+
+.micks-mobile-menu-links > a,
+.micks-mobile-submenu > summary {
+  display: flex;
+  min-height: 35px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+  color: #111;
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.25;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.micks-mobile-submenu > summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.micks-mobile-submenu > summary svg {
+  width: 17px;
+  height: 17px;
+  margin-right: 1px;
+  transition: transform 160ms ease;
+}
+
+.micks-mobile-submenu[open] > summary svg { transform: rotate(180deg); }
+
+.micks-mobile-submenu > div {
+  padding: 0 0 8px 14px;
+}
+
+.micks-mobile-submenu > div a {
+  display: block;
+  padding: 6px 0;
+  color: #333;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+@keyframes micks-menu-slide-in {
+  from { transform: translateX(-100%); opacity: .72; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes micks-menu-slide-out {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(-100%); opacity: .72; }
+}
+
+@keyframes micks-menu-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes micks-menu-overlay-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+body.micks-menu-open {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .micks-mobile-menu-list,
+  .micks-mobile-menu-overlay {
+    animation-duration: 1ms;
+  }
 }
 
 @media (min-width: 1025px) and (max-width: 1200px) {
@@ -391,8 +617,16 @@ details>summary::-webkit-details-marker {
     display: block;
   }
 
+  .micks-mobile-menu-trigger {
+    box-sizing: border-box;
+    width: 60px;
+    height: 48px;
+    border: 1px solid var(--button-bg, #c62828);
+    padding: 8px;
+  }
+
   .micks-phone-panel {
-    min-width: 185px;
+    display: none;
   }
 }
 
@@ -1903,7 +2137,7 @@ details>summary::-webkit-details-marker {
   }
 
   .micks-about-copy {
-    padding-inline: 8px;
+    /* padding-inline: 8px; */
   }
 
   .micks-ai-grid {
@@ -6519,6 +6753,22 @@ details>summary::-webkit-details-marker {
 }
 
 @media (max-width: 767px) {
+  .micks-cases-intro, .micks-cases-closing{
+    max-width: 100%;
+  }
+  .micks-smart-feature-intro > .container-site{
+    padding-inline: 0px;
+  }
+  .micks-about{
+    padding-block: 0px;
+  }
+  .micks-reviews,
+  .micks-cases,
+  .micks-tires-section,
+  .micks-contact-booking,
+  .container-site.micks-footer-main-grid{
+    padding-block: 30px;
+  }
   .micks-home-social-proof{
     justify-content: space-between;width: 85%; margin: 0 auto; gap: 10px
   }
@@ -6580,11 +6830,12 @@ details>summary::-webkit-details-marker {
   }
 
   main > section.micks-home-hero {
-    padding-inline: 0; padding-bottom: 0;
+    padding-inline: 0; padding-bottom: 30px;
   }
 
   .micks-home-hero > .container-site {
     padding-inline: 20px;
+    padding-block: 0;
   }
 
   .micks-home-actions {
@@ -6597,7 +6848,7 @@ details>summary::-webkit-details-marker {
 
   .container-site {
     padding-inline: 20px;
-    padding-block:30px;
+    padding-block:0px;
   }
 
   main > section {
@@ -6607,13 +6858,16 @@ details>summary::-webkit-details-marker {
   main > section .container-site {
     padding-inline: 0;
   }
-
-  main > section + section {
-    margin-top: 20px;
+  main > section .container-site.micks-about-grid {
+    padding-inline: 0; padding-block:30px
   }
 
+  /* main > section + section {
+    margin-top: 30px;
+  } */
+
   .section {
-    padding-block: 20px;
+     margin:0;
   }
 
   .micks-contact-page.section,
@@ -6657,7 +6911,7 @@ details>summary::-webkit-details-marker {
     margin-left: auto;
   }
 
-  .micks-mobile-menu > summary {
+  .micks-mobile-menu-trigger {
     box-sizing: border-box;
     display: flex;
     width: 60px;
@@ -6666,5 +6920,9 @@ details>summary::-webkit-details-marker {
     justify-content: center;
     border: 1px solid var(--button-bg, #c62828);
     padding: 8px;
+  }
+
+  .micks-ai-section {
+    padding: 30px 20px;
   }
 }

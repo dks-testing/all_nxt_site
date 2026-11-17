@@ -71,8 +71,8 @@ export function SiteFooter({ bundle }: { bundle: SiteBundle }) {
         </div>
       </footer>
       {settings?.phone && (
-        <a href={telHref(settings.phone)} className="btn btn-primary fixed inset-x-3 bottom-3 z-50 shadow-2xl sm:hidden">
-          <PhoneIcon className="h-5 w-5" /><span>Call {settings.phone}</span>
+        <a href={telHref(settings.phone)} className="mobile-fixed-call sm:hidden" aria-label={`Make a call to ${settings.phone}`}>
+          <span><PhoneIcon />{settings.phone}</span><strong>Make a Call</strong>
         </a>
       )}
     </>
@@ -161,6 +161,6 @@ function MicksFooter({ bundle }: { bundle: SiteBundle }) {
         </div>
       </div>
     </footer>
-    {settings?.phone && <a href={telHref(settings.phone)} className="btn btn-primary fixed inset-x-3 bottom-3 z-50 shadow-2xl sm:hidden"><PhoneIcon className="h-5 w-5" /><span>Call {settings.phone}</span></a>}
+    {settings?.phone && <a href={telHref(settings.phone)} className="mobile-fixed-call sm:hidden" aria-label={`Make a call to ${settings.phone}`}><span><PhoneIcon />{settings.phone}</span><strong>Make a Call</strong></a>}
   </>;
 }
