@@ -188,7 +188,7 @@ details>summary::-webkit-details-marker {
   z-index: 50;
   min-height: 81px;
   padding: 10px 20px calc(10px + env(safe-area-inset-bottom));
-  display: flex;
+  display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -235,6 +235,12 @@ details>summary::-webkit-details-marker {
 .mobile-fixed-call:focus-visible {
   color: var(--button-hover-text, #fff);
   background: var(--button-hover-bg, #a91919);
+}
+
+@media (max-width: 639px) {
+  .mobile-fixed-call {
+    display: flex;
+  }
 }
 
 /* Mick's angled header is a site-selectable theme, not a global tenant override. */
@@ -543,14 +549,15 @@ details>summary::-webkit-details-marker {
 .micks-mobile-submenu[open] > summary svg { transform: rotate(180deg); }
 
 .micks-mobile-submenu > div {
-  padding: 0 0 8px 14px;
+  /* padding: 0 0 8px 14px; */
 }
 
 .micks-mobile-submenu > div a {
   display: block;
   padding: 6px 0;
-  color: #333;
-  font-size: 15px;
+  color: #111;
+  font-size: 18px;
+  font-weight: 500;
   text-decoration: none;
 }
 
@@ -978,7 +985,7 @@ body.micks-menu-open {
   }
 
   .micks-home-trust-card {
-    min-height: 235px;
+    min-height: auto;
     padding: 15px 10px;
     border-radius: 22px;
   }
@@ -1425,7 +1432,7 @@ body.micks-menu-open {
 
 .micks-about-copy .prose-site {
   color: #090909;
-  font-size: 15.5px;
+  font-size: 16px;
   font-weight: 500;
   line-height: 1.45;
 }
@@ -2522,7 +2529,7 @@ body.micks-menu-open {
 
 .micks-smart-feature-final {
   color: #fff;
-  background: #6a8fb5;
+  /* background: #6a8fb5; */
 }
 
 .micks-smart-feature-final .micks-smart-feature-grid>img {
@@ -3068,6 +3075,7 @@ body.micks-menu-open {
   border-radius: 40px;
   color: #0c0c0c;
   background: linear-gradient(180deg, #fff 0%, rgb(106 143 181 / 30%) 100%);
+  margin-bottom:20px
 }
 
 .micks-smart-feature-final .micks-smart-feature-copy-wrap {
@@ -3244,7 +3252,7 @@ body.micks-menu-open {
   margin-bottom: 18px;
   font-size: clamp(58px, 5vw, 80px);
   line-height: 1.05;
-  text-align: center;
+ 
 }
 
 .micks-shared-banner-actions {
@@ -5856,7 +5864,7 @@ body.micks-menu-open {
   }
 
   .micks-mission-table {
-    grid-template-columns: 1fr;
+    overflow-x: scroll;
   }
 
   .micks-mission-table>* {
@@ -6753,6 +6761,28 @@ body.micks-menu-open {
 }
 
 @media (max-width: 767px) {
+  .micks-home-trust-grid{
+    grid-template-columns: 1fr;
+  }
+  .micks-shared-banner .micks-inner-hero-content h1{
+    text-align: center;
+  }
+  .micks-mission.section,
+  .micks-about-page-intro{
+    padding:30px 20px 0px;
+  }
+  .micks-mission-grid{
+    width:100%;
+  }
+  .micks-about-actions{
+    justify-content: center;
+  }
+  .micks-about-actions .micks-certification-group{
+    margin-right:0;
+  }
+  .micks-about-copy .prose-site{
+    font-size: 14px;
+  }
   .micks-cases-intro, .micks-cases-closing{
     max-width: 100%;
   }
