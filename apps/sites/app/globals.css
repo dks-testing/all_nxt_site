@@ -6046,21 +6046,21 @@ details>summary::-webkit-details-marker {
   font-weight: 500;
 }
 .micks-specials-offers { display: grid; gap: 25px; }
-.micks-offer-secondary-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.micks-offer-secondary-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .micks-offer-card {
   position: relative;
   isolation: isolate;
   display: flex;
   overflow: hidden;
   min-width: 0;
-  min-height: 412px;
-  border-radius: 27px;
+  min-height: 472px;
+  border-radius: 38px;
   background-color: #101010;
   background-position: center;
   background-size: cover;
   color: #fff;
 }
-.micks-offer-featured { min-height: 430px; }
+.micks-offer-featured { min-height: 442px; }
 .micks-offer-shade {
   position: absolute;
   z-index: -1;
@@ -6068,75 +6068,79 @@ details>summary::-webkit-details-marker {
   background: linear-gradient(120deg, rgb(0 0 0 / .90), rgb(0 0 0 / .84)),
     radial-gradient(circle at 80% 10%, rgb(128 36 35 / .34), transparent 55%);
 }
-.micks-offer-content { display: flex; flex: 1; flex-direction: column; align-items: stretch; padding: 25px 30px 24px; }
+.micks-offer-content { display: flex; flex: 1; min-width: 0; flex-direction: column; align-items: stretch; padding: 10px 10px 19px; }
 .micks-offer-heading { text-align: center; }
 .micks-offer-pricing {
   margin: 0;
-  font: 800 clamp(21px, 2.5vw, 42px)/1.07 var(--font-heading), Impact, sans-serif;
+  font: 800 clamp(28px, 3.7vw, 42px)/1.2 var(--font-heading), Impact, sans-serif;
   text-transform: uppercase;
 }
 .micks-offer-now { color: #d6242d; }
 .micks-offer-heading h3 {
-  margin: 8px auto 0;
-  font: 800 clamp(21px, 2.1vw, 32px)/1.13 var(--font-heading), Impact, sans-serif;
+  margin: 0 auto;
+  font: 800 clamp(24px, 2.85vw, 32px)/1.13 var(--font-heading), Impact, sans-serif;
   text-transform: uppercase;
 }
-.micks-offer-intro { max-width: 680px; margin: 5px auto 0; color: #fff; font-size: 13px; line-height: 1.5; }
-.micks-offer-included { flex: 1; border-top: 3px solid #fff; margin-top: 15px; padding-top: 15px; }
+.micks-offer-intro { margin: 3px auto 0; color: #fff; font-size: 17px; line-height: 1.5; font-weight: 500; }
+.micks-offer-included { flex: 1; border-top: 3px solid #fff; margin-top: 16px; padding-top: 14px; }
 .micks-offer-included h4 {
-  font: 800 clamp(19px, 1.65vw, 32px)/1.1 var(--font-heading), Impact, sans-serif;
+  margin: 0;
+  font: 800 clamp(24px, 2.85vw, 32px)/1.2 var(--font-heading), Impact, sans-serif;
   text-align: center;
   text-transform: uppercase;
 }
 .micks-offer-included ul {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 5px 80px;
-  max-width: calc(100% - 60px);
-  margin: 16px auto 0;
-  padding: 0 0 0 1.4em;
+  column-count: 2;
+  column-gap: 80px;
+  margin: 20px 40px 0;
+  padding: 0 0 0 20px;
   list-style: disc;
   color: #fff;
-  font-size: 16px;
-  line-height: 1.35;
+  font-size: 17px;
+  line-height: 1.47;
   font-weight: 500;
 }
-.micks-offer-note { margin: 15px 0 0; text-align: center; font-size: 16px; }
-.micks-offer-actions { display: flex; justify-content: center; flex-wrap: wrap; margin-top: auto; padding-top: 16px; gap:10px;}
+.micks-offer-included li { break-inside: avoid; }
+.micks-offer-note { margin: 20px 0 0; text-align: center; font-size: 17px; line-height: 1.5; font-weight: 500; }
+.micks-offer-actions { display: flex; justify-content: center; flex-wrap: wrap; margin-top: auto; padding-top: 10px; gap:10px;}
 .micks-offer-call,
 .micks-offer-code {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 52px;
+  min-height: 53px;
   padding: 8px 26px;
   color: #fff;
   font-size: 18px;
   font-weight: 700;
   text-transform: uppercase;
   text-align: center;
-  transform: skewX(-14deg);
+  transform: skewX(var(--button-skew, -14deg));
 }
 .micks-offer-call { background: var(--button-bg, #d6242d); }
 .micks-offer-call:hover { background: var(--button-hover-bg, #a91a23); color: var(--button-hover-text, #fff); }
-.micks-offer-call { transform: skewX(var(--button-skew, -14deg)); }
-.micks-offer-call>span { display: inline-block; transform: skewX(var(--button-text-skew, 14deg)); }
-.micks-offer-code { background: #6a90b5; }
+.micks-offer-call>span,
+.micks-offer-code>span { display: inline-block; transform: skewX(var(--button-text-skew, 14deg)); }
+.micks-offer-code { min-width: 240px; background: #7393b9; }
 .micks-offer-expiry { margin: 10px 0 0; text-align: center; font-size: 12px; opacity: .8; }
-.micks-offer-compact .micks-offer-content { padding: 18px 26px 22px; }
-.micks-offer-compact .micks-offer-pricing { font-size: clamp(19px, 2vw, 42px); }
-.micks-offer-compact .micks-offer-heading h3 { font-size: clamp(19px, 1.75vw, 32px); }
-.micks-offer-compact .micks-offer-included { margin-top: 10px; padding-top: 11px; }
-.micks-offer-compact .micks-offer-included ul { grid-template-columns: 1fr; margin-top: 10px; font-size: 16px; }
-/* .micks-offer-compact .micks-offer-included h4 { font-size: 21px; } */
+.micks-offer-compact .micks-offer-content { padding: 27px 10px 19px; }
+.micks-offer-compact .micks-offer-pricing { font-size: clamp(28px, 3.7vw, 42px); }
+.micks-offer-compact .micks-offer-saving { display: block; }
+.micks-offer-compact .micks-offer-heading h3 { margin-top: 4px; }
+.micks-offer-compact .micks-offer-included { margin: 16px -10px 0; padding: 14px 20px 0; }
+.micks-offer-compact .micks-offer-included ul { column-count: 1; width: fit-content; max-width: 100%; margin: 0 auto; }
 .micks-offer-compact .micks-offer-actions { padding-top: 12px; }
 .micks-specials-page .micks-specials-empty { padding: 45px 15px; text-align: center; }
 @media (max-width: 767px) {
   .micks-offer-secondary-grid { grid-template-columns: 1fr; }
   .micks-offer-card, .micks-offer-featured { min-height: 0; border-radius: 19px; }
   .micks-offer-content, .micks-offer-compact .micks-offer-content { padding: 23px 22px; }
-  .micks-offer-included ul { grid-template-columns: 1fr; font-size: 13px; }
-  .micks-offer-call, .micks-offer-code { min-height: 40px; padding-inline: 18px; font-size: 12px; }
+  .micks-offer-included ul { column-count: 1; width: fit-content; max-width: 100%; margin: 16px auto 0; font-size: 15px; }
+  .micks-offer-compact .micks-offer-included { margin-inline: -22px; padding-inline: 22px; }
+  .micks-offer-compact .micks-offer-included ul { margin-top: 8px; }
+  .micks-offer-intro, .micks-offer-note { font-size: 15px; }
+  .micks-offer-actions { padding-top: 16px; }
+  .micks-offer-call, .micks-offer-code { min-width: 0; min-height: 44px; padding-inline: 18px; font-size: 13px; }
 }
 
 

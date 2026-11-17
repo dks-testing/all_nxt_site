@@ -65,7 +65,7 @@ function OfferCard({ item, bundle, featured, fallbackImage }: { item: Offer; bun
             <p className="micks-offer-pricing">
               {prices.was && <span>{prices.was} {featured ? "VALUE." : "NORMALLY."} </span>}
               <span className="micks-offer-now">NOW {prices.now}.</span>
-              {prices.saving && <span> SAVE {prices.saving}</span>}
+              {prices.saving && <span className="micks-offer-saving"> SAVE {prices.saving}</span>}
             </p>
           ) : content.discount ? <p className="micks-offer-pricing">{content.discount}</p> : null}
           <h3>{content.title}</h3>
@@ -80,7 +80,7 @@ function OfferCard({ item, bundle, featured, fallbackImage }: { item: Offer; bun
         {copy.note && <p className="micks-offer-note">{copy.note}</p>}
         <div className="micks-offer-actions">
           <a className="micks-offer-call" href={ctaHref}><span>{phone ? "Call Us" : "Book Now"}</span></a>
-          {item.couponCode && <span className="micks-offer-code">CODE &ldquo;{item.couponCode}&rdquo;</span>}
+          {item.couponCode && <span className="micks-offer-code"><span>CODE &ldquo;{item.couponCode}&rdquo;</span></span>}
         </div>
         {item.validUntil && <p className="micks-offer-expiry">Valid until {item.validUntil}</p>}
       </div>
