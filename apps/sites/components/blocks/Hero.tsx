@@ -16,14 +16,16 @@ type HeroExtra = { integratedTrust?: BlockProps<"trust_cards"> };
 export async function Hero({ ctx, bundle, props, index, pageSlug, integratedTrust }: BlockComponentProps<"hero"> & HeroExtra) {
   const banner = pageSlug === "" && index === 0 ? await getHeroBanner(ctx) : null;
   const heading = globalText(banner?.heading ?? props.heading, bundle);
-  const sub = globalText(banner?.subheading ?? props.subheading, bundle);
+  // Subheadings are reserved for the landing/home hero. Inner-page heroes keep
+  // the heading concise regardless of the selected header style.
+  const sub = pageSlug === "" ? globalText(banner?.subheading ?? props.subheading, bundle) : "";
   const image = banner?.imageUrl ?? props.imageUrl;
-  const primarySource = banner?.ctaUrl ? { label: banner.ctaLabel ?? "Learn more", href: banner.ctaUrl } : props.primaryCta;
+  const primarySource = pageSlug === "" ? (banner?.ctaUrl ? { label: banner.ctaLabel ?? "Learn more", href: banner.ctaUrl } : props.primaryCta) : undefined;
   const design = getDesign(bundle.theme ?? {});
   const sharedCertifications = getActiveCertificationBadges(design);
   const primary = primarySource ? { ...primarySource, href: globalCtaHref(design, primarySource.href, primarySource.label) } : undefined;
-  const secondary = props.secondaryCta ? { ...props.secondaryCta, href: globalCtaHref(design, props.secondaryCta.href, props.secondaryCta.label) } : undefined;
-  const tertiary = props.tertiaryCta ? { ...props.tertiaryCta, href: globalCtaHref(design, props.tertiaryCta.href, props.tertiaryCta.label) } : undefined;
+  const secondary = pageSlug === "" && props.secondaryCta ? { ...props.secondaryCta, href: globalCtaHref(design, props.secondaryCta.href, props.secondaryCta.label) } : undefined;
+  const tertiary = pageSlug === "" && props.tertiaryCta ? { ...props.tertiaryCta, href: globalCtaHref(design, props.tertiaryCta.href, props.tertiaryCta.label) } : undefined;
   const micksHome = pageSlug === "" && index === 0 && (design.heroStyle === "micks-overlay" || (!design.heroStyle && design.headerStyle === "angled"));
 
   if (micksHome) {

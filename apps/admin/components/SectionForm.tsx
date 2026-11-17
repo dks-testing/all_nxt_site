@@ -41,12 +41,14 @@ function FieldInput({ f, value, siteId, media, publicOrigin, changed }: { f: Fie
   }
 }
 
-export function SectionFields({ type, props, siteId, media, publicOrigin, onChange }: { type: BlockType; props: Record<string, unknown>; siteId: string; media: MediaAsset[]; publicOrigin: string; onChange?: () => void }) {
+export function SectionFields({ type, props, siteId, media, publicOrigin, isHomePage = false, hideHeroDesign = false, onChange }: { type: BlockType; props: Record<string, unknown>; siteId: string; media: MediaAsset[]; publicOrigin: string; isHomePage?: boolean; hideHeroDesign?: boolean; onChange?: () => void }) {
   // These legacy page-level fields are intentionally hidden: certification artwork
   // is now managed once per website in Branding, not independently per section.
   const fields = blockFields[type].filter((field) => !(
     (type === "hero" && field.path.startsWith("certificationLogos")) ||
-    (type === "about" && field.path.startsWith("certificationLogoUrl"))
+    (type === "about" && field.path.startsWith("certificationLogoUrl")) ||
+    (type === "hero" && !isHomePage && (field.path === "subheading" || /^(primary|secondary|tertiary)Cta\./.test(field.path))) ||
+    (type === "hero" && hideHeroDesign && fieldGroup(field) === "Design")
   ));
   const groups = (["Content", "Design", "Images", "Buttons", "Advanced"] as Group[]).filter((group) => fields.some((field) => fieldGroup(field) === group));
   const [active, setActive] = useState<Group>(groups[0] ?? "Content");

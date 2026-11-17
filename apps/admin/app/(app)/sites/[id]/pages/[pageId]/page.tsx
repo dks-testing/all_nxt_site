@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getDb, pages, pageSections, media, eq, and, asc, desc } from "@platform/db";
+import { getDb, pages, pageSections, media, themes, eq, and, asc, desc } from "@platform/db";
 import { blockLabels, blockTypes, isBlockType } from "@platform/db/blocks";
+import { getDesign } from "@platform/db/theme";
 import { loadSite } from "@/lib/site";
 import { previewUrl } from "@/lib/site-url";
 import { savePageMeta, deletePage, addSection, saveSection, sectionOp, reorderSections } from "@/lib/actions/content";
@@ -29,6 +30,8 @@ export default async function PageEditor({ params }: { params: Promise<{ id: str
   const db = getDb();
   const [page] = await db.select().from(pages).where(and(eq(pages.id, pageId), eq(pages.siteId, id)));
   if (!page) notFound();
+  const [theme] = await db.select({ design: themes.design }).from(themes).where(eq(themes.siteId, id)).limit(1);
+  const angledInnerPage = page.slug !== "" && getDesign(theme ?? {}).headerStyle === "angled";
   const sections = await db.select().from(pageSections).where(and(eq(pageSections.pageId, pageId), eq(pageSections.siteId, id))).orderBy(asc(pageSections.sortOrder));
   const assets = await db.select({ id: media.id, url: media.url, alt: media.alt, width: media.width, height: media.height }).from(media).where(eq(media.siteId, id)).orderBy(desc(media.createdAt));
   const publicOrigin = (process.env.SITES_APP_URL || "http://localhost:3000").replace(/\/$/, "");
@@ -97,7 +100,7 @@ export default async function PageEditor({ params }: { params: Promise<{ id: str
                   </span>
                 </summary>
                 <SectionEditor action={saveSection} type={sectionType} sectionId={s.id} previewBaseUrl={pagePreviewUrl} initialProps={s.props} visible={s.isVisible} hidden={hidden(s.id)} hint={hint && <p className="mb-4 rounded-md bg-indigo-50 px-3 py-2 text-xs text-indigo-800">This section shows content from <Link className="font-semibold underline" href={`/sites/${id}/${hint[0]}`}>{hint[1]}</Link>.</p>}>
-                  <SectionFields type={sectionType} props={s.props} siteId={id} media={assets} publicOrigin={publicOrigin} />
+                  <SectionFields type={sectionType} props={s.props} siteId={id} media={assets} publicOrigin={publicOrigin} isHomePage={page.slug === ""} hideHeroDesign={angledInnerPage} />
                 </SectionEditor>
               </details>
             );
