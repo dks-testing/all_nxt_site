@@ -18,6 +18,7 @@ export default async function CollectionPage({ params, searchParams }: { params:
   await loadSite(id, "EDITOR");
   const q = getDb().select().from(def.table).where(eq(def.table.siteId, id));
   const rows = (await (def.sortable ? q.orderBy(asc(def.table.sortOrder)) : q)) as Row[];
+  const featuredOfferId = collection === "specials" ? rows.find((row) => Boolean(row.isActive))?.id : undefined;
   const assets = await getDb().select({ id: media.id, url: media.url, alt: media.alt, width: media.width, height: media.height }).from(media).where(eq(media.siteId, id)).orderBy(desc(media.createdAt));
   const publicOrigin = (process.env.SITES_APP_URL || "http://localhost:3000").replace(/\/$/, "");
   const editing = edit ? rows.find((r) => r.id === edit) : undefined;
@@ -34,7 +35,7 @@ export default async function CollectionPage({ params, searchParams }: { params:
             <input type="hidden" name="siteId" value={id} />
             <input type="hidden" name="collection" value={collection} />
             {editing && <input type="hidden" name="itemId" value={editing.id} />}
-            {def.fields.map((f) => <CollectionFieldInput key={f.name} field={f} row={editing} siteId={id} assets={assets} publicOrigin={publicOrigin} />)}
+            {def.fields.map((f) => <CollectionFieldInput key={f.name} field={f} row={editing} siteId={id} assets={assets} publicOrigin={publicOrigin} featured={editing?.id === featuredOfferId} />)}
             <div className="flex gap-2 sm:col-span-2">
               <SubmitButton>Save</SubmitButton>
               <Link href={base} className="btn btn-secondary">Cancel</Link>

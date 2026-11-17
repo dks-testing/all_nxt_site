@@ -67,7 +67,7 @@ export const collections: Record<string, CollectionDef> = {
     sortable: true,
     fields: [
       { name: "title", label: "Title", kind: "text", required: true },
-      { name: "discount", label: "Offer price and savings", kind: "text", help: "For example: $149 (a $350+ value, save 60%). The price headline is generated automatically." },
+      { name: "discount", label: "Offer price and savings", kind: "text", help: "Enter the current price, regular/value price, and savings. The preview uses the same VALUE/NORMALLY · NOW · SAVE format as the live offer card." },
       { name: "couponCode", label: "Coupon code", kind: "text" },
       { name: "validUntil", label: "Valid until", kind: "date" },
       { name: "includedHeading", label: "Included items heading", kind: "text", wide: true, help: "Defaults to “What's Included”." },
@@ -75,7 +75,7 @@ export const collections: Record<string, CollectionDef> = {
       { name: "ctaLabel", label: "Primary button label", kind: "text", help: "Defaults to Call Us (or Book Now if no phone is set)." },
       { name: "ctaHref", label: "Primary button link", kind: "text", help: "Optional. Use a /page path or an http(s), tel:, or mailto: URL. If blank, the phone or booking link is used." },
       { name: "couponButtonLabel", label: "Coupon button label", kind: "text", help: "Text before the coupon code; defaults to CODE." },
-      { name: "couponButtonHref", label: "Coupon button link", kind: "text", help: "Optional link for the coupon button. Leave blank to show it as a non-clickable code." },
+      { name: "couponButtonHref", label: "Coupon button link", kind: "text", help: "Optional site path or http(s), tel:, or mailto: link. Leave blank to show it as a non-clickable code." },
       { name: "imageUrl", label: "Card background image", kind: "image", help: "A dark overlay keeps text readable; if empty, the website’s inner banner is used." },
       { name: "isActive", label: "Visible on site", kind: "boolean" },
     ],
@@ -184,6 +184,11 @@ export function parseCollectionForm(def: CollectionDef, fd: FormData) {
         out[f.name] = f.options?.includes(raw) ? (f.name === "code" ? Number(raw) : raw) : f.options?.[0];
         break;
       default:
+        if (f.name === "discount" && raw) {
+          const amount = String.raw`\$\s*(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d{2})?\+?`;
+          const format = new RegExp(`^${amount}(?: \\((?:normally ${amount}(?:, save \\d+\\s*%)?|save \\d+\\s*%)\\))?$`, "i");
+          if (!format.test(raw)) throw new Error("Enter a now price and optional regular/value price and savings percentage");
+        }
         if (raw && ["ctaHref", "couponButtonHref"].includes(f.name) && !/^(?:https?:\/\/|tel:|mailto:|\/(?!\/)|#)/i.test(raw)) {
           throw new Error(`${f.label} must be a site path or an http(s), tel:, or mailto: link`);
         }

@@ -39,7 +39,7 @@ export function SpecialsSectionManager({ siteId, pageId, sectionId, offers, asse
               <input type="hidden" name="collection" value="specials" />
               <input type="hidden" name="itemId" value={offer.id} />
               <input type="hidden" name="returnTo" value={returnTo} />
-              {fields.map((field) => <CollectionFieldInput key={field.name} field={field} row={offer} siteId={siteId} assets={assets} publicOrigin={publicOrigin} />)}
+              {fields.map((field) => <CollectionFieldInput key={field.name} field={field} row={offer} siteId={siteId} assets={assets} publicOrigin={publicOrigin} featured={offer.id === firstActiveId} />)}
               <div className="sm:col-span-2"><SubmitButton>Save offer</SubmitButton></div>
             </form>
             <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4">
@@ -72,7 +72,7 @@ export function SpecialsSectionManager({ siteId, pageId, sectionId, offers, asse
           <input type="hidden" name="siteId" value={siteId} />
           <input type="hidden" name="collection" value="specials" />
           <input type="hidden" name="returnTo" value={returnTo} />
-          {fields.map((field) => <CollectionFieldInput key={field.name} field={field} siteId={siteId} assets={assets} publicOrigin={publicOrigin} />)}
+          {fields.map((field) => <CollectionFieldInput key={field.name} field={field} siteId={siteId} assets={assets} publicOrigin={publicOrigin} featured={!offers.some((offer) => offer.isActive)} />)}
           <div className="sm:col-span-2"><SubmitButton>Add offer</SubmitButton></div>
         </form>
       </details>
