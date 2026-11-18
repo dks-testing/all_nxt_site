@@ -1492,12 +1492,14 @@ body.micks-menu-open {
 
 .micks-ai-offer {
   display: block;
-  max-width: 458px;
+  width: 100%;
+  max-width: 511px;
   margin-top: 0;
 }
 
 .micks-ai-offer strong {
   display: flex;
+  width: 100%;
   align-items: center;
   justify-content: center;
   min-height: 168px;
@@ -1512,12 +1514,13 @@ body.micks-menu-open {
   text-transform: uppercase;
 }
 
-.micks-ai-offer span {
+.micks-ai-offer-description {
   display: block;
+  width: 100%;
   margin-top: 16px;
   color: #fff;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 500;
   line-height: 1.45;
 }
 
