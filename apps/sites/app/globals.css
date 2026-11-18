@@ -116,10 +116,6 @@ h4 {
     color: #fff;
   }
 
-  .section {
-    padding-block: 4.5rem;
-  }
-
   .eyebrow {
     font-weight: 700;
     text-transform: uppercase;
@@ -134,7 +130,6 @@ h4 {
     border-radius: calc(var(--radius) * .6);
     padding: .65rem .8rem;
     background: #fff;
-    color: #111827;
   }
 
   .field:focus {
@@ -236,7 +231,11 @@ details>summary::-webkit-details-marker {
   color: var(--button-hover-text, #fff);
   background: var(--button-hover-bg, #a91919);
 }
-
+.micks-footer-main,
+main > section {
+    padding-inline: 20px;
+    padding-block: 50px;
+  }
 @media (max-width: 639px) {
   .mobile-fixed-call {
     display: flex;
@@ -269,7 +268,7 @@ details>summary::-webkit-details-marker {
   position: absolute;
   z-index: -1;
   inset: 0;
-  /* border-radius: 9px; */
+  border-radius: 6px;
   background: #eee;
   transform: skewX(-11deg);
 }
@@ -306,7 +305,6 @@ details>summary::-webkit-details-marker {
   gap: 2px;
   height: 50px;
   padding: 0 15px;
-  color: #080808;
   text-decoration: none;
   font-family: var(--font-body);
   font-size: 14px;
@@ -326,7 +324,6 @@ details>summary::-webkit-details-marker {
   left: 0;
   top: 100%;
   background: #fff;
-  color: #111;
   border-radius: 16px;
   box-shadow: 0 8px 25px #0003;
   padding: 10px 0;
@@ -337,7 +334,6 @@ details>summary::-webkit-details-marker {
   display: block;
   padding: 8px 20px;
   border-radius: 5px;
-  color: #111;
   font-family: var(--font-body);
   font-size: 16px;
   font-weight: 600;
@@ -365,7 +361,7 @@ details>summary::-webkit-details-marker {
   box-sizing: border-box;
   background: var(--nav-button-bg, var(--button-bg, #c62828));
   color: var(--nav-button-text, var(--button-text, #fff));
-  transform: skewX(-4deg);
+  transform: skewX(-11deg);
   flex: 0 0 18%;
   width: 18%;
   min-width: 0;
@@ -380,17 +376,16 @@ details>summary::-webkit-details-marker {
 
 .micks-phone-panel:hover {
   color: var(--nav-button-hover-text, var(--button-hover-text, #fff));
-  background: var(--nav-button-hover-bg, var(--button-hover-bg, #a91919));
+  background: var(--button-hover-bg, #a91919);
 }
 
 .micks-phone-panel>* {
-  transform: skewX(4deg);
+  transform: skewX(11deg);
 }
 
 .micks-phone-panel strong {
   font-size: clamp(19px, 1.55vw, 21px);
   font-weight: 700;
-  font-style: italic;
   white-space: nowrap;
   line-height: 1.15;
 }
@@ -398,12 +393,13 @@ details>summary::-webkit-details-marker {
 .micks-phone-panel span {
   font-weight: 800;
   font-size: 13px;
+  font-style: italic;
+
 }
 
 .micks-mobile-menu {
   display: none;
   position: relative;
-  color: #111;
   margin-left: auto;
 }
 
@@ -525,7 +521,6 @@ details>summary::-webkit-details-marker {
   align-items: center;
   justify-content: space-between;
   padding: 4px 0;
-  color: #111;
   font-family: var(--font-body);
   font-size: 18px;
   font-weight: 500;
@@ -555,7 +550,6 @@ details>summary::-webkit-details-marker {
 .micks-mobile-submenu > div a {
   display: block;
   padding: 6px 0;
-  color: #111;
   font-size: 18px;
   font-weight: 500;
   text-decoration: none;
@@ -585,13 +579,6 @@ body.micks-menu-open {
   overflow: hidden;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .micks-mobile-menu-list,
-  .micks-mobile-menu-overlay {
-    animation-duration: 1ms;
-  }
-}
-
 @media (min-width: 1025px) and (max-width: 1200px) {
   .micks-header-shape {
     width: 94%;
@@ -616,7 +603,8 @@ body.micks-menu-open {
 }
 
 @media (max-width: 1024px) {
-  .micks-primary-nav {
+  .micks-primary-nav,
+  .micks-phone-panel {
     display: none;
   }
 
@@ -630,10 +618,6 @@ body.micks-menu-open {
     height: 48px;
     border: 1px solid var(--button-bg, #c62828);
     padding: 8px;
-  }
-
-  .micks-phone-panel {
-    display: none;
   }
 }
 
@@ -671,28 +655,21 @@ body.micks-menu-open {
   }
 }
 
-@media (max-width: 420px) {
-  .micks-phone-panel {
-    display: none;
-  }
-}
-
 /* CMS-selectable Mick's-style hero. Kept separate from generic theme sections. */
 .micks-home-hero {
   position: relative;
-  margin-top: -132px;
+  margin-top: -124px;
   /* bring the background behind the floating header */
   min-height: 1040px;
-  padding: 132px 0 35px;
+  padding: 145px 0 56px;
   color: white;
-  background-color: #111;
   background-size: cover;
   background-position: center 55%;
   background-repeat: no-repeat;
 }
 
 .micks-home-hero-inner {
-  padding-top: 20px;
+  /* padding-top: 20px; */
 }
 
 .micks-home-top {
@@ -797,7 +774,7 @@ body.micks-menu-open {
   gap: 7px;
   min-height: 41px;
   background: #fff;
-  color: #111;
+  color:var(--color-text);
   padding: 7px 16px;
   transform: skewX(var(--button-skew, -15deg));
   font: 500 14px/1 var(--font-body), sans-serif;
@@ -871,7 +848,7 @@ body.micks-menu-open {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 381px;
+  /* min-height: 381px; */
   padding: 20px 14px;
   text-align: center;
   border: 1px solid #fff;
@@ -881,7 +858,8 @@ body.micks-menu-open {
 }
 
 .micks-home-trust-card:hover {
-  background: #6a8fb5;
+  /* background: #6a8fb5; */
+  background: var(--button-hover-bg);
 }
 
 .micks-home-trust-card h2 {
@@ -896,7 +874,7 @@ body.micks-menu-open {
 
 .micks-home-card-rule {
   width: 100%;
-  max-width: 145px;
+  max-width: 200px;
   height: 1px;
   margin: 0 auto 12px;
   background: #fff;
@@ -911,7 +889,7 @@ body.micks-menu-open {
 
 .micks-home-closing {
   white-space: pre-line;
-  margin: 34px auto 30px;
+  margin: 40px auto 0px;
   max-width: 950px;
   font-size: clamp(19px, 2vw, 30px);
   line-height: 1;
@@ -1046,7 +1024,6 @@ body.micks-menu-open {
   align-items: center;
   justify-content: center;
   padding: 10px 20px;
-  color: #111;
   background: #fff;
   transform: skewX(var(--button-skew, -15deg));
   font-size: 14px;
@@ -1094,7 +1071,6 @@ body.micks-menu-open {
 .micks-service-intro {
   padding: 96px 0 75px;
   background: #fff;
-  color: #050505;
 }
 
 .micks-service-intro-grid {
@@ -1372,15 +1348,11 @@ body.micks-menu-open {
 /* Mick's data-driven homepage sections. */
 .micks-section-kicker {
   margin: 0;
-  color: #050505;
-  font: 800 clamp(30px, 3.2vw, 52px)/1 var(--font-heading), sans-serif;
+  font: 800 52px/1 var(--font-heading), sans-serif;
   text-transform: uppercase;
 }
 
 .micks-about {
-  padding-block: 56px;
-  background: #fff;
-  color: #050505;
 }
 
 .micks-about-grid {
@@ -1426,12 +1398,11 @@ body.micks-menu-open {
 
 .micks-about-copy h2 {
   margin-bottom: 12px;
-  font: 800 clamp(27px, 2.5vw, 35px)/1.16 var(--font-heading), sans-serif;
+  font: 800 32px/1.16 var(--font-heading), sans-serif;
   text-transform: uppercase;
 }
 
 .micks-about-copy .prose-site {
-  color: #090909;
   font-size: 16px;
   font-weight: 500;
   line-height: 1.45;
@@ -1464,7 +1435,6 @@ body.micks-menu-open {
 
 .micks-ai-section {
   overflow: hidden;
-  padding: 74px 0 58px;
   color: #fff;
   background: #000;
 }
@@ -1473,7 +1443,7 @@ body.micks-menu-open {
   max-width: 1140px;
   display: grid;
   grid-template-columns: 52% minmax(0, 1fr);
-  gap: 63px;
+  gap: 40px;
   align-items: center;
   min-height: 540px;
 }
@@ -1564,11 +1534,7 @@ body.micks-menu-open {
   object-fit: cover;
 }
 
-.micks-tires-section {
-  padding-block: 66px 74px;
-  background: #fff;
-  color: #050505;
-}
+
 
 .micks-tires-grid {
   max-width: 1140px;
@@ -1601,7 +1567,6 @@ body.micks-menu-open {
 
 .micks-tire-copy .prose-site {
   margin-top: 26px;
-  color: #050505;
   font-size: 16px;
   font-weight: 500;
   line-height: 1.5;
@@ -1633,11 +1598,7 @@ body.micks-menu-open {
 
 .micks-cases {
   position: relative;
-  padding-block: 56px 42px;
-  color: #050505;
-  background: #fff;
   border-top: 0;
-  border-bottom: 5px solid #7198bd;
 }
 
 .micks-cases::before {
@@ -1663,7 +1624,7 @@ body.micks-menu-open {
 .micks-cases-closing {
   max-width: 58%;
   margin: 14px auto 0;
-  color: #050505;
+  
   text-align: center;
   font-size: 16px;
   font-weight: 500;
@@ -1689,11 +1650,12 @@ body.micks-menu-open {
 
 .micks-case-label {
   position: absolute;
-  top: 0;
-  left: -5px;
-  width: calc(100% + 10px);
-  transform: translateY(-100%);
-  color: #050505;
+  top: -36px;
+  left: auto;
+  right: auto;
+  width: 100%;
+  transform: none;
+  
   text-align: center;
   font: 800 28px/1 var(--font-heading), sans-serif;
   text-transform: uppercase;
@@ -1739,7 +1701,6 @@ body.micks-menu-open {
 }
 
 .micks-reviews {
-  padding-block: 38px 55px;
   color: #fff;
   background: #738fb3;
 }
@@ -1810,7 +1771,6 @@ body.micks-menu-open {
   overflow: hidden;
   border: 0;
   border-radius: 8px;
-  color: #333;
   background: #f4f4f4;
   font-family: Arial, sans-serif;
   box-shadow: none;
@@ -1883,6 +1843,7 @@ body.micks-menu-open {
   scrollbar-color: #8c8c8c #e3e3e3;
   font-size: 15px;
   line-height: 25px;
+  color:var(--color-text);
 }
 
 .micks-review-card blockquote::-webkit-scrollbar {
@@ -1905,9 +1866,7 @@ body.micks-menu-open {
 }
 
 .micks-contact-booking {
-  padding-block: 74px;
   background: #fff;
-  color: #050505;
 }
 
 .micks-contact-booking-grid {
@@ -2059,7 +2018,6 @@ body.micks-menu-open {
 
 .micks-booking-form label {
   position: relative;
-  color: #222;
   font-size: 11px;
 }
 
@@ -2135,9 +2093,7 @@ body.micks-menu-open {
     gap: 35px;
   }
 
-  .micks-about {
-    padding-block: 55px;
-  }
+  
 
   .micks-about-photo {
     height: min(125vw, 600px);
@@ -2153,10 +2109,6 @@ body.micks-menu-open {
 
   .micks-feature-image {
     min-width: 0;
-  }
-
-  .micks-tires-section {
-    padding-block: 55px;
   }
 
   .micks-tire-image img {
@@ -2255,12 +2207,7 @@ body.micks-menu-open {
   background: #6a8fb5;
 }
 
-.micks-case-label {
-  top: -36px;
-  left: 0;
-  width: 100%;
-  transform: none;
-}
+
 
 .micks-case-image {
   width: 100%;
@@ -2321,7 +2268,7 @@ body.micks-menu-open {
 }
 
 .micks-smart-feature {
-  color: #070707;
+  
   background: #fff;
 }
 
@@ -2538,7 +2485,6 @@ body.micks-menu-open {
 
 .micks-footer-main-grid {
   min-height: 0;
-  padding-block: 50px;
   align-items: start;
 }
 
@@ -3147,6 +3093,20 @@ body.micks-menu-open {
   }
 }
 
+/* The live tire finder uses the shared smart-feature layouts with two
+   tire-specific image proportions. Content and assets still come from CMS. */
+.micks-smart-feature-page-tires.micks-smart-feature-tool .micks-smart-tool-photo {
+  aspect-ratio: 530 / 444;
+}
+
+.micks-smart-feature-page-tires.micks-smart-feature-cta .micks-smart-feature-copy-wrap {
+  min-height: 390px;
+}
+
+.micks-smart-feature-page-tires.micks-smart-feature-cta .micks-smart-feature-media {
+  height: 390px;
+}
+
 @media (max-width: 700px) {
   .micks-smart-feature.section {
     padding-block: 20px;
@@ -3214,23 +3174,7 @@ body.micks-menu-open {
   .micks-smart-feature-testimonial .micks-smart-feature-grid>img {
     grid-row: 1;
   }
-}
 
-/* The live tire finder uses the shared smart-feature layouts with two
-   tire-specific image proportions. Content and assets still come from CMS. */
-.micks-smart-feature-page-tires.micks-smart-feature-tool .micks-smart-tool-photo {
-  aspect-ratio: 530 / 444;
-}
-
-.micks-smart-feature-page-tires.micks-smart-feature-cta .micks-smart-feature-copy-wrap {
-  min-height: 390px;
-}
-
-.micks-smart-feature-page-tires.micks-smart-feature-cta .micks-smart-feature-media {
-  height: 390px;
-}
-
-@media (max-width: 700px) {
   .micks-smart-feature-page-tires.micks-smart-feature-cta .micks-smart-feature-copy-wrap {
     min-height: 0;
   }
@@ -3322,6 +3266,7 @@ body.micks-menu-open {
 
 .micks-footer-logo-band {
   background: #f5f5f5;
+  padding-inline:20px;
 }
 
 .micks-footer-logos {
@@ -3349,7 +3294,6 @@ body.micks-menu-open {
 }
 
 .micks-footer-main-grid {
-  min-height: 295px;
   display: grid;
   grid-template-columns: 456px 342px;
   justify-content: space-between;
@@ -3417,7 +3361,7 @@ body.micks-menu-open {
 }
 
 .micks-footer-bottom {
-  color: #050505;
+  color:var(--color-text);
   background: #fff;
 }
 
@@ -3432,7 +3376,7 @@ body.micks-menu-open {
 }
 
 .micks-footer-bottom a {
-  color: #050505;
+  
   text-decoration: none;
 }
 
@@ -3469,7 +3413,7 @@ body.micks-menu-open {
 
 .micks-about-page-intro {
   padding: 46px 0 20px;
-  color: #050505;
+  
   background: #fff;
 }
 
@@ -3547,7 +3491,7 @@ body.micks-menu-open {
 
 .micks-mission {
   padding: 56px 0 24px;
-  color: #050505;
+  
   background: linear-gradient(#fff, #dbe6f2);
 }
 
@@ -3601,7 +3545,7 @@ body.micks-menu-open {
   padding: 14px 15px;
   border-right: 1px solid #aeb5bc;
   border-bottom: 1px solid #aeb5bc;
-  color: #050505;
+  
 }
 
 .micks-mission-table> :nth-child(n+4) {
@@ -3666,7 +3610,7 @@ body.micks-menu-open {
 }
 
 .micks-how-we-work {
-  color: #050505;
+  
   background: #f5f5f5;
 }
 
@@ -3720,7 +3664,7 @@ body.micks-menu-open {
 
 .micks-owner {
   padding: 37px 0 20px;
-  color: #050505;
+  
   background: #fff;
 }
 
@@ -3844,6 +3788,11 @@ body.micks-menu-open {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .micks-mobile-menu-list,
+  .micks-mobile-menu-overlay {
+    animation-duration: 1ms;
+  }
+
   .micks-crew-card-overlay {
     transition: none;
   }
@@ -3877,7 +3826,7 @@ body.micks-menu-open {
 }
 
 .micks-smart-intro {
-  color: #050505;
+  
   background: #fff;
 }
 
@@ -3942,7 +3891,7 @@ body.micks-menu-open {
 }
 
 .micks-smart-tool {
-  color: #050505;
+  
   background: #eef2f5;
   text-align: center;
 }
@@ -3974,7 +3923,7 @@ body.micks-menu-open {
 }
 
 .micks-smart-experience {
-  color: #050505;
+  
   background: #fff;
 }
 
@@ -3986,7 +3935,7 @@ body.micks-menu-open {
 .micks-specials-page,
 .micks-testimonials-page,
 .micks-appointment-page {
-  color: #050505;
+  
   background: #fff;
 }
 
@@ -4659,7 +4608,7 @@ body.micks-menu-open {
   gap: 12px;
 }
 
-@media (max-width:760px) {
+@media (max-width: 760px) {
 
   .book-contact-fields,
   .book-tool--appointment .book-contact-fields,
@@ -5497,7 +5446,7 @@ body.micks-menu-open {
 }
 
 .micks-services-index {
-  color: #050505;
+  
   background: #fff;
   padding-top: 40;
 }
@@ -5584,7 +5533,7 @@ body.micks-menu-open {
 .micks-service-process,
 .micks-service-live-trust {
   padding: 72px 0;
-  color: #050505;
+  
   background: #f4f4f4;
 }
 
@@ -5692,7 +5641,7 @@ body.micks-menu-open {
 
 .micks-service-vehicle-callout {
   padding: 50px 0;
-  color: #050505;
+  
   background: linear-gradient(#fff, #dce7f2);
 }
 
@@ -5827,9 +5776,7 @@ body.micks-menu-open {
     width: 46px;
     height: 46px;
   }
-}
 
-@media (max-width: 560px) {
   .micks-shared-banner {
     min-height: 0;
     padding-top: 125px;
@@ -6231,12 +6178,6 @@ body.micks-menu-open {
   }
 }
 
-@media (max-width: 560px) {
-  .micks-footer-certifications {
-    --certification-badge-size: 58px;
-  }
-}
-
 /* Final cascade overrides for elements whose legacy replica rules appear later
    in this stylesheet. */
 .micks-work-grid>div {
@@ -6264,11 +6205,7 @@ body.micks-menu-open {
   align-self: start;
 }
 
-.micks-footer-main-grid {
-  min-height: 0;
-  padding-block: 50px;
-  align-items: start;
-}
+
 
 .micks-footer-bottom>div {
   min-height: 62px;
@@ -6291,9 +6228,25 @@ body.micks-menu-open {
   .micks-footer-facebook {
     justify-content: flex-start;
   }
+
+  .micks-owner {
+    padding-top: 32px;
+  }
+
+  .micks-owner .micks-live-title {
+    margin-bottom: 30px;
+  }
+
+  .micks-owner-grid {
+    gap: 30px;
+  }
 }
 
 @media (max-width: 560px) {
+  .micks-footer-certifications {
+    --certification-badge-size: 58px;
+  }
+
   .micks-work-grid>div {
     grid-template-columns: 46px minmax(0, 1fr);
   }
@@ -6310,23 +6263,7 @@ body.micks-menu-open {
   .micks-work-grid span {
     font-size: 15px;
   }
-}
 
-@media (max-width: 850px) {
-  .micks-owner {
-    padding-top: 32px;
-  }
-
-  .micks-owner .micks-live-title {
-    margin-bottom: 30px;
-  }
-
-  .micks-owner-grid {
-    gap: 30px;
-  }
-}
-
-@media (max-width: 560px) {
   .micks-owner .micks-live-title {
     gap: 16px;
     margin-bottom: 24px;
@@ -6356,7 +6293,7 @@ body.micks-menu-open {
 .micks-specials-page > .container-site { max-width: 1140px; }
 .micks-specials-page > .container-site > h2 {
   margin: 0;
-  color: #050505;
+  
   text-align: center;
   font: 800 clamp(34px, 4.4vw, 55px)/1.1 var(--font-heading), Impact, sans-serif;
   text-transform: uppercase;
@@ -6365,7 +6302,7 @@ body.micks-menu-open {
   max-width: 1140px;
   margin: 16px auto 28px;
   text-align: center;
-  color: #111;
+  
   font-size: clamp(14px, 1.3vw, 17px);
   line-height: 1.55;
   font-weight: 500;
@@ -6881,9 +6818,7 @@ body.micks-menu-open {
     padding-block:0px;
   }
 
-  main > section {
-    padding-inline: 20px;
-  }
+  
 
   main > section .container-site {
     padding-inline: 0;

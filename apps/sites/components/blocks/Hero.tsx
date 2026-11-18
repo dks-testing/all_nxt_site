@@ -38,7 +38,7 @@ export async function Hero({ ctx, bundle, props, index, pageSlug, integratedTrus
     const third = tertiary;
     const cards = integratedTrust?.items ?? [];
     return (
-      <section className="micks-home-hero" style={image ? { backgroundImage: `linear-gradient(rgba(0,0,0,.69),rgba(0,0,0,.73)),url(${JSON.stringify(image)})` } : undefined}>
+      <section className="micks-home-hero" style={image ? { backgroundImage: `linear-gradient(rgba(3,3,3,.82),rgba(3,3,3,.82)),url(${JSON.stringify(image)})` } : undefined}>
         <div className="container-site micks-home-hero-inner">
           <div className="micks-home-top">
             <div className="micks-home-copy">
