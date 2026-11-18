@@ -127,9 +127,9 @@ export function Embed({ bundle, props, id }: BlockComponentProps<"embed">) {
               {props.cta ? <Link href={localSiteHref(bundle.site.slug, globalCtaHref(getDesign(bundle.theme ?? {}), props.cta.href, props.cta.label))}>AI DIAGNOSTIC TOOL</Link> : <strong>AI DIAGNOSTIC TOOL</strong>}
             </div>
             {props.toolDescription && <p className="micks-tool-description">{props.toolDescription}</p>}
-            {(props.offerHeading || props.offerBody) && (
+            {(props.offerAmount || props.offerHeading || props.offerBody) && (
               <>
-                <div className="micks-ai-offer"><strong>{props.offerHeading}</strong></div>
+                <div className="micks-ai-offer"><strong>{props.offerAmount}{props.offerAmount && props.offerHeading && <br />}{props.offerHeading}</strong></div>
                 {props.offerBody && <span className="micks-ai-offer-description">{props.offerBody}</span>}
               </>
             )}

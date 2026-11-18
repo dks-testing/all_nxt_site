@@ -29,7 +29,7 @@ export function globalText(value: string | null | undefined, bundle: SiteBundle)
 const TEXT_FIELDS = new Set([
   "heading", "subheading", "eyebrow", "title", "subtitle", "body", "description",
   "summary", "text", "label", "caption", "placeholder", "question", "answer",
-  "offerHeading", "offerBody", "calloutHeading", "calloutBody", "supportText",
+  "offerAmount", "offerHeading", "offerBody", "calloutHeading", "calloutBody", "supportText",
   "closingText", "footerNote", "intro", "problem", "diagnosis", "fix", "discount",
   "shortDescription", "testimonial", "quote", "note", "buttonLabel", "ctaLabel",
 ]);

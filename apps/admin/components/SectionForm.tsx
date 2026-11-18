@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { blockFields, type BlockType, type Field } from "@platform/db/blocks";
+import { blockFields, splitLegacyOffer, type BlockType, type Field } from "@platform/db/blocks";
 import { MediaPicker, type MediaAsset } from "./MediaPicker";
 
 function get(obj: Record<string, unknown>, path: string): unknown {
@@ -50,6 +50,7 @@ export function SectionFields({ type, props, siteId, media, publicOrigin, isHome
     (type === "hero" && !isHomePage && (field.path === "subheading" || /^(primary|secondary|tertiary)Cta\./.test(field.path))) ||
     (type === "hero" && hideHeroDesign && fieldGroup(field) === "Design")
   ));
+  const fieldProps = type === "embed" ? splitLegacyOffer(props) as Record<string, unknown> : props;
   const groups = (["Content", "Design", "Images", "Buttons", "Advanced"] as Group[]).filter((group) => fields.some((field) => fieldGroup(field) === group));
   const [active, setActive] = useState<Group>(groups[0] ?? "Content");
   const changed = onChange ?? (() => undefined);
@@ -66,7 +67,7 @@ export function SectionFields({ type, props, siteId, media, publicOrigin, isHome
           : type === "embed" && props.variant === "micks-ai" && f.path === "toolDescription"
             ? "Try our AI diagnostic tool for an instant initial check before coming in.\nFree, efficient, and time-saving."
             : undefined;
-        return <FieldInput key={f.path} f={f} value={get(props, f.path) ?? fallback} siteId={siteId} media={media} publicOrigin={publicOrigin} changed={changed} />;
+        return <FieldInput key={f.path} f={f} value={get(fieldProps, f.path) ?? fallback} siteId={siteId} media={media} publicOrigin={publicOrigin} changed={changed} />;
       })}
     </div>)}
     {active === "Advanced" && <p className="mt-4 rounded-lg bg-amber-50 p-3 text-xs text-amber-800">Advanced settings can affect layout or third-party integrations. Change them only when needed.</p>}

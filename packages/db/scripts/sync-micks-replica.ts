@@ -74,7 +74,8 @@ const aiFeature = {
   variant: "micks-ai",
   imageUrl: `${WP}/2026/06/micks-repair-kelly-eggers-home.webp`,
   cta: { label: "Start diagnostic", href: "/diagnostics/" },
-  offerHeading: "$25 OFF\ndiagnostic fee",
+  offerAmount: "$25 OFF",
+  offerHeading: "diagnostic fee",
   offerBody: "For doing the pre-diagnostic, it saves us a little bit of time, we’ll take $25 off your diagnostic fee.",
 };
 

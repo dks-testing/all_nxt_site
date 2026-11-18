@@ -8,6 +8,21 @@ import { z } from "zod";
 
 const link = z.object({ label: z.string().min(1), href: z.string().min(1) });
 
+export function splitLegacyOffer(props: unknown): unknown {
+  if (!props || typeof props !== "object" || Array.isArray(props)) return props;
+  const values = props as Record<string, unknown>;
+  const heading = values.offerHeading;
+  if (typeof values.offerAmount === "string" && values.offerAmount.trim()) return props;
+  if (typeof heading !== "string") return props;
+  const [amount, ...headingLines] = heading.split(/\r?\n/);
+  if (!headingLines.length) return props;
+  return {
+    ...values,
+    offerAmount: amount.trim(),
+    offerHeading: headingLines.join("\n").trim(),
+  };
+}
+
 export const blockSchemas = {
   hero: z.object({
     eyebrow: z.string().optional(),
@@ -85,7 +100,7 @@ export const blockSchemas = {
     variant: z.enum(["primary", "dark", "light"]).default("primary"),
   }),
   rich_text: z.object({ heading: z.string().optional(), body: z.string().default("") }),
-  embed: z.object({
+  embed: z.preprocess(splitLegacyOffer, z.object({
     heading: z.string().optional(),
     body: z.string().optional(),
     integration: z.enum(["tire_finder", "ai_diagnostic", "custom"]).default("custom"),
@@ -95,9 +110,10 @@ export const blockSchemas = {
     toolDescription: z.string().optional(),
     imageUrl: z.string().optional(),
     cta: link.optional(),
+    offerAmount: z.string().optional(),
     offerHeading: z.string().optional(),
     offerBody: z.string().optional(),
-  }),
+  })),
   smart_feature: z.object({
     eyebrow: z.string().optional(),
     heading: z.string().min(1),
@@ -242,6 +258,7 @@ export const blockFields: Record<BlockType, Field[]> = {
     { path: "cta.label", label: "Button label", kind: "text" },
     { path: "cta.href", label: "Button link", kind: "text" },
     { path: "toolDescription", label: "Tool description", kind: "textarea" },
+    { path: "offerAmount", label: "Offer Amount", kind: "text" },
     { path: "offerHeading", label: "Offer heading", kind: "text" },
     { path: "offerBody", label: "Offer text", kind: "textarea" },
   ],
