@@ -48,7 +48,7 @@ export default async function Overview({ params }: { params: Promise<{ id: strin
       <div className="grid items-stretch gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="min-w-0 space-y-6">
           <Card title="Quick actions" description="Common tasks for this website.">
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-4">
               {[
                 ["Edit pages", "Update page content and sections", `/sites/${id}/pages`],
                 ["Header & footer", "Manage public navigation", `/sites/${id}/navigation`],
