@@ -15,25 +15,32 @@ export default async function SiteLayout({ children, params }: { children: React
   const [theme] = await getDb().select({ logoUrl: themes.logoUrl }).from(themes).where(eq(themes.siteId, id)).limit(1);
   return (
     <div className="admin-page">
-      <div className="site-workspace-header mb-7 flex flex-wrap items-center justify-between gap-5 overflow-hidden p-5 sm:p-6">
-        <div className="relative z-10">
-          <Link href="/sites" className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-indigo-700">← Website directory</Link>
-          <div className="mt-2 flex flex-wrap items-center gap-3">
-            <h1 className="text-xl font-bold"><SiteIdentity name={site.name} logoUrl={theme?.logoUrl} compact /></h1>
-            <StatusBadge status={site.status} />
-          </div>
-          <p className="mt-1 pl-[3.25rem] text-sm text-slate-500">{process.env.NODE_ENV === "development" ? `Local: ${platformUrl(site.slug).replace(/^https?:\/\//, "")}` : primary ?? `${site.slug} · no custom domain yet`}</p>
+      <div className="site-workspace-header sticky top-[4.5rem] z-30 mb-6 flex min-h-[4.5rem] flex-wrap items-center justify-between gap-x-4 gap-y-3 px-3 py-3 sm:px-4 lg:flex-nowrap">
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+          <Link href="/sites" aria-label="Website directory" className="inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-2 text-xs font-semibold text-slate-500 transition-colors hover:bg-slate-100 hover:text-indigo-700 sm:px-2">
+            <span aria-hidden="true">←</span><span className="hidden sm:inline">Website directory</span>
+          </Link>
+          <span aria-hidden="true" className="hidden h-8 w-px shrink-0 bg-slate-200 sm:block" />
+          <h1 className="min-w-0 truncate text-base font-bold leading-tight">
+            <SiteIdentity
+              name={site.name}
+              logoUrl={theme?.logoUrl}
+              compact
+              subtitle={process.env.NODE_ENV === "development" ? `Local: ${platformUrl(site.slug).replace(/^https?:\/\//, "")}` : primary ?? `${site.slug} · no custom domain yet`}
+            />
+          </h1>
+          <StatusBadge status={site.status} />
         </div>
-        <div className="relative z-10 flex flex-wrap gap-2">
-          <a href={await previewUrl(site)} target="_blank" rel="noreferrer" className="btn btn-secondary">Preview draft</a>
-          {live && <a href={publicUrl(site, primary)} target="_blank" rel="noreferrer" className="btn btn-secondary">View site ↗</a>}
+        <div className="flex w-full shrink-0 flex-wrap gap-2 lg:w-auto">
+          <a href={await previewUrl(site)} target="_blank" rel="noreferrer" className="btn btn-secondary min-w-0 flex-1 lg:flex-none">Preview draft</a>
+          {live && <a href={publicUrl(site, primary)} target="_blank" rel="noreferrer" className="btn btn-secondary min-w-0 flex-1 lg:flex-none">View site ↗</a>}
           {role === "OWNER" && (
-            <form action={setStatus}>
+            <form action={setStatus} className="min-w-0 flex-1 lg:flex-none">
               <input type="hidden" name="siteId" value={site.id} />
               {live ? (
-                <><input type="hidden" name="status" value="UNPUBLISHED" /><SubmitButton className="btn btn-danger" confirm="Unpublish this site? Visitors will see a 'temporarily unavailable' page.">Unpublish</SubmitButton></>
+                <><input type="hidden" name="status" value="UNPUBLISHED" /><SubmitButton className="btn btn-danger w-full lg:w-auto" confirm="Unpublish this site? Visitors will see a 'temporarily unavailable' page.">Unpublish</SubmitButton></>
               ) : (
-                <><input type="hidden" name="status" value="PUBLISHED" /><SubmitButton>Publish site</SubmitButton></>
+                <><input type="hidden" name="status" value="PUBLISHED" /><SubmitButton className="btn btn-primary w-full lg:w-auto">Publish site</SubmitButton></>
               )}
             </form>
           )}
