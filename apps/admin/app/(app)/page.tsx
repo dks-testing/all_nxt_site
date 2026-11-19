@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getDb, sites, siteMembers, themes, appointments, auditLog, eq, desc, count, and, inArray } from "@platform/db";
 import { requireUser } from "@/lib/auth";
-import { PageHeader, StatusBadge } from "@/components/ui";
+import { StatusBadge } from "@/components/ui";
 import { SiteIdentity } from "@/components/SiteIdentity";
 
 export const metadata = { title: "Dashboard" };
@@ -36,16 +36,24 @@ export default async function AdminDashboard() {
     { label: "Archived", total: visibleSites.filter((site) => site.status === "ARCHIVED").length, bar: "bg-slate-400", dot: "bg-slate-400" },
   ];
   const metrics = [
-    { label: "Websites", number: visibleSites.length, hint: "Sites in your workspace", tone: "indigo" },
-    { label: "Live", number: liveCount, hint: "Currently published", tone: "emerald" },
-    { label: "Needs publishing", number: offlineCount, hint: "Draft or offline", tone: "amber" },
-    { label: "New appointments", number: appointmentCount, hint: "Awaiting a response", tone: "rose" },
+    { label: "Websites", number: visibleSites.length, hint: "Sites in your workspace", tone: "indigo", icon: "M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2ZM3 9h18M7 6.5h.01M10 6.5h.01M7 13h10m-10 3h6" },
+    { label: "Live", number: liveCount, hint: "Currently published", tone: "emerald", icon: "M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM3 12h18M12 3a18 18 0 0 1 0 18 18 18 0 0 1 0-18Z" },
+    { label: "Needs publishing", number: offlineCount, hint: "Draft or offline", tone: "amber", icon: "M12 16V3m-5 5 5-5 5 5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4" },
+    { label: "New appointments", number: appointmentCount, hint: "Awaiting a response", tone: "rose", icon: "M8 2v4m8-4v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm4 11 2 2 4-4" },
   ];
   return (
     <main className="admin-page space-y-7">
-      <PageHeader title="Workspace dashboard" description="Monitor every website from one place, then open a site to manage its own dashboard." actions={<div className="flex flex-wrap gap-2"><Link className="btn btn-secondary" href="/sites">Manage websites</Link>{isSuper && <Link className="btn btn-primary" href="/sites/new">+ New website</Link>}</div>} />
+      <section className="dashboard-welcome" aria-labelledby="workspace-title">
+        <div className="max-w-xl"><p className="mb-2 text-xs font-medium uppercase tracking-widest text-indigo-100">Your workspace, at a glance</p><h1 id="workspace-title" className="text-2xl font-bold tracking-tight sm:text-3xl">Workspace dashboard</h1><p className="mt-3 max-w-md text-sm leading-relaxed text-indigo-50">Monitor every website from one place, then open a site to manage its content, publishing, and appointments.</p></div>
+        <div className="flex flex-wrap gap-2"><Link className="btn" href="/sites">Manage websites</Link>{isSuper && <Link className="btn" href="/sites/new">+ New website</Link>}</div>
+      </section>
       <section aria-label="Workspace totals" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {metrics.map((metric) => <div key={metric.label} className="metric-card"><span className={`metric-card__mark metric-card__mark--${metric.tone}`} aria-hidden="true" /><div><p className="text-sm font-semibold text-slate-600">{metric.label}</p><p className="mt-1 text-3xl font-bold tabular-nums tracking-tight text-slate-950">{metric.number}</p><p className="mt-1.5 text-xs text-slate-500">{metric.hint}</p></div></div>)}
+        {metrics.map((metric) => (
+          <div key={metric.label} className={`site-stat-card site-stat-card--${metric.tone}`}>
+            <div className="site-stat-card__top"><span className="site-stat-card__icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d={metric.icon} /></svg></span></div>
+            <div><p className="text-xs font-semibold text-slate-600">{metric.label}</p><p className="mt-1 text-3xl font-bold tabular-nums tracking-tight text-slate-900">{metric.number}</p><p className="mt-2 text-xs leading-5 text-slate-500">{metric.hint}</p></div>
+          </div>
+        ))}
       </section>
       <section className="card p-5" aria-labelledby="dashboard-publishing">
         <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2"><h2 id="dashboard-publishing" className="font-semibold">Publishing overview</h2><span className="text-xs text-slate-500">Statuses across your websites</span></div>

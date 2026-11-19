@@ -20,8 +20,8 @@ export function SiteNav({ siteId }: { siteId: string }) {
             const full = href ? `${base}/${href}` : base;
             const active = href ? path.startsWith(full) : path === base;
             return (
-              <Link key={href} href={full} className={`group mb-1 flex items-center gap-2.5 rounded-xl px-3 py-2.5 font-medium transition ${active ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"}`}>
-                <span className={`h-1.5 w-1.5 rounded-full ${active ? "bg-white" : "bg-slate-300 transition group-hover:bg-indigo-500"}`} aria-hidden="true" />{label}
+              <Link key={href} href={full} aria-current={active ? "page" : undefined} className={`admin-site-link mb-1 flex items-center gap-2.5 rounded-lg px-3 py-2.5 font-medium transition${active ? " admin-site-link--active" : ""}`}>
+                <span className="admin-site-link__dot h-1.5 w-1.5 shrink-0 rounded-full" aria-hidden="true" />{label}
               </Link>
             );
           })}

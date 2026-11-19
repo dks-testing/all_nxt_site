@@ -5,7 +5,6 @@ import { SiteIdentity } from "@/components/SiteIdentity";
 import { publicUrl, platformUrl, previewUrl } from "@/lib/site-url";
 import { setStatus } from "@/lib/actions/sites";
 import { StatusBadge } from "@/components/ui";
-import { SiteNav } from "@/components/SiteNav";
 import { SubmitButton } from "@/components/ConfirmButton";
 
 export default async function SiteLayout({ children, params }: { children: React.ReactNode; params: Promise<{ id: string }> }) {
@@ -17,15 +16,16 @@ export default async function SiteLayout({ children, params }: { children: React
     <div className="admin-page">
       <div className="site-workspace-header sticky top-[4.5rem] z-30 mb-6 flex min-h-[4.5rem] flex-wrap items-center justify-between gap-x-4 gap-y-3 px-3 py-3 sm:px-4 lg:flex-nowrap">
         <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
-          <Link href="/sites" aria-label="Website directory" className="inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-2 text-xs font-semibold text-slate-500 transition-colors hover:bg-slate-100 hover:text-indigo-700 sm:px-2">
+          <Link href="/sites" aria-label="Website directory" className="inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-2 text-xs font-semibold text-slate-200 transition-colors hover:bg-slate-600 hover:text-white sm:px-2">
             <span aria-hidden="true">←</span><span className="hidden sm:inline">Website directory</span>
           </Link>
-          <span aria-hidden="true" className="hidden h-8 w-px shrink-0 bg-slate-200 sm:block" />
+          <span aria-hidden="true" className="hidden h-8 w-px shrink-0 bg-slate-500 sm:block" />
           <h1 className="min-w-0 truncate text-base font-bold leading-tight">
             <SiteIdentity
               name={site.name}
               logoUrl={theme?.logoUrl}
               compact
+              tone="light"
               subtitle={process.env.NODE_ENV === "development" ? `Local: ${platformUrl(site.slug).replace(/^https?:\/\//, "")}` : primary ?? `${site.slug} · no custom domain yet`}
             />
           </h1>
@@ -46,8 +46,7 @@ export default async function SiteLayout({ children, params }: { children: React
           )}
         </div>
       </div>
-      <div className="grid gap-7 lg:grid-cols-[15rem_minmax(0,1fr)]">
-        <aside className="admin-sidebar p-3 lg:sticky lg:top-24 lg:self-start"><SiteNav siteId={site.id} /></aside>
+      <div>
         <div className="min-w-0">{children}</div>
       </div>
     </div>

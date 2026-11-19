@@ -10,7 +10,7 @@ export function resolveSiteLogo(logoUrl: string | null | undefined): string | nu
   return null;
 }
 
-export function SiteIdentity({ name, slug, subtitle, logoUrl, compact = false }: { name: string; slug?: string; subtitle?: string; logoUrl?: string | null; compact?: boolean }) {
+export function SiteIdentity({ name, slug, subtitle, logoUrl, compact = false, tone = "default" }: { name: string; slug?: string; subtitle?: string; logoUrl?: string | null; compact?: boolean; tone?: "default" | "light" }) {
   const src = resolveSiteLogo(logoUrl);
   return (
     <span className="inline-flex max-w-full items-center gap-3 align-middle">
@@ -18,9 +18,9 @@ export function SiteIdentity({ name, slug, subtitle, logoUrl, compact = false }:
         {src ? <img src={src} alt={`${name} logo`} className="h-full w-full object-contain" loading="lazy" /> : <span aria-hidden="true" className="text-lg font-semibold text-indigo-600">{name.trim().charAt(0).toUpperCase() || "S"}</span>}
       </span>
       <span className="min-w-0 text-left">
-        <span className={`block font-semibold text-slate-900 ${subtitle ? "truncate" : "break-words"}`}>{name}</span>
-        {subtitle && <span className="block truncate text-xs font-normal text-slate-500">{subtitle}</span>}
-        {slug && <span className="mt-0.5 block text-xs font-normal text-slate-500">{slug}</span>}
+        <span className={`block font-semibold ${tone === "light" ? "text-white" : "text-slate-900"} ${subtitle ? "truncate" : "break-words"}`}>{name}</span>
+        {subtitle && <span className={`block truncate text-xs font-normal ${tone === "light" ? "text-slate-200" : "text-slate-500"}`}>{subtitle}</span>}
+        {slug && <span className={`mt-0.5 block text-xs font-normal ${tone === "light" ? "text-slate-200" : "text-slate-500"}`}>{slug}</span>}
       </span>
     </span>
   );
