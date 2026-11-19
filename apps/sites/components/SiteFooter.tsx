@@ -9,11 +9,12 @@ import { localSiteHref } from "@/lib/url";
 import { getDesign } from "@platform/db/theme";
 import { Stars } from "./Icons";
 import { CertificationBadge, getActiveCertificationBadges } from "./CertificationBadge";
-import { globalText } from "@/lib/global-content";
+import { globalCta, globalText } from "@/lib/global-content";
 
 export function SiteFooter({ bundle }: { bundle: SiteBundle }) {
   const { settings, footerMenu, theme } = bundle;
   const design = getDesign(theme ?? {});
+  const mobileCall = globalCta(design, design.callCtaHref || telHref(settings?.phone), "Make a Call");
   if (design.headerStyle === "angled" || (!theme?.design && bundle.site.slug === "micks-repair")) {
     return <MicksFooter bundle={bundle} />;
   }
@@ -71,8 +72,8 @@ export function SiteFooter({ bundle }: { bundle: SiteBundle }) {
         </div>
       </footer>
       {settings?.phone && (
-        <a href={telHref(settings.phone)} className="mobile-fixed-call sm:hidden" aria-label={`Make a call to ${settings.phone}`}>
-          <span><PhoneIcon />{settings.phone}</span><strong>Make a Call</strong>
+        <a href={mobileCall.href} className="mobile-fixed-call sm:hidden" aria-label={`Make a call to ${settings.phone}`}>
+          <span><PhoneIcon />{settings.phone}</span><strong>{mobileCall.label}</strong>
         </a>
       )}
     </>
@@ -88,6 +89,7 @@ function MicksFooter({ bundle }: { bundle: SiteBundle }) {
   const pathname = usePathname();
   const { settings, theme, footerMenu } = bundle;
   const design = getDesign(theme ?? {});
+  const mobileCall = globalCta(design, design.callCtaHref || telHref(settings?.phone), "Make a Call");
   const parts = pathname.split("/").filter(Boolean).map((part) => {
     try { return decodeURIComponent(part); } catch { return part; }
   });
@@ -161,6 +163,6 @@ function MicksFooter({ bundle }: { bundle: SiteBundle }) {
         </div>
       </div>
     </footer>
-    {settings?.phone && <a href={telHref(settings.phone)} className="mobile-fixed-call sm:hidden" aria-label={`Make a call to ${settings.phone}`}><span><PhoneIcon />{settings.phone}</span><strong>Make a Call</strong></a>}
+    {settings?.phone && <a href={mobileCall.href} className="mobile-fixed-call sm:hidden" aria-label={`Make a call to ${settings.phone}`}><span><PhoneIcon />{settings.phone}</span><strong>{mobileCall.label}</strong></a>}
   </>;
 }

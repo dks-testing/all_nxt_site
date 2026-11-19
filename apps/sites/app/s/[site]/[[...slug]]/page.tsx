@@ -14,7 +14,7 @@ import { MicksSpecials } from "@/components/MicksSpecials";
 import { CertificationBadges } from "@/components/CertificationBadge";
 import { QuoteMark } from "@/components/QuoteMark";
 import { StepListIcon } from "@/components/TrustListIcon";
-import { globalCtaHref, globalText } from "@/lib/global-content";
+import { globalCta, globalCtaHref, globalText } from "@/lib/global-content";
 
 type Props = { params: Promise<{ site: string; slug?: string[] }>; searchParams?: Promise<Record<string, string | string[] | undefined>> };
 
@@ -89,6 +89,9 @@ export default async function Page({ params, searchParams }: Props) {
           return <div className="cms-section-preview"><style>{`body:has(.cms-section-preview)>header,body:has(.cms-section-preview)>footer,body:has(.cms-section-preview)>.sticky{display:none!important}body:has(.cms-section-preview){background:var(--color-background);overflow-x:hidden}.cms-section-preview{min-height:100vh}`}</style><MicksSpecials ctx={ctx} bundle={bundle} props={props} /></div>;
         }
       }
+      if (design.headerStyle === "angled" && r.slug === "about-us" && selectedSection?.type === "about") {
+        return <div className="cms-section-preview"><style>{`body:has(.cms-section-preview)>header,body:has(.cms-section-preview)>footer,body:has(.cms-section-preview)>.sticky{display:none!important}body:has(.cms-section-preview){background:var(--color-background);overflow-x:hidden}.cms-section-preview{min-height:100vh}`}</style><MicksContentPage pageSlug={r.slug} bundle={bundle} ctx={ctx} sections={sections.filter((section) => section.id === sectionPreview)} /></div>;
+      }
       return <div className="cms-section-preview"><style>{`body:has(.cms-section-preview)>header,body:has(.cms-section-preview)>footer,body:has(.cms-section-preview)>.sticky{display:none!important}body:has(.cms-section-preview){background:var(--color-background);overflow-x:hidden}.cms-section-preview{min-height:100vh}`}</style><RenderSections sections={sections.filter((section) => section.id === sectionPreview)} ctx={ctx} bundle={bundle} pageSlug={r.slug} /></div>;
     }
     // Diagnostics and Tires are composed from normal CMS sections so their
@@ -122,6 +125,8 @@ export default async function Page({ params, searchParams }: Props) {
   const others = (await getServices(ctx)).filter((x) => x.id !== svc.id).slice(0, 6);
   const phone = bundle.settings?.phone;
   const design = getDesign(bundle.theme ?? {});
+  const scheduleAction = globalCta(design, "/make-an-appointment/#book", "Schedule Service");
+  const callAction = globalCta(design, design.callCtaHref || telHref(bundle.settings?.phone), "Call Now");
   if (design.headerStyle === "angled") {
     const serviceImage = svc.imageUrl || design.serviceDefaultImageUrl;
     const blocks = globalText(svc.body, bundle).replace(/\r/g, "").split(/\n{2,}/).filter(Boolean);
@@ -142,6 +147,7 @@ export default async function Page({ params, searchParams }: Props) {
     }).filter(([title, body]) => title && body);
     const process = { heading: globalText(svc.processHeading || `Our 4-Step ${svc.name} Service`, bundle), steps: pairs(svc.processSteps) };
     const trustItems = pairs(svc.trustItems);
+    const finalAction = globalCta(design, svc.finalCtaHref || "/diagnostics/", svc.finalCtaLabel || "Start Diagnostics");
     return (
       <>
         <MicksInnerHero bundle={bundle} heading={svc.name} variant="service" />
@@ -159,16 +165,16 @@ export default async function Page({ params, searchParams }: Props) {
               </>}
               {closingBlocks.map((block, i) => <RichText key={i} text={block} className="micks-service-prose" />)}
               <div className="micks-service-bottom-actions">
-                <Link href={localSiteHref(bundle.site.slug, globalCtaHref(design, "/make-an-appointment/#book", design.scheduleCtaLabel || "Schedule Service"))} className="micks-hero-button"><span>{design.scheduleCtaLabel || "Schedule Service"}</span></Link>
+                <Link href={localSiteHref(bundle.site.slug, scheduleAction.href)} className="micks-hero-button"><span>{scheduleAction.label}</span></Link>
                 <CertificationBadges design={design} className="micks-service-badges" />
               </div>
             </div>
           </div>
         </section>
         <section className="micks-service-process"><div className="container-site micks-service-live-grid"><img src={processImage} alt={`${bundle.settings?.businessName ?? bundle.site.name} storefront`} /><div><h2>{process.heading}</h2><div className="micks-service-step-list">{process.steps.map(([title, body]) => <div key={title}><StepListIcon design={design} label={title} /><p><strong>{title}</strong>{body}</p></div>)}</div></div></div></section>
-        {svc.showVehicleCallout && <section className="micks-service-vehicle-callout"><div className="container-site"><div><h2>{globalText(svc.vehicleCalloutHeading, bundle)}</h2><p>{globalText(svc.vehicleCalloutBody, bundle)}</p><div className="service-btns"><a href={telHref(bundle.settings?.phone)}><span>Call Now</span></a><Link href={localSiteHref(bundle.site.slug, globalCtaHref(design, "/make-an-appointment/", design.scheduleCtaLabel || "Schedule Service"))}><span>{design.scheduleCtaLabel || "Schedule Service"}</span></Link></div></div><img src={vehicleImage} alt="Vehicle" /></div></section>}
+        {svc.showVehicleCallout && <section className="micks-service-vehicle-callout"><div className="container-site"><div><h2>{globalText(svc.vehicleCalloutHeading, bundle)}</h2><p>{globalText(svc.vehicleCalloutBody, bundle)}</p><div className="service-btns"><a href={callAction.href}><span>{callAction.label}</span></a><Link href={localSiteHref(bundle.site.slug, scheduleAction.href)}><span>{scheduleAction.label}</span></Link></div></div><img src={vehicleImage} alt="Vehicle" /></div></section>}
         <section className="micks-service-live-trust"><div className="container-site micks-service-live-grid"><div><h2>{globalText(svc.trustHeading, bundle)}</h2><div className="micks-service-step-list micks-service-trust-list">{trustItems.map(([title, body]) => <div key={title}><StepListIcon design={design} label={title} /><p><strong>{globalText(title, bundle)}</strong>{globalText(body, bundle)}</p></div>)}</div></div><img src={trustImage} alt={`${bundle.settings?.businessName ?? bundle.site.name} in the community`} /></div></section>
-        <section className="micks-know-cta section"><div><h2>{globalText(svc.finalHeading, bundle)}</h2><p>{globalText(svc.finalBody, bundle)}</p><Link href={localSiteHref(bundle.site.slug, svc.finalCtaHref || design.diagnosticsCtaHref || "/diagnostics/")}><span>{svc.finalCtaLabel}</span></Link></div></section>
+        <section className="micks-know-cta section"><div><h2>{globalText(svc.finalHeading, bundle)}</h2><p>{globalText(svc.finalBody, bundle)}</p><Link href={localSiteHref(bundle.site.slug, finalAction.href)}><span>{finalAction.label}</span></Link></div></section>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "Service", name: svc.name, description: svc.summary, provider: { "@type": bundle.settings?.businessType ?? "LocalBusiness", name: bundle.settings?.businessName } }).replace(/</g, "\\u003c") }} />
       </>
     );
@@ -181,7 +187,7 @@ export default async function Page({ params, searchParams }: Props) {
           <h1 className="max-w-3xl text-4xl font-bold uppercase md:text-5xl">{svc.name}</h1>
             {svc.summary && <p className="mt-4 max-w-2xl text-lg text-white/85">{globalText(svc.summary, bundle)}</p>}
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href={localSiteHref(bundle.site.slug, globalCtaHref(design, "/make-an-appointment/", "Schedule service"))} className="btn btn-primary"><span>Schedule service</span></Link>
+            <Link href={localSiteHref(bundle.site.slug, scheduleAction.href)} className="btn btn-primary"><span>{scheduleAction.label}</span></Link>
             {phone && <a href={telHref(phone)} className="btn btn-outline text-white"><PhoneIcon className="h-4 w-4" /><span>{phone}</span></a>}
           </div>
         </div>

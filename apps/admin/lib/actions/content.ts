@@ -33,6 +33,13 @@ export async function saveGlobalSettings(fd: FormData) {
     const scheduleCtaLabel = str(fd, "scheduleCtaLabel").trim() || "Schedule Service";
     const diagnosticsCtaLabel = str(fd, "diagnosticsCtaLabel").trim() || "Start Diagnostics";
     const tiresCtaLabel = str(fd, "tiresCtaLabel").trim() || "Find the Right Tires";
+    const aboutCtaHref = str(fd, "aboutCtaHref").trim() || "/about-us/";
+    const servicesCtaHref = str(fd, "servicesCtaHref").trim() || "/services/";
+    const callCtaHref = str(fd, "callCtaHref").trim();
+    const aboutCtaLabel = str(fd, "aboutCtaLabel").trim() || "About Us";
+    const servicesCtaLabel = str(fd, "servicesCtaLabel").trim() || "View Services";
+    const serviceCardCtaLabel = str(fd, "serviceCardCtaLabel").trim() || "Learn More";
+    const callCtaLabel = str(fd, "callCtaLabel").trim() || "Call Now";
     const toolUrl = str(fd, "toolEmbedUrl").trim();
     const toolEnabled = bool(fd, "toolEnabled");
 
@@ -43,7 +50,7 @@ export async function saveGlobalSettings(fd: FormData) {
     const [themeRow] = await db.select().from(themes).where(eq(themes.siteId, siteId));
     if (!themeRow) throw new Error("Set up branding before saving global links");
     await db.update(themes).set({
-      design: { ...(themeRow.design ?? {}), scheduleCtaHref, diagnosticsCtaHref, tiresCtaHref, scheduleCtaLabel, diagnosticsCtaLabel, tiresCtaLabel },
+      design: { ...(themeRow.design ?? {}), scheduleCtaHref, diagnosticsCtaHref, tiresCtaHref, aboutCtaHref, servicesCtaHref, callCtaHref: callCtaHref || undefined, scheduleCtaLabel, diagnosticsCtaLabel, tiresCtaLabel, aboutCtaLabel, servicesCtaLabel, serviceCardCtaLabel, callCtaLabel },
     }).where(eq(themes.siteId, siteId));
 
     for (const type of ["tire_finder", "ai_diagnostic"] as const) {
@@ -135,10 +142,6 @@ export async function saveTheme(fd: FormData) {
     const serviceStepIconUrl = opt(fd, "serviceStepIconUrl") ?? undefined;
     const serviceStepIconColor = optionalHex("serviceStepIconColor");
     const serviceStepIconHoverColor = optionalHex("serviceStepIconHoverColor");
-    const aboutWorkItems = str(fd, "aboutWorkItems").split(/\r?\n/).map((line) => line.trim()).filter(Boolean).slice(0, 8).map((line) => {
-      const [title, ...body] = line.split("|");
-      return { title: title.trim(), body: body.join("|").trim() };
-    }).filter((item) => item.title && item.body);
     if (quoteSvgHoverColor && !quoteSvgColor) throw new Error("Set an SVG Color before choosing an SVG Hover Color");
     if (serviceStepIconHoverColor && !serviceStepIconColor) throw new Error("Set a step-list SVG Color before choosing a Hover Color");
     const svgUrls = [quoteSvgUrl, serviceStepIconUrl].filter((url): url is string => Boolean(url));
@@ -185,13 +188,6 @@ export async function saveTheme(fd: FormData) {
       footerPoweredLink: opt(fd, "footerPoweredLink") ?? undefined,
       footerPoweredText: opt(fd, "footerPoweredText") ?? undefined,
       footerFacebookText: opt(fd, "footerFacebookText") ?? undefined,
-      aboutOwnerImageUrl: opt(fd, "aboutOwnerImageUrl") ?? undefined,
-      aboutTeamImageUrl: opt(fd, "aboutTeamImageUrl") ?? undefined,
-      aboutVehicleImageUrl: opt(fd, "aboutVehicleImageUrl") ?? undefined,
-      aboutCrewImageOneUrl: opt(fd, "aboutCrewImageOneUrl") ?? undefined,
-      aboutCrewImageTwoUrl: opt(fd, "aboutCrewImageTwoUrl") ?? undefined,
-      aboutCrewImageThreeUrl: opt(fd, "aboutCrewImageThreeUrl") ?? undefined,
-      aboutWorkItems,
       diagnosticsImageUrl: opt(fd, "diagnosticsImageUrl") ?? undefined,
       tiresImageUrl: opt(fd, "tiresImageUrl") ?? undefined,
       scheduleCtaHref: opt(fd, "scheduleCtaHref") ?? undefined,
@@ -313,6 +309,9 @@ function readField(fd: FormData, f: Field): unknown {
   switch (f.kind) {
     case "boolean": return fd.get(`p:${f.path}`) === "on";
     case "number": return raw.trim() === "" ? undefined : Number(raw);
+    case "image": return raw.trim();
+    case "image-list": return fd.getAll(`p:${f.path}`).map(String);
+    case "team": return fd.getAll(`p:${f.path}`).map(String).filter(Boolean);
     case "list": return lines(raw);
     case "pairs": return lines(raw).map((l) => {
       const [a, ...b] = l.split("|");

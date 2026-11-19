@@ -45,6 +45,18 @@ async function main() {
     const [[db]] = await conn.query<mysql.RowDataPacket[]>("SELECT DATABASE() AS name");
     const name = db.name as string;
     console.log(`Upgrading schema in ${name}. Do not run against the legacy next_admin_db unless you migrated the schema.`);
+    await conn.query(`CREATE TABLE IF NOT EXISTS \`team_profiles\` (
+      \`id\` VARCHAR(36) NOT NULL PRIMARY KEY,
+      \`site_id\` VARCHAR(36) NOT NULL,
+      \`name\` VARCHAR(191) NOT NULL,
+      \`position\` VARCHAR(191) NULL,
+      \`description\` TEXT NULL,
+      \`image_url\` VARCHAR(1024) NULL,
+      \`sort_order\` INT NOT NULL DEFAULT 0,
+      \`is_active\` BOOLEAN NOT NULL DEFAULT TRUE,
+      INDEX \`team_profiles_site_idx\` (\`site_id\`, \`sort_order\`)
+    )`);
+    console.log("READY team_profiles");
     for (const [table, columns] of Object.entries(tables)) {
       const [exists] = await conn.execute<mysql.RowDataPacket[]>("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=? AND TABLE_NAME=?", [name, table]);
       if (!exists.length) throw new Error(`Required Shop Platform table ${table} is missing; initialize the correct platform database first.`);
@@ -55,6 +67,25 @@ async function main() {
         await conn.query(`ALTER TABLE \`${table}\` ADD COLUMN \`${column}\` ${definition}`);
         console.log(`ADDED ${table}.${column}`);
       }
+    }
+    // Convert legacy crew arrays into reusable profiles once, preserving page order and images.
+    const [aboutSections] = await conn.query<mysql.RowDataPacket[]>("SELECT id, site_id, props FROM page_sections WHERE type='about'");
+    for (const section of aboutSections) {
+      const props = typeof section.props === "string" ? JSON.parse(section.props) : section.props;
+      if (!Array.isArray(props?.crew) || props.crew.length === 0 || (Array.isArray(props.teamMemberIds) && props.teamMemberIds.length > 0)) continue;
+      const [existing] = await conn.execute<mysql.RowDataPacket[]>("SELECT id FROM team_profiles WHERE site_id=? LIMIT 1", [section.site_id]);
+      if (existing.length) continue;
+      const ids: string[] = [];
+      for (let index = 0; index < props.crew.length; index++) {
+        const member = props.crew[index];
+        if (!member?.title) continue;
+        const memberId = crypto.randomUUID();
+        ids.push(memberId);
+        await conn.execute("INSERT INTO team_profiles (id, site_id, name, position, description, image_url, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, TRUE)", [memberId, section.site_id, member.title, null, member.body || null, props.crewImageUrls?.[index] || null, index]);
+      }
+      props.teamMemberIds = ids;
+      await conn.execute("UPDATE page_sections SET props=? WHERE id=?", [JSON.stringify(props), section.id]);
+      console.log(`MIGRATED ${ids.length} team profiles for site ${section.site_id}`);
     }
     console.log("Schema upgrade complete. No existing rows were deleted.");
   } finally { await conn.end(); }

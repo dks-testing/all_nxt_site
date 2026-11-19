@@ -1,4 +1,4 @@
-import { services, specials, faqs, testimonials, caseStudies, banners, redirects } from "@platform/db";
+import { services, specials, faqs, testimonials, caseStudies, banners, redirects, teamProfiles } from "@platform/db";
 
 export type CField = {
   name: string;
@@ -24,6 +24,22 @@ export type CollectionDef = {
 
 /** One generic editor drives all of these. Only listed fields can ever be written. */
 export const collections: Record<string, CollectionDef> = {
+  "our-team": {
+    label: "Our Team",
+    singular: "team member",
+    description: "Create reusable staff profiles. About Us pages can choose which people appear and set their display order.",
+    table: teamProfiles,
+    title: "name",
+    subtitle: "position",
+    sortable: true,
+    fields: [
+      { name: "name", label: "Name / heading", kind: "text", required: true },
+      { name: "position", label: "Position", kind: "text" },
+      { name: "description", label: "Description", kind: "textarea", wide: true },
+      { name: "imageUrl", label: "Photo", kind: "image", help: "Choose an existing Media Library image or upload a new one." },
+      { name: "isActive", label: "Available to display", kind: "boolean" },
+    ],
+  },
   services: {
     label: "Services",
     singular: "service",

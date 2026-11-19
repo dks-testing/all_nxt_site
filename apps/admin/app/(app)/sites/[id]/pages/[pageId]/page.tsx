@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getDb, pages, pageSections, media, themes, specials, eq, and, asc, desc } from "@platform/db";
+import { getDb, pages, pageSections, media, themes, specials, teamProfiles, eq, and, asc, desc } from "@platform/db";
 import { blockLabels, blockTypes, isBlockType } from "@platform/db/blocks";
 import { getDesign } from "@platform/db/theme";
 import { loadSite } from "@/lib/site";
@@ -32,12 +32,16 @@ export default async function PageEditor({ params, searchParams }: { params: Pro
   const [page] = await db.select().from(pages).where(and(eq(pages.id, pageId), eq(pages.siteId, id)));
   if (!page) notFound();
   const [theme] = await db.select({ design: themes.design }).from(themes).where(eq(themes.siteId, id)).limit(1);
-  const angledInnerPage = page.slug !== "" && getDesign(theme ?? {}).headerStyle === "angled";
+  const design = getDesign(theme ?? {});
+  const angledInnerPage = page.slug !== "" && design.headerStyle === "angled";
   const sections = await db.select().from(pageSections).where(and(eq(pageSections.pageId, pageId), eq(pageSections.siteId, id))).orderBy(asc(pageSections.sortOrder));
   const specialOffers = sections.some((section) => section.type === "specials")
     ? await db.select().from(specials).where(eq(specials.siteId, id)).orderBy(asc(specials.sortOrder))
     : [];
   const assets = await db.select({ id: media.id, url: media.url, alt: media.alt, width: media.width, height: media.height }).from(media).where(eq(media.siteId, id)).orderBy(desc(media.createdAt));
+  const teamOptions = sections.some((section) => section.type === "about")
+    ? await db.select({ id: teamProfiles.id, name: teamProfiles.name, position: teamProfiles.position, imageUrl: teamProfiles.imageUrl, isActive: teamProfiles.isActive }).from(teamProfiles).where(eq(teamProfiles.siteId, id)).orderBy(asc(teamProfiles.sortOrder))
+    : [];
   const publicOrigin = (process.env.SITES_APP_URL || "http://localhost:3000").replace(/\/$/, "");
   const pagePreviewUrl = await previewUrl(site, page.slug ? `/${page.slug}/` : "/");
   const hidden = (sId: string) => <><input type="hidden" name="siteId" value={id} /><input type="hidden" name="pageId" value={pageId} />{sId && <input type="hidden" name="sectionId" value={sId} />}</>;
@@ -80,6 +84,14 @@ export default async function PageEditor({ params, searchParams }: { params: Pro
           {sections.map((s, i) => {
             if (!isBlockType(s.type)) return null;
             const sectionType = s.type;
+            const editorProps = sectionType === "about" ? {
+              ...s.props,
+              imageUrl: s.props.imageUrl ?? design.aboutOwnerImageUrl,
+              teamImageUrl: s.props.teamImageUrl ?? design.aboutTeamImageUrl,
+              vehicleImageUrl: s.props.vehicleImageUrl ?? design.aboutVehicleImageUrl,
+              workItems: s.props.workItems ?? design.aboutWorkItems,
+              crewImageUrls: s.props.crewImageUrls ?? [design.aboutCrewImageOneUrl, design.aboutCrewImageTwoUrl, design.aboutCrewImageThreeUrl],
+            } : s.props;
             const hint = s.type === "specials" ? (
               <p className="mb-4 rounded-md bg-indigo-50 px-3 py-2 text-xs text-indigo-800">Set the section heading and intro here. Edit the offer cards below.</p>
             ) : collectionHint[s.type] ? (
@@ -107,8 +119,8 @@ export default async function PageEditor({ params, searchParams }: { params: Pro
                     ))}
                   </span>
                 </summary>
-                <SectionEditor action={saveSection} type={sectionType} sectionId={s.id} previewBaseUrl={pagePreviewUrl} initialProps={s.props} visible={s.isVisible} hidden={hidden(s.id)} hint={hint}>
-                  <SectionFields type={sectionType} props={s.props} siteId={id} media={assets} publicOrigin={publicOrigin} isHomePage={page.slug === ""} hideHeroDesign={angledInnerPage} />
+                <SectionEditor action={saveSection} type={sectionType} sectionId={s.id} previewBaseUrl={pagePreviewUrl} initialProps={editorProps} visible={s.isVisible} hidden={hidden(s.id)} hint={hint}>
+                  <SectionFields type={sectionType} props={editorProps} siteId={id} media={assets} publicOrigin={publicOrigin} teamProfiles={teamOptions} isHomePage={page.slug === ""} hideHeroDesign={angledInnerPage} />
                 </SectionEditor>
                 {sectionType === "specials" && <SpecialsSectionManager siteId={id} pageId={pageId} sectionId={s.id} offers={specialOffers} assets={assets} publicOrigin={publicOrigin} />}
               </details>

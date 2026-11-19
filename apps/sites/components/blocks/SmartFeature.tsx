@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { RichText } from "@/lib/format";
-import { globalCtaHref, sharedToolConfig } from "@/lib/global-content";
+import { globalCta, sharedToolConfig } from "@/lib/global-content";
 import { localSiteHref } from "@/lib/url";
 import { getDesign } from "@platform/db/theme";
 import { CertificationBadges } from "../CertificationBadge";
@@ -12,11 +12,12 @@ function FeatureLink({ bundle, href, children }: {
   children: React.ReactNode;
 }) {
   const design = getDesign(bundle.theme ?? {});
-  const resolved = /^https?:\/\//i.test(href) ? href : globalCtaHref(design, href, String(children));
+  const action = globalCta(design, href, String(children));
+  const resolved = /^https?:\/\//i.test(href) ? href : action.href;
   if (/^https?:\/\//i.test(resolved)) {
-    return <a href={resolved} target="_blank" rel="noopener noreferrer"><span>{children}</span></a>;
+    return <a href={resolved} target="_blank" rel="noopener noreferrer"><span>{action.label}</span></a>;
   }
-  return <Link href={localSiteHref(bundle.site.slug, resolved)}><span>{children}</span></Link>;
+  return <Link href={localSiteHref(bundle.site.slug, resolved)}><span>{action.label}</span></Link>;
 }
 
 export function SmartFeature({ bundle, props, pageSlug }: BlockComponentProps<"smart_feature">) {

@@ -18,7 +18,7 @@ const newId = () => crypto.randomUUID();
 /**
  * Deep-copies a site in one transaction.
  * Copied: settings, theme, locations, pages + sections, banners, services, specials, faqs,
- *         case studies, menus, integrations (disabled analytics), booking settings, redirects.
+ *         case studies, team profiles, menus, integrations (disabled analytics), booking settings, redirects.
  * NOT copied: domains, appointments, form submissions, members, audit log, versions,
  *             testimonials (unless includeTestimonials).
  */
@@ -76,10 +76,22 @@ export async function cloneSite(opts: CloneOptions) {
         })),
       );
     }
+    // Team profiles are reusable content. Remap About-page selections to the cloned IDs.
+    const teamRows = await tx.select().from(s.teamProfiles).where(eq(s.teamProfiles.siteId, sid));
+    const teamMap = new Map(teamRows.map((member) => [member.id, newId()]));
+    if (teamRows.length) {
+      await tx.insert(s.teamProfiles).values(teamRows.map((member) => ({ ...member, id: teamMap.get(member.id)!, siteId })));
+    }
     const sectionRows = await tx.select().from(s.pageSections).where(eq(s.pageSections.siteId, sid));
     const liveSections = sectionRows.filter((x) => pageMap.has(x.pageId));
     if (liveSections.length) {
-      await tx.insert(s.pageSections).values(liveSections.map((x) => ({ ...x, id: newId(), siteId, pageId: pageMap.get(x.pageId)! })));
+      await tx.insert(s.pageSections).values(liveSections.map((x) => {
+        const props = { ...x.props };
+        if (x.type === "about" && Array.isArray(props.teamMemberIds)) {
+          props.teamMemberIds = props.teamMemberIds.map((memberId) => teamMap.get(String(memberId))).filter(Boolean);
+        }
+        return { ...x, props, id: newId(), siteId, pageId: pageMap.get(x.pageId)! };
+      }));
     }
 
     // Simple collections: copy with a fresh id + new siteId.
@@ -136,9 +148,17 @@ export async function syncCloneSections(siteId: string) {
         pagesAdded++;
       }
       const sourceSections = await tx.select().from(s.pageSections).where(eq(s.pageSections.pageId, sourcePage.id));
+      const currentSections = await tx.select().from(s.pageSections).where(eq(s.pageSections.pageId, targetPageId));
+      const selectedTeamIds = (currentSections.find((section) => section.type === "about")?.props as { teamMemberIds?: unknown[] } | undefined)?.teamMemberIds;
       await tx.delete(s.pageSections).where(eq(s.pageSections.pageId, targetPageId));
       if (sourceSections.length) {
-        await tx.insert(s.pageSections).values(sourceSections.map((section) => ({ ...section, id: newId(), siteId, pageId: targetPageId })));
+        await tx.insert(s.pageSections).values(sourceSections.map((section) => ({
+          ...section,
+          props: section.type === "about" ? { ...section.props, teamMemberIds: Array.isArray(selectedTeamIds) ? selectedTeamIds : [] } : section.props,
+          id: newId(),
+          siteId,
+          pageId: targetPageId,
+        })));
         sectionsCopied += sourceSections.length;
       }
     }

@@ -5,7 +5,7 @@ import type { BlockProps } from "@platform/db/blocks";
 import { getSpecials, type SiteCtx } from "@/lib/data";
 import { telHref } from "@/lib/format";
 import { localSiteHref } from "@/lib/url";
-import { globalText } from "@/lib/global-content";
+import { globalCta, globalText } from "@/lib/global-content";
 
 /** All offers come from this website's Specials collection. The first visible offer is featured. */
 type Offer = Awaited<ReturnType<typeof getSpecials>>[number];
@@ -55,10 +55,14 @@ function OfferCard({ item, bundle, featured, fallbackImage }: { item: Offer; bun
   const prices = offerPrices(content);
   const copy = offerContent(content);
   const phone = telHref(bundle.settings?.phone);
-  const ctaHref = phone || localSiteHref(bundle.site.slug, "/make-an-appointment/");
+  const design = getDesign(bundle.theme ?? {});
+  const defaultAction = phone
+    ? globalCta(design, design.callCtaHref || phone, "Call Us")
+    : globalCta(design, "/make-an-appointment/", "Book Now");
+  const ctaHref = localSiteHref(bundle.site.slug, defaultAction.href);
   const image = item.imageUrl || fallbackImage;
   const actionHref = item.ctaHref ? localSiteHref(bundle.site.slug, item.ctaHref) : ctaHref;
-  const actionLabel = globalText(item.ctaLabel, bundle).trim() || (phone ? "Call Us" : "Book Now");
+  const actionLabel = globalText(item.ctaLabel, bundle).trim() || defaultAction.label;
   const couponLabel = globalText(item.couponButtonLabel, bundle).trim() || "CODE";
   const couponHref = item.couponButtonHref ? localSiteHref(bundle.site.slug, item.couponButtonHref) : null;
   return (

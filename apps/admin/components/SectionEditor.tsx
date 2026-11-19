@@ -18,6 +18,9 @@ function readField(data: FormData, field: Field) {
   const raw = String(data.get(name) ?? "");
   if (field.kind === "boolean") return data.has(name);
   if (field.kind === "number") return raw.trim() ? Number(raw) : undefined;
+  if (field.kind === "image") return raw.trim();
+  if (field.kind === "image-list") return data.getAll(name).map(String);
+  if (field.kind === "team") return data.getAll(name).map(String).filter(Boolean);
   if (field.kind === "list") return raw.split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
   if (field.kind === "pairs") return raw.split(/\r?\n/).map((item) => item.trim()).filter(Boolean).map((item) => {
     const [first, ...rest] = item.split("|");

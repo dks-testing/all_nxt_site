@@ -3792,6 +3792,16 @@ main > section {
   letter-spacing: 0;
 }
 
+.micks-crew-position {
+  display: block;
+  margin: -4px 0 12px;
+  color: #dce7f2;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
 .micks-crew-card-overlay p {
   max-width: 245px;
   margin: 0;

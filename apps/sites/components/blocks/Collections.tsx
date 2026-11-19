@@ -4,10 +4,13 @@ import { telHref, formatAddress, groupHours } from "@/lib/format";
 import { ArrowIcon, Stars, PhoneIcon, PinIcon, ClockIcon, WrenchIcon } from "../Icons";
 import type { BlockComponentProps } from "./types";
 import { localSiteHref } from "@/lib/url";
-import { globalText } from "@/lib/global-content";
+import { globalCta, globalText } from "@/lib/global-content";
+import { getDesign } from "@platform/db/theme";
 
 export async function ServicesGrid({ ctx, bundle, props }: BlockComponentProps<"services_grid">) {
   const all = await getServices(ctx);
+  const design = getDesign(bundle.theme ?? {});
+  const servicesAction = globalCta(design, "/services/", "All services");
   const items = props.limit ? all.slice(0, props.limit) : all;
   if (!items.length) return null;
   return (
@@ -23,12 +26,12 @@ export async function ServicesGrid({ ctx, bundle, props }: BlockComponentProps<"
               <WrenchIcon className="mb-4 h-8 w-8 text-[var(--color-primary)]" />
               <h3 className="mb-2 text-lg font-bold leading-snug">{s.name}</h3>
               <p className="mb-4 flex-1 text-sm text-[var(--color-muted)]">{globalText(s.summary, bundle)}</p>
-              <span className="inline-flex items-center gap-1 text-sm font-bold uppercase text-[var(--color-primary)]">Learn more <ArrowIcon className="h-4 w-4 transition group-hover:translate-x-1" /></span>
+              <span className="inline-flex items-center gap-1 text-sm font-bold uppercase text-[var(--color-primary)]">{design.serviceCardCtaLabel || "Learn More"} <ArrowIcon className="h-4 w-4 transition group-hover:translate-x-1" /></span>
             </Link>
           ))}
         </div>
         {props.limit && all.length > props.limit && (
-          <div className="mt-10 text-center"><Link href={localSiteHref(bundle.site.slug, "/services/")} className="btn btn-dark"><span>All services</span></Link></div>
+          <div className="mt-10 text-center"><Link href={localSiteHref(bundle.site.slug, servicesAction.href)} className="btn btn-dark"><span>{servicesAction.label}</span></Link></div>
         )}
       </div>
     </section>

@@ -73,19 +73,36 @@ function includesAny(value: string, terms: string[]) {
   return terms.some((term) => normalized.includes(term));
 }
 
-/** Maps any repeated CTA to its one site-wide destination. */
-export function globalCtaHref(design: DesignOptions, href?: string | null, label?: string | null) {
+/** Resolves a repeated action to its one site-wide label and destination. */
+export function globalCta(design: DesignOptions, href?: string | null, label?: string | null) {
   const signal = `${href ?? ""} ${label ?? ""}`;
+  if (includesAny(signal, ["tel:", "call now", "call us", "make a call"])) {
+    return { href: design.callCtaHref || href || "#", label: design.callCtaLabel || "Call Now" };
+  }
   if (includesAny(signal, ["make-an-appointment", "schedule service", "book appointment", "book service"])) {
-    return design.scheduleCtaHref || "/make-an-appointment/";
+    return { href: design.scheduleCtaHref || "/make-an-appointment/", label: design.scheduleCtaLabel || "Schedule Service" };
   }
   if (includesAny(signal, ["diagnostic", "start diagnosis", "pre-diagnosis"])) {
-    return design.diagnosticsCtaHref || "/diagnostics/";
+    return { href: design.diagnosticsCtaHref || "/diagnostics/", label: design.diagnosticsCtaLabel || "Start Diagnostics" };
   }
   if (includesAny(signal, ["/tires", "find my tires", "find the right tires", "tire finder"])) {
-    return design.tiresCtaHref || "/tires/";
+    return { href: design.tiresCtaHref || "/tires/", label: design.tiresCtaLabel || "Find the Right Tires" };
   }
-  return href || "#";
+  if (/\/about-us\/?(?:[#?].*)?$/i.test(href || "") || includesAny(label || "", ["about us", "our story"])) {
+    return { href: design.aboutCtaHref || "/about-us/", label: design.aboutCtaLabel || "About Us" };
+  }
+  if (/\/services\/?(?:[#?].*)?$/i.test(href || "") || includesAny(label || "", ["view services", "our services"])) {
+    return { href: design.servicesCtaHref || "/services/", label: design.servicesCtaLabel || "View Services" };
+  }
+  return { href: href || "#", label: label || "Learn More" };
+}
+
+export function globalCtaHref(design: DesignOptions, href?: string | null, label?: string | null) {
+  return globalCta(design, href, label).href;
+}
+
+export function globalCtaLabel(design: DesignOptions, href?: string | null, label?: string | null) {
+  return globalCta(design, href, label).label;
 }
 
 /** Diagnostics and tire finder intentionally share one embed configuration. */

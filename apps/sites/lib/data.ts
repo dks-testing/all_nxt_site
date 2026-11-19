@@ -43,6 +43,7 @@ export const getSpecials = cached("specials", q.listSpecials);
 export const getTestimonials = cached("testimonials", q.listTestimonials);
 export const getFaqs = cached("faqs", q.listFaqs);
 export const getCaseStudies = cached("caseStudies", q.listCaseStudies);
+export const getTeamProfiles = cached("teamProfiles", q.listTeamProfiles);
 export const getHeroBanner = cached("heroBanner", (siteId: string) => q.getActiveBanner(siteId, "hero"));
 export const getTopBar = cached("topBar", (siteId: string) => q.getActiveBanner(siteId, "top_bar"));
 export const getPages = cached("pages", q.listPublishedPages);

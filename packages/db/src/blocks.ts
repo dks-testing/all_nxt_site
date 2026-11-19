@@ -53,11 +53,20 @@ export const blockSchemas = {
     variant: z.enum(["default", "micks-home"]).default("default"),
     missionHeading: z.string().optional(),
     missionBody: z.string().optional(),
+    locationLabel: z.string().optional(),
+    phoneLabel: z.string().optional(),
+    hoursLabel: z.string().optional(),
+    callCtaLabel: z.string().optional(),
+    teamImageUrl: z.string().optional(),
+    vehicleImageUrl: z.string().optional(),
     workHeading: z.string().optional(),
+    workItems: z.array(z.object({ title: z.string(), body: z.string() })).optional(),
     ownerHeading: z.string().optional(),
     ownerBody: z.string().optional(),
+    teamMemberIds: z.array(z.string()).default([]),
+    /** Legacy embedded crew data remains readable while sites migrate to team profiles. */
     crew: z.array(z.object({ title: z.string(), body: z.string() })).default([]),
-    crewImageUrls: z.array(z.string()).default([]),
+    crewImageUrls: z.array(z.string()).optional(),
     finalHeading: z.string().optional(),
     finalBody: z.string().optional(),
     finalCta: link.optional(),
@@ -155,6 +164,8 @@ export const blockLabels: Record<BlockType, string> = {
 /** Field descriptors that the admin turns into a form. `path` is dot-notation into props. */
 export type Field =
   | { path: string; label: string; kind: "text" | "textarea" | "url" | "image" | "number" | "boolean" }
+  | { path: string; label: string; kind: "image-list"; help?: string }
+  | { path: string; label: string; kind: "team"; help?: string }
   | { path: string; label: string; kind: "select"; options: string[] }
   | { path: string; label: string; kind: "list"; help?: string } // string[] one per line
   | { path: string; label: string; kind: "pairs"; keys: [string, string]; help?: string }; // [{a,b}] "a | b" per line
@@ -192,11 +203,16 @@ export const blockFields: Record<BlockType, Field[]> = {
     { path: "variant", label: "Layout", kind: "select", options: ["default", "micks-home"] },
     { path: "missionHeading", label: "Mission heading", kind: "text" },
     { path: "missionBody", label: "Mission text", kind: "textarea" },
+    { path: "locationLabel", label: "Location column label", kind: "text" },
+    { path: "phoneLabel", label: "Phone column label", kind: "text" },
+    { path: "hoursLabel", label: "Hours column label", kind: "text" },
+    { path: "teamImageUrl", label: "How we work team image", kind: "image" },
+    { path: "vehicleImageUrl", label: "Mission vehicle image", kind: "image" },
     { path: "workHeading", label: "How we work heading", kind: "text" },
+    { path: "workItems", label: "How we work items", kind: "pairs", keys: ["title", "body"], help: "One per line: Heading | Description" },
     { path: "ownerHeading", label: "Owner / crew heading", kind: "text" },
     { path: "ownerBody", label: "Owner biography", kind: "textarea" },
-    { path: "crew", label: "Crew members", kind: "pairs", keys: ["title", "body"], help: "One per line: Name | Description" },
-    { path: "crewImageUrls", label: "Crew image URLs", kind: "list", help: "One image URL per crew member, in the same order" },
+    { path: "teamMemberIds", label: "Team members shown on this page", kind: "team", help: "Select profiles and use the arrows to set their display order." },
     { path: "finalHeading", label: "Final call-to-action heading", kind: "text" },
     { path: "finalBody", label: "Final call-to-action text", kind: "textarea" },
     { path: "finalCta.label", label: "Final button label", kind: "text" },
@@ -206,7 +222,6 @@ export const blockFields: Record<BlockType, Field[]> = {
     { path: "heading", label: "Heading", kind: "text" },
     { path: "subheading", label: "Subheading", kind: "textarea" },
     { path: "limit", label: "Max services shown (empty = all)", kind: "number" },
-    { path: "ctaLabel", label: "Service card button label", kind: "text" },
   ],
   specials: [
     { path: "heading", label: "Heading", kind: "text" },

@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { SiteBundle } from "@platform/db";
 import { buildSlots } from "@platform/db/booking";
 import { getDesign } from "@platform/db/theme";
-import { getServices, type SiteCtx } from "@/lib/data";
+import { getServices, getTeamProfiles, type SiteCtx } from "@/lib/data";
 import { formatAddress, groupHours, telHref } from "@/lib/format";
 import { localSiteHref } from "@/lib/url";
 import { Stars } from "./Icons";
@@ -10,7 +10,7 @@ import { MicksInnerHero } from "./MicksInnerHero";
 import { BookingFormClient } from "./BookingFormClient";
 import { CertificationBadges } from "./CertificationBadge";
 import { QuoteMark } from "./QuoteMark";
-import { globalText, sharedToolConfig } from "@/lib/global-content";
+import { globalCta, globalText, sharedToolConfig } from "@/lib/global-content";
 import { StepListIcon } from "./TrustListIcon";
 import { MicksSpecials } from "./MicksSpecials";
 import { MicksTestimonials } from "./MicksTestimonials";
@@ -48,7 +48,7 @@ export async function MicksContentPage({ pageSlug, bundle, ctx, sections }: { pa
   return <>
     {(heroProps || pageSlug === "make-an-appointment") && <MicksInnerHero bundle={bundle} heading={heroHeading} imageUrl={heroProps?.imageUrl} variant={pageSlug === "services" ? "service" : "page"} />}
     {pageSlug === "services" && servicesProps && <MicksServices bundle={bundle} ctx={ctx} props={servicesProps} />}
-    {pageSlug === "about-us" && aboutProps && <MicksAbout bundle={bundle} props={aboutProps} />}
+    {pageSlug === "about-us" && aboutProps && <MicksAbout bundle={bundle} ctx={ctx} props={aboutProps} />}
     {pageSlug === "diagnostics" && <MicksSmartTool bundle={bundle} kind="diagnostics" />}
     {pageSlug === "tires" && <MicksSmartTool bundle={bundle} kind="tires" />}
     {pageSlug === "specials" && specialsProps && <MicksSpecials bundle={bundle} ctx={ctx} props={specialsProps} />}
@@ -58,6 +58,7 @@ export async function MicksContentPage({ pageSlug, bundle, ctx, sections }: { pa
 }
 
 async function MicksServices({ bundle, ctx, props }: { bundle: SiteBundle; ctx: SiteCtx; props: BlockProps<"services_grid"> }) {
+  const design = getDesign(bundle.theme ?? {});
   const services = await getServices(ctx);
   const visibleServices = props.limit ? services.slice(0, props.limit) : services;
   return <section className="micks-services-index section"><div className="container-site">
@@ -69,39 +70,47 @@ async function MicksServices({ bundle, ctx, props }: { bundle: SiteBundle; ctx: 
         <h3>{service.name}</h3>
         {service.summary && <p>{globalText(service.summary, bundle)}</p>}
         <Link href={localSiteHref(bundle.site.slug, `/${service.slug}/`)} style={{ transform: "skewX(var(--button-skew))" }}>
-          <span style={{ transform: "skewX(var(--button-text-skew))" }}>{props.ctaLabel}</span>
+          <span style={{ transform: "skewX(var(--button-text-skew))" }}>{design.serviceCardCtaLabel || "Learn More"}</span>
         </Link>
       </article>;
     })}</div>
   </div></section>;
 }
 
-function MicksAbout({ bundle, props }: { bundle: SiteBundle; props: BlockProps<"about"> }) {
+async function MicksAbout({ bundle, ctx, props }: { bundle: SiteBundle; ctx: SiteCtx; props: BlockProps<"about"> }) {
   const design = getDesign(bundle.theme ?? {});
   const settings = bundle.settings;
   const name = settings?.businessName ?? bundle.site.name;
   const address = formatAddress(settings?.address);
-  const owner = props.imageUrl || design.aboutOwnerImageUrl;
-  const team = design.aboutTeamImageUrl;
-  const car = design.aboutVehicleImageUrl;
-  const crew = props.crew.map((member, index) => ({ name: member.title, description: member.body, imageUrl: props.crewImageUrls[index] }));
-  const workItems = design.aboutWorkItems ?? [];
+  const owner = props.imageUrl ?? design.aboutOwnerImageUrl;
+  const team = props.teamImageUrl ?? design.aboutTeamImageUrl;
+  const car = props.vehicleImageUrl ?? design.aboutVehicleImageUrl;
+  const legacyCrewImages = [design.aboutCrewImageOneUrl, design.aboutCrewImageTwoUrl, design.aboutCrewImageThreeUrl];
+  const teamProfiles = await getTeamProfiles(ctx);
+  const selectedIds = props.teamMemberIds ?? [];
+  const crew = teamProfiles.length
+    ? selectedIds.map((id) => teamProfiles.find((member) => member.id === id)).filter((member): member is NonNullable<typeof member> => Boolean(member)).map((member) => ({ name: member.name, position: member.position, description: member.description ?? "", imageUrl: member.imageUrl }))
+    : props.crew.map((member, index) => ({ name: member.title, position: null, description: member.body, imageUrl: props.crewImageUrls?.[index] ?? legacyCrewImages[index] }));
+  const workItems = props.workItems ?? design.aboutWorkItems ?? [];
   const ownerParagraphs = globalText(props.ownerBody, bundle).split(/\n{2,}/).filter(Boolean);
   const [ownerLabel, ...ownerIntroParts] = (ownerParagraphs[0] ?? "").split("\n");
   const ownerIntro = ownerIntroParts.join("\n");
+  const callAction = globalCta(design, design.callCtaHref || telHref(settings?.phone), props.callCtaLabel || "Call Now");
+  const scheduleAction = globalCta(design, "/make-an-appointment/", "Schedule Service");
+  const finalAction = globalCta(design, props.finalCta?.href, props.finalCta?.label);
   return <>
     <section className="micks-about-page-intro section"><div className="container-site micks-about-page-grid">
-      <img src={owner} alt={`Mick Eggers at ${name}`} />
+      {owner && <img src={owner} alt={`Mick Eggers at ${name}`} />}
       <div><div className="micks-live-title"><QuoteMark design={design} className="micks-about-quote" /><h2>{props.eyebrow}</h2></div><h3><LineBreakText text={globalText(props.heading, bundle)} /></h3>
         {globalText(props.body, bundle).split(/\n{2,}/).filter(Boolean).map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
         <CertificationBadges design={design} className="micks-about-badges" />
       </div>
     </div></section>
-    <section className="micks-mission section"><div className="container-site micks-mission-grid"><div><h2>{props.missionHeading}</h2><h3><LineBreakText text={props.missionBody || ""} /></h3><div className="micks-mission-table"><b>Location</b><b>Phone</b><b>Hours</b><span>{address}</span><a href={telHref(settings?.phone)}>{settings?.phone}</a><span>{groupHours(settings?.hours)[0]?.days}: {groupHours(settings?.hours)[0]?.time}</span></div><div className="micks-live-buttons">{settings?.phone && <a href={telHref(settings.phone)}><span>Call Now</span></a>}<Link href={localSiteHref(bundle.site.slug, design.scheduleCtaHref || "/make-an-appointment/")}><span>{design.scheduleCtaLabel}</span></Link></div></div><img src={car} alt="Vehicle" /></div></section>
-    <section className="micks-how-we-work section"><div className="container-site"><h2>{props.workHeading}</h2><img src={team} alt={`The ${name} team`} /><div className="micks-work-grid">{workItems.map(({ title, body }) => <div key={title}><StepListIcon design={design} label={title} /><b>{title}</b><span>{body}</span></div>)}</div></div></section>
-    <section className="micks-owner section"><div className="container-site"><div className="micks-live-title"><QuoteMark design={design} className="micks-about-quote" /><h2>{props.ownerHeading}</h2></div><div className="micks-owner-grid"><img src={owner} alt="Mick Eggers" /><div>{ownerLabel && <p><strong>{ownerLabel}</strong>{ownerIntro && <><br />{ownerIntro}</>}</p>}{ownerParagraphs.slice(1).map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div></div></div></section>
-    <section className="micks-crew-gallery"><div className="container-site">{crew.map((member) => <article className="micks-crew-card" key={member.name} tabIndex={0} aria-label={`${member.name}: ${member.description}`}><img src={member.imageUrl} alt={member.name} /><div className="micks-crew-card-overlay"><h3>{member.name}</h3><p>{member.description}</p></div></article>)}</div></section>
-    <section className="micks-know-cta section"><div><h2>{props.finalHeading}</h2><p>{props.finalBody}</p><Link href={localSiteHref(bundle.site.slug, props.finalCta?.href || design.diagnosticsCtaHref || "/diagnostics/")}><span>{props.finalCta?.label}</span></Link></div></section>
+    <section className="micks-mission section"><div className="container-site micks-mission-grid"><div><h2>{props.missionHeading}</h2><h3><LineBreakText text={props.missionBody || ""} /></h3><div className="micks-mission-table"><b>{props.locationLabel || "Location"}</b><b>{props.phoneLabel || "Phone"}</b><b>{props.hoursLabel || "Hours"}</b><span>{address}</span><a href={telHref(settings?.phone)}>{settings?.phone}</a><span>{groupHours(settings?.hours)[0]?.days}: {groupHours(settings?.hours)[0]?.time}</span></div><div className="micks-live-buttons">{settings?.phone && <a href={callAction.href}><span>{callAction.label}</span></a>}<Link href={localSiteHref(bundle.site.slug, scheduleAction.href)}><span>{scheduleAction.label}</span></Link></div></div>{car && <img src={car} alt="Vehicle" />}</div></section>
+    <section className="micks-how-we-work section"><div className="container-site"><h2>{props.workHeading}</h2>{team && <img src={team} alt={`The ${name} team`} />}<div className="micks-work-grid">{workItems.map(({ title, body }, index) => <div key={`${title}-${index}`}><StepListIcon design={design} label={title} /><b>{globalText(title, bundle)}</b><span>{globalText(body, bundle)}</span></div>)}</div></div></section>
+    <section className="micks-owner section"><div className="container-site"><div className="micks-live-title"><QuoteMark design={design} className="micks-about-quote" /><h2>{props.ownerHeading}</h2></div><div className="micks-owner-grid">{owner && <img src={owner} alt="Mick Eggers" />}<div>{ownerLabel && <p><strong>{ownerLabel}</strong>{ownerIntro && <><br />{ownerIntro}</>}</p>}{ownerParagraphs.slice(1).map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div></div></div></section>
+    {crew.length > 0 && <section className="micks-crew-gallery"><div className="container-site">{crew.map((member) => <article className="micks-crew-card" key={member.name} tabIndex={0} aria-label={`${member.name}${member.position ? `, ${member.position}` : ""}: ${member.description}`}>{member.imageUrl && <img src={member.imageUrl} alt={member.name} />}<div className="micks-crew-card-overlay"><h3>{member.name}</h3>{member.position && <strong className="micks-crew-position">{member.position}</strong>}<p>{member.description}</p></div></article>)}</div></section>}
+    <section className="micks-know-cta section"><div><h2>{props.finalHeading}</h2><p>{props.finalBody}</p><Link href={localSiteHref(bundle.site.slug, finalAction.href)}><span>{finalAction.label}</span></Link></div></section>
   </>;
 }
 
@@ -111,7 +120,7 @@ function MicksSmartTool({ bundle, kind }: { bundle: SiteBundle; kind: "diagnosti
   const image = diagnostics ? (design.diagnosticsImageUrl || `${WP}/2026/06/Pre-Diagnostic-Tool-2.png`) : (design.tiresImageUrl || `${WP}/2026/04/tire-ai-2048x1365.jpg`);
   const integration = sharedToolConfig(bundle);
   const toolUrl = integration?.url;
-  const cta = diagnostics ? "Start My Free Diagnosis" : "Find My Perfect Tire";
+  const cta = diagnostics ? (design.diagnosticsCtaLabel || "Start Diagnostics") : (design.tiresCtaLabel || "Find the Right Tires");
   const href = toolUrl || (diagnostics ? design.diagnosticsCtaHref : design.tiresCtaHref) || (diagnostics ? "/diagnostics/#tool" : "/tires/#tool");
   return <>
     <section className="micks-smart-intro section"><div className="container-site"><p className="micks-smart-kicker">{globalText(diagnostics ? "Smart free pre-diagnosis from {{businessName}}" : "Smart Tire Finder at {{businessName}}", bundle)}</p><div className="micks-smart-grid"><div><h2>Smarter Car Care for Worthington Drivers</h2><p>{globalText(diagnostics ? "{{businessName}} combines trusted local service with advanced technology to give you a smarter, more reliable automotive experience. Our skilled technicians bring years of hands-on expertise, while our modern diagnostic tools help identify issues before they turn into costly problems." : "{{businessName}} combines trusted local service with advanced technology to help you find the perfect tires and keep your vehicle performing at its best—anytime, anywhere.", bundle)}</p><a href={href}><span>{cta}</span></a></div><img src={image} alt="" /></div><div className="micks-smart-offer"><strong>Special Offer</strong><span>Our digital tools save you time and save us time. Bring in your online results and take $25 off your associated service.</span></div></div></section>

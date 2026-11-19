@@ -36,14 +36,25 @@ export default async function GlobalSettingsPage({ params }: { params: Promise<{
           </div>
         </Card>
 
-        <Card title="Global button destinations" description="All buttons recognized as the same action use these links, including heroes, service pages, callouts and content blocks.">
-          <div className="grid gap-4 lg:grid-cols-3">
-            <Input label="Schedule service label" name="scheduleCtaLabel" defaultValue={design.scheduleCtaLabel ?? "Schedule Service"} required />
-            <Input label="Diagnostics label" name="diagnosticsCtaLabel" defaultValue={design.diagnosticsCtaLabel ?? "Start Diagnostics"} required />
-            <Input label="Tire finder label" name="tiresCtaLabel" defaultValue={design.tiresCtaLabel ?? "Find the Right Tires"} required />
-            <Input label="Schedule service link" name="scheduleCtaHref" defaultValue={design.scheduleCtaHref ?? "/make-an-appointment/"} required />
-            <Input label="Diagnostics link" name="diagnosticsCtaHref" defaultValue={design.diagnosticsCtaHref ?? "/diagnostics/"} required />
-            <Input label="Tire finder link" name="tiresCtaHref" defaultValue={design.tiresCtaHref ?? "/tires/"} required />
+        <Card title="Global website buttons" description="Edit each shared action once. Matching buttons in heroes, page sections, service pages, contact areas and mobile actions update together.">
+          <div className="space-y-4">
+            {[
+              ["Schedule service", "scheduleCtaLabel", design.scheduleCtaLabel ?? "Schedule Service", "scheduleCtaHref", design.scheduleCtaHref ?? "/make-an-appointment/"],
+              ["Diagnostics", "diagnosticsCtaLabel", design.diagnosticsCtaLabel ?? "Start Diagnostics", "diagnosticsCtaHref", design.diagnosticsCtaHref ?? "/diagnostics/"],
+              ["Tire finder", "tiresCtaLabel", design.tiresCtaLabel ?? "Find the Right Tires", "tiresCtaHref", design.tiresCtaHref ?? "/tires/"],
+              ["About us", "aboutCtaLabel", design.aboutCtaLabel ?? "About Us", "aboutCtaHref", design.aboutCtaHref ?? "/about-us/"],
+              ["Services", "servicesCtaLabel", design.servicesCtaLabel ?? "View Services", "servicesCtaHref", design.servicesCtaHref ?? "/services/"],
+              ["Call", "callCtaLabel", design.callCtaLabel ?? "Call Now", "callCtaHref", design.callCtaHref ?? (settings?.phone ? `tel:${settings.phone.replace(/[^+\d]/g, "")}` : "")],
+            ].map(([title, labelName, labelValue, hrefName, hrefValue]) => <div key={String(labelName)} className="grid gap-3 rounded-xl border border-slate-200 p-4 lg:grid-cols-[150px_1fr_1.3fr] lg:items-end">
+              <strong className="pb-2 text-sm">{title}</strong>
+              <Input label="Button label" name={String(labelName)} defaultValue={String(labelValue)} required />
+              <Input label="Button link" name={String(hrefName)} defaultValue={String(hrefValue)} required={title !== "Call"} help={title === "Call" ? "Leave blank to use the phone number from Business info." : undefined} />
+            </div>)}
+            <div className="grid gap-3 rounded-xl border border-slate-200 p-4 lg:grid-cols-[150px_1fr_1.3fr] lg:items-end">
+              <strong className="pb-2 text-sm">Service cards</strong>
+              <Input label="Button label" name="serviceCardCtaLabel" defaultValue={design.serviceCardCtaLabel ?? "Learn More"} required />
+              <p className="pb-2 text-xs text-slate-500">Each card automatically links to its own service page, so only one shared label is needed.</p>
+            </div>
           </div>
         </Card>
 

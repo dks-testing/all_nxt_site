@@ -4,7 +4,7 @@ import { getDesign } from "@platform/db/theme";
 import { formatAddress, telHref } from "@/lib/format";
 import { localSiteHref } from "@/lib/url";
 import { PhoneIcon, PinIcon } from "./Icons";
-import { globalCtaHref } from "@/lib/global-content";
+import { globalCta } from "@/lib/global-content";
 
 type Cta = { label: string; href: string };
 
@@ -14,7 +14,7 @@ export function MicksInnerHero({ bundle, heading, primaryCta, imageUrl, variant 
   const background = imageUrl || design.innerHeroImageUrl;
   const address = formatAddress(settings?.address);
   const scheduleSource = primaryCta ?? { label: "Schedule Service", href: "/make-an-appointment/#book" };
-  const schedule = { ...scheduleSource, href: globalCtaHref(design, scheduleSource.href, scheduleSource.label) };
+  const schedule = globalCta(design, scheduleSource.href, scheduleSource.label);
   if (variant === "page") {
     const actions = [
       { label: design.scheduleCtaLabel || "Schedule Service", href: design.scheduleCtaHref || "/make-an-appointment/" },
@@ -40,7 +40,7 @@ export function MicksInnerHero({ bundle, heading, primaryCta, imageUrl, variant 
           <Link href={localSiteHref(bundle.site.slug, schedule.href)} className="micks-inner-action micks-inner-action-primary"><span>{schedule.label}</span></Link>
           {address && <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`} className="micks-inner-action"><span><PinIcon className="h-4 w-4" />{address}</span></a>}
           {settings?.phone && <a href={telHref(settings.phone)} className="micks-inner-action"><span><PhoneIcon className="h-4 w-4" />{settings.phone}</span></a>}
-          <Link href={localSiteHref(bundle.site.slug, globalCtaHref(design, "/diagnostics/", "Start diagnostics"))} className="micks-inner-action micks-inner-diagnostic"><span><strong>Not sure what&apos;s wrong?</strong><small>Free AI-Powered<br />Pre-Diagnosis</small></span></Link>
+          <Link href={localSiteHref(bundle.site.slug, globalCta(design, "/diagnostics/", "Start diagnostics").href)} className="micks-inner-action micks-inner-diagnostic"><span><strong>Not sure what&apos;s wrong?</strong><small>Free AI-Powered<br />Pre-Diagnosis</small></span></Link>
         </div>
       </div>
     </section>

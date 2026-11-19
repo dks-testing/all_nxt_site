@@ -11,7 +11,7 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
   const owner = role === "OWNER";
   return (
     <>
-      <PageHeader title="Team" description="Owners can publish and manage domains. Editors can change content. Viewers can only look." />
+      <PageHeader title="Users & permissions" description="Manage who can access this admin website. Public staff profiles are managed under Our Team." />
       <Card className="mb-6">
         {rows.length === 0 ? <Empty>No members yet. Super-admins always have access.</Empty> : (
           <ul className="divide-y divide-slate-100">

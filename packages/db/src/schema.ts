@@ -106,6 +106,13 @@ export type DesignOptions = {
   scheduleCtaLabel?: string;
   diagnosticsCtaLabel?: string;
   tiresCtaLabel?: string;
+  aboutCtaHref?: string;
+  servicesCtaHref?: string;
+  callCtaHref?: string;
+  aboutCtaLabel?: string;
+  servicesCtaLabel?: string;
+  serviceCardCtaLabel?: string;
+  callCtaLabel?: string;
   buttonBackground?: string;
   buttonText?: string;
   buttonHoverBackground?: string;
@@ -367,6 +374,22 @@ export const caseStudies = mysqlTable(
     sortOrder: int("sort_order").notNull().default(0),
   },
   (t) => [index("case_studies_site_idx").on(t.siteId)],
+);
+
+/** Public-facing staff profiles. Kept separate from siteMembers (admin access). */
+export const teamProfiles = mysqlTable(
+  "team_profiles",
+  {
+    id: id(),
+    siteId: siteId(),
+    name: varchar("name", { length: 191 }).notNull(),
+    position: varchar("position", { length: 191 }),
+    description: text("description"),
+    imageUrl: varchar("image_url", { length: 1024 }),
+    sortOrder: int("sort_order").notNull().default(0),
+    isActive: boolean("is_active").notNull().default(true),
+  },
+  (t) => [index("team_profiles_site_idx").on(t.siteId, t.sortOrder)],
 );
 
 export const menus = mysqlTable(

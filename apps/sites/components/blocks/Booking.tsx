@@ -5,7 +5,7 @@ import { telHref, formatAddress, groupHours } from "@/lib/format";
 import Link from "next/link";
 import { localSiteHref } from "@/lib/url";
 import { getDesign } from "@platform/db/theme";
-import { globalCtaHref } from "@/lib/global-content";
+import { globalCta } from "@/lib/global-content";
 
 export function BookingForm({ bundle, props }: BlockComponentProps<"booking_form">) {
   const b = bundle.booking;
@@ -33,6 +33,9 @@ export function MicksContactBooking({ bundle, contactProps, bookingProps }: {
   const booking = bundle.booking;
   if (booking && !booking.enabled) return null;
   const address = formatAddress(settings?.address);
+  const design = getDesign(bundle.theme ?? {});
+  const callAction = globalCta(design, design.callCtaHref || telHref(settings?.phone), "Call Now");
+  const scheduleAction = globalCta(design, "/make-an-appointment/", "Schedule Service");
   const rules = { slotMinutes: booking?.slotMinutes ?? 30, openTime: booking?.openTime ?? "08:00", closeTime: booking?.closeTime ?? "16:30", closedDays: booking?.closedDays ?? [0, 6] };
   return <section className="micks-contact-booking section" id="contact">
     <div className="container-site micks-contact-booking-grid">
@@ -46,9 +49,9 @@ export function MicksContactBooking({ bundle, contactProps, bookingProps }: {
           {settings?.hours && <li className="micks-contact-hours"><strong>Hours:</strong> <span>{groupHours(settings.hours).map((row) => <span key={row.days}>{row.days}: {row.time}</span>)}</span></li>}
         </ul>
         <div className="micks-contact-actions">
-          {settings?.phone && <a href={telHref(settings.phone)}><span>Call Now</span></a>}
+          {settings?.phone && <a href={callAction.href}><span>{callAction.label}</span></a>}
           {address && <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`}><span>Get Directions</span></a>}
-          <Link href={localSiteHref(bundle.site.slug, globalCtaHref(getDesign(bundle.theme ?? {}), "/make-an-appointment/", "Schedule Service"))}><span>Schedule Service</span></Link>
+          <Link href={localSiteHref(bundle.site.slug, scheduleAction.href)}><span>{scheduleAction.label}</span></Link>
         </div>
       </div>
       <div className="micks-booking-column" id="book">

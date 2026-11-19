@@ -5,7 +5,7 @@ import * as s from "./schema";
 /** Tables keyed by site_id that are deleted with a site. */
 const siteTables = [
   s.domains, s.locations, s.pages, s.pageSections, s.banners, s.services, s.specials, s.testimonials, s.faqs,
-  s.caseStudies, s.menus, s.integrations, s.appointments, s.formSubmissions, s.media, s.redirects, s.siteMembers,
+  s.caseStudies, s.teamProfiles, s.menus, s.integrations, s.appointments, s.formSubmissions, s.media, s.redirects, s.siteMembers,
   s.siteVersions,
 ] as const;
 
@@ -23,6 +23,7 @@ export async function snapshotSite(siteId: string) {
     specials: await many(s.specials),
     faqs: await many(s.faqs),
     caseStudies: await many(s.caseStudies),
+    teamProfiles: await many(s.teamProfiles),
     banners: await many(s.banners),
     menus: await many(s.menus),
     locations: await many(s.locations),
@@ -72,6 +73,7 @@ export async function restoreVersion(siteId: string, versionId: string, userId?:
     await replaceMany(s.specials, snap.specials);
     await replaceMany(s.faqs, snap.faqs);
     await replaceMany(s.caseStudies, snap.caseStudies);
+    await replaceMany(s.teamProfiles, snap.teamProfiles);
     await replaceMany(s.banners, snap.banners);
     await replaceMany(s.menus, snap.menus);
     await replaceMany(s.locations, snap.locations);

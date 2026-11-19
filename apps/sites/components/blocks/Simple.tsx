@@ -6,7 +6,7 @@ import { localSiteHref } from "@/lib/url";
 import { getDesign } from "@platform/db/theme";
 import { CertificationBadges } from "../CertificationBadge";
 import { QuoteMark } from "../QuoteMark";
-import { globalCtaHref, sharedToolConfig } from "@/lib/global-content";
+import { globalCta, globalCtaHref, globalCtaLabel, sharedToolConfig } from "@/lib/global-content";
 
 export function TrustCards({ props }: BlockComponentProps<"trust_cards">) {
   if (!props.items.length) return null;
@@ -47,7 +47,7 @@ export function About({ bundle, props }: BlockComponentProps<"about">) {
             <h2>{props.heading}</h2>
             <RichText text={props.body} className="prose-site" />
             <div className="micks-about-actions">
-              {props.cta && <Link href={localSiteHref(bundle.site.slug, globalCtaHref(design, props.cta.href, props.cta.label))} className="btn btn-primary"><span>{props.cta.label}</span></Link>}
+              {props.cta && <Link href={localSiteHref(bundle.site.slug, globalCtaHref(design, props.cta.href, props.cta.label))} className="btn btn-primary"><span>{globalCtaLabel(design, props.cta.href, props.cta.label)}</span></Link>}
               <CertificationBadges design={design} className="micks-about-action-certifications" />
             </div>
           </div>
@@ -94,7 +94,7 @@ export function Cta({ bundle, props }: BlockComponentProps<"cta">) {
           <h2 className="text-2xl font-bold uppercase md:text-3xl">{props.heading}</h2>
           {props.body && <p className="mt-2 max-w-2xl opacity-90">{props.body}</p>}
         </div>
-        <Link href={localSiteHref(bundle.site.slug, globalCtaHref(design, props.cta.href, props.cta.label))} className={btn}>{props.cta.label}</Link>
+        <Link href={localSiteHref(bundle.site.slug, globalCtaHref(design, props.cta.href, props.cta.label))} className={btn}>{globalCtaLabel(design, props.cta.href, props.cta.label)}</Link>
       </div>
     </section>
   );
@@ -112,6 +112,7 @@ export function RichTextBlock({ props }: BlockComponentProps<"rich_text">) {
 }
 
 export function Embed({ bundle, props, id }: BlockComponentProps<"embed">) {
+  const design = getDesign(bundle.theme ?? {});
   const cfg = props.integration === "tire_finder" || props.integration === "ai_diagnostic"
     ? sharedToolConfig(bundle)
     : props.integration !== "custom" ? bundle.integrations[props.integration] : undefined;
@@ -124,7 +125,7 @@ export function Embed({ bundle, props, id }: BlockComponentProps<"embed">) {
           <div className="micks-ai-copy">
             <h2>{props.heading}{props.body && <span>{props.body}</span>}</h2>
             <div className="micks-tool-card">
-              {props.cta ? <Link href={localSiteHref(bundle.site.slug, globalCtaHref(getDesign(bundle.theme ?? {}), props.cta.href, props.cta.label))}>AI DIAGNOSTIC TOOL</Link> : <strong>AI DIAGNOSTIC TOOL</strong>}
+              {props.cta ? <Link href={localSiteHref(bundle.site.slug, globalCtaHref(design, props.cta.href, props.cta.label))}>{globalCtaLabel(design, props.cta.href, props.cta.label)}</Link> : <strong>{design.diagnosticsCtaLabel || "Start Diagnostics"}</strong>}
             </div>
             {props.toolDescription && <p className="micks-tool-description">{props.toolDescription}</p>}
             {(props.offerAmount || props.offerHeading || props.offerBody) && (
@@ -146,7 +147,7 @@ export function Embed({ bundle, props, id }: BlockComponentProps<"embed">) {
           {props.imageUrl && <div className="micks-tire-image">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={props.imageUrl} alt={`Wheel alignment at ${bundle.settings?.businessName ?? bundle.site.name}`} /></div>}
           <div className="micks-tire-copy">
             <h2>{props.heading}</h2>
-            {props.cta && <Link href={localSiteHref(bundle.site.slug, globalCtaHref(getDesign(bundle.theme ?? {}), props.cta.href, props.cta.label))} className="btn btn-primary"><span>{props.cta.label}</span></Link>}
+            {props.cta && <Link href={localSiteHref(bundle.site.slug, globalCtaHref(design, props.cta.href, props.cta.label))} className="btn btn-primary"><span>{globalCtaLabel(design, props.cta.href, props.cta.label)}</span></Link>}
             {props.body && <RichText text={props.body} className="prose-site" />}
           </div>
         </div>
@@ -164,7 +165,7 @@ export function Embed({ bundle, props, id }: BlockComponentProps<"embed">) {
           <div className="mx-auto flex max-w-xl flex-col items-center gap-4 rounded-site border-2 border-dashed border-gray-300 bg-white p-10 text-center">
             <WrenchIcon className="h-8 w-8 text-[var(--color-primary)]" />
             <p className="text-[var(--color-muted)]">{cfg?.label ?? "This tool"} is coming soon. Call us and we&apos;ll help right away.</p>
-            <Link href={localSiteHref(bundle.site.slug, globalCtaHref(getDesign(bundle.theme ?? {}), "/make-an-appointment/", "Schedule service"))} className="btn btn-primary"><span>Schedule service</span></Link>
+            <Link href={localSiteHref(bundle.site.slug, globalCta(design, "/make-an-appointment/", "Schedule service").href)} className="btn btn-primary"><span>{globalCta(design, "/make-an-appointment/", "Schedule service").label}</span></Link>
           </div>
         )}
       </div>

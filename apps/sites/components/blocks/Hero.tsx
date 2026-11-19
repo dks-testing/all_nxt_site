@@ -8,7 +8,7 @@ import { localSiteHref } from "@/lib/url";
 import { telHref } from "@/lib/format";
 import { MicksInnerHero } from "../MicksInnerHero";
 import { CertificationBadges, getActiveCertificationBadges } from "../CertificationBadge";
-import { globalCtaHref, globalText } from "@/lib/global-content";
+import { globalCta, globalText } from "@/lib/global-content";
 
 type HeroExtra = { integratedTrust?: BlockProps<"trust_cards"> };
 
@@ -23,9 +23,9 @@ export async function Hero({ ctx, bundle, props, index, pageSlug, integratedTrus
   const primarySource = pageSlug === "" ? (banner?.ctaUrl ? { label: banner.ctaLabel ?? "Learn more", href: banner.ctaUrl } : props.primaryCta) : undefined;
   const design = getDesign(bundle.theme ?? {});
   const sharedCertifications = getActiveCertificationBadges(design);
-  const primary = primarySource ? { ...primarySource, href: globalCtaHref(design, primarySource.href, primarySource.label) } : undefined;
-  const secondary = pageSlug === "" && props.secondaryCta ? { ...props.secondaryCta, href: globalCtaHref(design, props.secondaryCta.href, props.secondaryCta.label) } : undefined;
-  const tertiary = pageSlug === "" && props.tertiaryCta ? { ...props.tertiaryCta, href: globalCtaHref(design, props.tertiaryCta.href, props.tertiaryCta.label) } : undefined;
+  const primary = primarySource ? globalCta(design, primarySource.href, primarySource.label) : undefined;
+  const secondary = pageSlug === "" && props.secondaryCta ? globalCta(design, props.secondaryCta.href, props.secondaryCta.label) : undefined;
+  const tertiary = pageSlug === "" && props.tertiaryCta ? globalCta(design, props.tertiaryCta.href, props.tertiaryCta.label) : undefined;
   const micksHome = pageSlug === "" && index === 0 && (design.heroStyle === "micks-overlay" || (!design.heroStyle && design.headerStyle === "angled"));
 
   if (micksHome) {

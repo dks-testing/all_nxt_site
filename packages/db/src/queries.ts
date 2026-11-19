@@ -168,6 +168,14 @@ export async function listCaseStudies(siteId: string) {
   return getDb().select().from(s.caseStudies).where(eq(s.caseStudies.siteId, siteId)).orderBy(asc(s.caseStudies.sortOrder));
 }
 
+export async function listTeamProfiles(siteId: string) {
+  return getDb()
+    .select()
+    .from(s.teamProfiles)
+    .where(and(eq(s.teamProfiles.siteId, siteId), eq(s.teamProfiles.isActive, true)))
+    .orderBy(asc(s.teamProfiles.sortOrder));
+}
+
 export async function getActiveBanner(siteId: string, placement: "hero" | "top_bar" | "promo") {
   const now = new Date();
   const rows = await getDb()
