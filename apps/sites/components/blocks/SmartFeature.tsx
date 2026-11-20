@@ -1,24 +1,9 @@
-import Link from "next/link";
 import { RichText } from "@/lib/format";
-import { globalCta, sharedToolConfig } from "@/lib/global-content";
-import { localSiteHref } from "@/lib/url";
+import { sharedToolConfig } from "@/lib/global-content";
 import { getDesign } from "@platform/db/theme";
 import { CertificationBadges } from "../CertificationBadge";
+import { FeatureLink } from "./FeatureLink";
 import type { BlockComponentProps } from "./types";
-
-function FeatureLink({ bundle, href, children }: {
-  bundle: BlockComponentProps<"smart_feature">["bundle"];
-  href: string;
-  children: React.ReactNode;
-}) {
-  const design = getDesign(bundle.theme ?? {});
-  const action = globalCta(design, href, String(children));
-  const resolved = /^https?:\/\//i.test(href) ? href : action.href;
-  if (/^https?:\/\//i.test(resolved)) {
-    return <a href={resolved} target="_blank" rel="noopener noreferrer"><span>{action.label}</span></a>;
-  }
-  return <Link href={localSiteHref(bundle.site.slug, resolved)}><span>{action.label}</span></Link>;
-}
 
 export function SmartFeature({ bundle, props, pageSlug }: BlockComponentProps<"smart_feature">) {
   const design = getDesign(bundle.theme ?? {});
@@ -26,7 +11,15 @@ export function SmartFeature({ bundle, props, pageSlug }: BlockComponentProps<"s
   const toolUrl = props.integration === "custom" ? undefined : tool?.url;
   const imageAlt = `${props.heading} at ${bundle.settings?.businessName ?? bundle.site.name}`;
   const ctaHref = props.variant === "tool" && toolUrl ? toolUrl : props.cta?.href;
-  const cta = props.cta && ctaHref && <FeatureLink bundle={bundle} href={ctaHref}>{props.cta.label}</FeatureLink>;
+  const cta = props.cta && ctaHref && (
+    <FeatureLink
+      bundle={bundle}
+      href={ctaHref}
+      className={props.variant === "final" ? "micks-smart-feature-compact-button" : undefined}
+    >
+      {props.cta.label}
+    </FeatureLink>
+  );
   const pageClass = pageSlug === "tires"
     ? " micks-smart-feature-page-tires"
     : pageSlug === "diagnostics"

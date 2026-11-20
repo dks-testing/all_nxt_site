@@ -2682,6 +2682,13 @@ main > section {
   line-height: 28px;
 }
 
+.micks-smart-feature-compact-button {
+  align-self: center;
+  width: fit-content;
+  max-width: 100%;
+  text-align: center;
+}
+
 .micks-smart-feature-intro.section {
   padding-block: 0 16px;
 }
@@ -6441,9 +6448,7 @@ main > section {
 }
 
 
-/* Diagnostics / Drive Smarter final card: match the live white outer section,
-   softly tinted inner card and intrinsic-width centered CTA. Scoped to
-   /diagnostics/ so shared SmartFeature variants on other pages are unchanged. */
+/* Diagnostics / Drive Smarter final card backgrounds. */
 .micks-smart-feature-final.micks-smart-feature-page-diagnostics {
   background: #fff;
   margin-bottom:10px;
@@ -6452,13 +6457,6 @@ main > section {
 .micks-smart-feature-final.micks-smart-feature-page-diagnostics .micks-smart-feature-grid {
   background: linear-gradient(180deg, #fff 0%, #d2dfee 100%);
   padding:20px;
-}
-
-.micks-smart-feature-final.micks-smart-feature-page-diagnostics .micks-smart-feature-copy-wrap > a {
-  align-self: center;
-  width: fit-content;
-  max-width: 100%;
-  text-align: center;
 }
 
 /* Contact page: full booking tool followed by the shop profile and map. */
