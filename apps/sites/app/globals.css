@@ -154,7 +154,9 @@ h4 {
     margin-bottom: .35rem;
   }
 }
-
+a, a:hover{
+  transition:all .3s ease-in-out;
+}
 details>summary {
   list-style: none;
   cursor: pointer;
@@ -233,7 +235,7 @@ details>summary::-webkit-details-marker {
   background: var(--button-hover-bg, #a91919);
 }
 .micks-footer-main{padding-inline: 20px;
-    padding-block: 40px;}
+    padding-block: 50px;}
 main > section {
     padding-inline: 20px;
     padding-block: 75px;
@@ -745,7 +747,7 @@ body.micks-menu-open {
   color: var(--button-text, #fff);
   background: var(--button-bg, #c62828);
   transform: skewX(var(--button-skew, -15deg));
-  transition: background-color .2s, transform .2s;
+  /* transition: background-color .2s, transform .2s; */
   text-decoration: none;
   text-transform: uppercase;
   font: italic 700 18px/1 var(--font-body), sans-serif;
@@ -997,9 +999,9 @@ body.micks-menu-open {
 /* Mick's inner-page and service template. All images/content come from tenant data. */
 .micks-inner-hero {
   position: relative;
-  margin-top: -132px;
+  margin-top: -133px;
   min-height: 0;
-  padding: 165px 0 20px;
+  padding: 179px 0 20px;
   color: #fff;
   background: #202326 center/cover no-repeat;
 }
@@ -1015,8 +1017,9 @@ body.micks-menu-open {
 
 .micks-inner-actions {
   display: grid;
-  grid-template-columns: .82fr 1.52fr .88fr 1.18fr;
-  gap: 16px;
+  /* grid-template-columns: .82fr 1.52fr .88fr 1.18fr; */
+  grid-template-columns: 181px 313px 181px 255px;
+  gap: 20px;
   align-items: center;
 }
 
@@ -1053,6 +1056,7 @@ body.micks-menu-open {
 .micks-inner-diagnostic {
   min-height: 76px;
   margin-top: -24px;
+  padding: 10px;
 }
 
 .micks-inner-diagnostic>span {
@@ -1522,6 +1526,7 @@ main > section {
   font: 800 clamp(40px, 4.1vw, 52px)/1.28 var(--font-heading), sans-serif;
   white-space: pre-line;
   text-transform: uppercase;
+  text-wrap: balance;
 }
 
 .micks-ai-offer-description {
@@ -2274,7 +2279,7 @@ main > section {
 .micks-work-grid>div {
   grid-template-columns: 57px minmax(115px, .9fr) minmax(0, 1.6fr);
 }
-
+.micks-work-grid>div:hover{background:var(--button-hover-bg);}
 .micks-work-grid .micks-step-icon {
   width: 57px;
   height: 57px;
@@ -2335,6 +2340,10 @@ main > section {
   font-size: 14px;
   font-style: italic;
   font-weight: 800;
+}
+.micks-smart-feature-copy-wrap>a:hover,
+.micks-smart-tool-panel-copy>a:hover {
+  background: var(--button-hover-bg, #d1272c);
 }
 
 .micks-smart-feature-copy-wrap>a>span,
@@ -3311,20 +3320,19 @@ main > section {
   grid-template-columns: 456px 342px;
   justify-content: space-between;
   gap: 0;
-  align-items: center;
+  align-items: start;
   max-width: var(--inner-container);
 }
 
 .micks-footer-main h2 {
-  margin: 0 0 24px;
+  margin: 0 0 20px;
   font: 400 36px/46px var(--font-heading), sans-serif;
   text-transform: uppercase;
 }
 
+.micks-footer-main p{margin: 0 0 32px;}
 .micks-footer-main p,
 .micks-footer-main nav {
-  margin: 0 0 32px;
-  font-size: 16px;
   font-weight: 500;
   line-height: 1.5;
 }
@@ -3503,6 +3511,7 @@ main > section {
 }
 
 .micks-mission {
+  overflow-x: clip;
   /* padding: 56px 0 24px; */
   
   background: linear-gradient(#fff, #dbe6f2);
@@ -3670,7 +3679,7 @@ main > section {
 }
 
 .micks-work-grid span {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 600;
   line-height: 1.4;
 }
@@ -6059,7 +6068,7 @@ main > section {
 }
 
 .micks-footer-main nav {
-  margin-bottom: 0;
+  margin-bottom: 5px;
   font-weight: 400;
 }
 
