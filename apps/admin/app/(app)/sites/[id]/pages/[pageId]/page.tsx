@@ -39,7 +39,7 @@ export default async function PageEditor({ params, searchParams }: { params: Pro
     ? await db.select().from(specials).where(eq(specials.siteId, id)).orderBy(asc(specials.sortOrder))
     : [];
   const assets = await db.select({ id: media.id, url: media.url, alt: media.alt, width: media.width, height: media.height }).from(media).where(eq(media.siteId, id)).orderBy(desc(media.createdAt));
-  const teamOptions = sections.some((section) => section.type === "about")
+  const teamOptions = sections.some((section) => section.type === "about" || section.type === "team_gallery")
     ? await db.select({ id: teamProfiles.id, name: teamProfiles.name, position: teamProfiles.position, imageUrl: teamProfiles.imageUrl, isActive: teamProfiles.isActive }).from(teamProfiles).where(eq(teamProfiles.siteId, id)).orderBy(asc(teamProfiles.sortOrder))
     : [];
   const publicOrigin = (process.env.SITES_APP_URL || "http://localhost:3000").replace(/\/$/, "");

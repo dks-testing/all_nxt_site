@@ -4,7 +4,7 @@
  * bookings, users, domains, and customer records are never changed.
  * Safe to rerun: the same content values are written each time.
  */
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { closeDb, getDb } from "../src/client";
 import * as s from "../src/schema";
@@ -417,7 +417,17 @@ async function main() {
   }
 
   await writePageSection("about-us", "hero", { heading: "About Us", showRating: true, badges: [] }, 0);
-  await writePageSection("about-us", "about", aboutPage, 1);
+  const ownerParagraphs = aboutPage.ownerBody.split(/\n{2,}/);
+  const [ownerName, ...ownerIntro] = ownerParagraphs.shift()!.split("\n");
+  const teamRows = await db.select({ id: s.teamProfiles.id }).from(s.teamProfiles).where(eq(s.teamProfiles.siteId, site.id)).orderBy(asc(s.teamProfiles.sortOrder));
+  await writePageSection("about-us", "about_intro", { eyebrow: aboutPage.eyebrow, heading: aboutPage.heading, body: aboutPage.body, imageUrl: aboutPage.imageUrl }, 1);
+  await writePageSection("about-us", "about_mission", { heading: aboutPage.missionHeading, body: aboutPage.missionBody, imageUrl: aboutPage.vehicleImageUrl, locationLabel: aboutPage.locationLabel, phoneLabel: aboutPage.phoneLabel, hoursLabel: aboutPage.hoursLabel }, 2);
+  await writePageSection("about-us", "about_work", { heading: aboutPage.workHeading, imageUrl: aboutPage.teamImageUrl, items: aboutPage.workItems }, 3);
+  await writePageSection("about-us", "about_owner", { heading: aboutPage.ownerHeading, ownerName, body: [ownerIntro.join("\n"), ...ownerParagraphs].filter(Boolean).join("\n\n"), imageUrl: aboutPage.imageUrl }, 4);
+  await writePageSection("about-us", "team_gallery", { heading: "Meet the Team", teamMemberIds: teamRows.map((row) => row.id) }, 5);
+  await writePageSection("about-us", "about_cta", { heading: aboutPage.finalHeading, body: aboutPage.finalBody, cta: aboutPage.finalCta }, 6);
+  const [aboutPageRow] = await db.select({ id: s.pages.id }).from(s.pages).where(and(eq(s.pages.siteId, site.id), eq(s.pages.slug, "about-us")));
+  if (aboutPageRow) await db.delete(s.pageSections).where(and(eq(s.pageSections.pageId, aboutPageRow.id), eq(s.pageSections.type, "about")));
   await writePageSection("services", "hero", { heading: "Yea, We Can Fix That", showRating: false, badges: [] }, 0);
   await writePageSection("services", "services_grid", {
     heading: "Comprehensive Automotive Solutions at {{businessName}}\nin Worthington",

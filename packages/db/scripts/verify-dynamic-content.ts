@@ -15,7 +15,7 @@ async function main() {
   const sections = await db.select({ pageId: s.pageSections.pageId, type: s.pageSections.type, props: s.pageSections.props }).from(s.pageSections)
     .where(and(eq(s.pageSections.siteId, site.id), inArray(s.pageSections.pageId, pages.map((page) => page.id)), eq(s.pageSections.isVisible, true)));
   const requiredSections: Record<string, string[]> = {
-    "about-us": ["hero", "about"], services: ["hero", "services_grid"], specials: ["hero", "specials"],
+    "about-us": ["hero", "about_intro", "about_mission", "about_work", "about_owner", "team_gallery", "about_cta"], services: ["hero", "services_grid"], specials: ["hero", "specials"],
     testimonials: ["hero", "reviews"], "make-an-appointment": ["hero", "booking_form"],
   };
   for (const page of pages) {
@@ -26,10 +26,15 @@ async function main() {
     const page = pages.find((item) => item.slug === slug);
     return sections.find((section) => section.pageId === page?.id && section.type === type)?.props ?? {};
   };
-  const about = propsFor("about-us", "about");
-  if (!about.missionHeading || !about.ownerBody || !Array.isArray(about.crew) || about.crew.length !== 6 || !about.finalHeading) throw new Error("About template content is incomplete");
+  const intro = propsFor("about-us", "about_intro");
+  const mission = propsFor("about-us", "about_mission");
+  const work = propsFor("about-us", "about_work");
+  const owner = propsFor("about-us", "about_owner");
+  const team = propsFor("about-us", "team_gallery");
+  const aboutCta = propsFor("about-us", "about_cta");
+  if (!intro.heading || !intro.body || !mission.heading || !Array.isArray(work.items) || !work.items.length || !owner.body || !Array.isArray(team.teamMemberIds) || !team.teamMemberIds.length || !aboutCta.heading) throw new Error("Split About template content is incomplete");
   const serviceGrid = propsFor("services", "services_grid");
-  if (!serviceGrid.heading || !serviceGrid.subheading || serviceGrid.ctaLabel !== "Read More") throw new Error("Services index template content is incomplete");
+  if (!serviceGrid.heading || !serviceGrid.subheading) throw new Error("Services index template content is incomplete");
   const specials = propsFor("specials", "specials");
   if (!specials.heading || !specials.subheading) throw new Error("Specials template content is incomplete");
   const booking = propsFor("make-an-appointment", "booking_form");
@@ -42,8 +47,8 @@ async function main() {
   if (services.some((service) => !service.imageUrl || !service.processSteps?.length || !service.trustItems?.length || !service.finalCtaLabel || !service.finalCtaHref)) throw new Error("One or more service templates have incomplete persisted content or imagery");
 
   const [theme] = await db.select({ design: s.themes.design }).from(s.themes).where(eq(s.themes.siteId, site.id));
-  if (!theme?.design?.scheduleCtaLabel || !theme.design.diagnosticsCtaLabel || !theme.design.tiresCtaLabel) throw new Error("Missing global CTA labels");
-  console.log(JSON.stringify({ siteId: site.id, templatePages: pages.length, persistedSections: sections.length, dynamicServices: services.length, globalCtaLabels: 3 }));
+  if (!theme?.design?.scheduleCtaLabel || !theme.design.diagnosticsCtaLabel || !theme.design.tiresCtaLabel || !theme.design.aboutCtaLabel || !theme.design.servicesCtaLabel || !theme.design.serviceCardCtaLabel || !theme.design.callCtaLabel) throw new Error("Missing global CTA labels");
+  console.log(JSON.stringify({ siteId: site.id, templatePages: pages.length, persistedSections: sections.length, dynamicServices: services.length, globalCtaLabels: 7 }));
 }
 
 main().catch((error) => { console.error(error); process.exitCode = 1; }).finally(closeDb);

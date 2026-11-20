@@ -87,7 +87,7 @@ export async function cloneSite(opts: CloneOptions) {
     if (liveSections.length) {
       await tx.insert(s.pageSections).values(liveSections.map((x) => {
         const props = { ...x.props };
-        if (x.type === "about" && Array.isArray(props.teamMemberIds)) {
+        if ((x.type === "about" || x.type === "team_gallery") && Array.isArray(props.teamMemberIds)) {
           props.teamMemberIds = props.teamMemberIds.map((memberId) => teamMap.get(String(memberId))).filter(Boolean);
         }
         return { ...x, props, id: newId(), siteId, pageId: pageMap.get(x.pageId)! };
@@ -149,12 +149,12 @@ export async function syncCloneSections(siteId: string) {
       }
       const sourceSections = await tx.select().from(s.pageSections).where(eq(s.pageSections.pageId, sourcePage.id));
       const currentSections = await tx.select().from(s.pageSections).where(eq(s.pageSections.pageId, targetPageId));
-      const selectedTeamIds = (currentSections.find((section) => section.type === "about")?.props as { teamMemberIds?: unknown[] } | undefined)?.teamMemberIds;
+      const selectedTeamIds = (currentSections.find((section) => section.type === "team_gallery" || section.type === "about")?.props as { teamMemberIds?: unknown[] } | undefined)?.teamMemberIds;
       await tx.delete(s.pageSections).where(eq(s.pageSections.pageId, targetPageId));
       if (sourceSections.length) {
         await tx.insert(s.pageSections).values(sourceSections.map((section) => ({
           ...section,
-          props: section.type === "about" ? { ...section.props, teamMemberIds: Array.isArray(selectedTeamIds) ? selectedTeamIds : [] } : section.props,
+          props: section.type === "about" || section.type === "team_gallery" ? { ...section.props, teamMemberIds: Array.isArray(selectedTeamIds) ? selectedTeamIds : [] } : section.props,
           id: newId(),
           siteId,
           pageId: targetPageId,

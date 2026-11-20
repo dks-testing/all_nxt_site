@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { blockFields, splitLegacyOffer, type BlockType, type Field } from "@platform/db/blocks";
 import { MediaPicker, type MediaAsset } from "./MediaPicker";
+import { PairListEditor } from "./PairListEditor";
 
 function get(obj: Record<string, unknown>, path: string): unknown {
   return path.split(".").reduce<unknown>((o, k) => (o && typeof o === "object" ? (o as Record<string, unknown>)[k] : undefined), obj);
@@ -83,8 +84,8 @@ function FieldInput({ f, value, siteId, media, publicOrigin, changed, imageCount
     case "list":
       return <label className={`block ${cls}`}><span className="label">{f.label}</span><textarea name={name} defaultValue={Array.isArray(value) ? value.join("\n") : ""} rows={4} className="input" onInput={changed} />{f.help && <p className="help">{f.help}</p>}</label>;
     case "pairs": {
-      const v = Array.isArray(value) ? (value as Record<string, string>[]).map((o) => `${o[f.keys[0]] ?? ""} | ${o[f.keys[1]] ?? ""}`).join("\n") : "";
-      return <label className={`block ${cls}`}><span className="label">{f.label}</span><textarea name={name} defaultValue={v} rows={5} className="input" onInput={(event) => { if (f.path === "crew") onCrewCountChange?.(event.currentTarget.value.split(/\r?\n/).filter((line) => line.trim()).length); changed(); }} />{f.help && <p className="help">{f.help}</p>}</label>;
+      const pairs = Array.isArray(value) ? value as Record<string, string>[] : [];
+      return <PairListEditor name={name} label={f.label} value={pairs} keys={f.keys} help={f.help} />;
     }
     default:
       return <label className={`block ${cls}`}><span className="label">{f.label}</span><input name={name} type={f.kind === "number" ? "number" : "text"} defaultValue={value === undefined || value === null ? "" : String(value)} className="input" onInput={changed} /></label>;

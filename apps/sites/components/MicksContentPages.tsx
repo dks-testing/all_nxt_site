@@ -3,7 +3,7 @@ import type { SiteBundle } from "@platform/db";
 import { buildSlots } from "@platform/db/booking";
 import { getDesign } from "@platform/db/theme";
 import { getServices, getTeamProfiles, type SiteCtx } from "@/lib/data";
-import { formatAddress, groupHours, telHref } from "@/lib/format";
+import { formatAddress, groupHours, RichText, telHref } from "@/lib/format";
 import { localSiteHref } from "@/lib/url";
 import { Stars } from "./Icons";
 import { MicksInnerHero } from "./MicksInnerHero";
@@ -44,17 +44,69 @@ export async function MicksContentPage({ pageSlug, bundle, ctx, sections }: { pa
   const reviewsProps = parseBlock("reviews", section("reviews") ?? {});
   const bookingProps = parseBlock("booking_form", section("booking_form") ?? {});
   const contactProps = parseBlock("contact_map", section("contact_map") ?? {});
+  const splitAboutTypes = new Set(["about_intro", "about_mission", "about_work", "about_owner", "team_gallery", "about_cta"]);
+  const hasSplitAbout = sections.some((item) => splitAboutTypes.has(item.type));
   const heroHeading = heroProps?.heading || (pageSlug === "make-an-appointment" ? bookingProps?.heading : undefined) || headings[pageSlug] || pageSlug;
   return <>
-    {(heroProps || pageSlug === "make-an-appointment") && <MicksInnerHero bundle={bundle} heading={heroHeading} imageUrl={heroProps?.imageUrl} variant={pageSlug === "services" ? "service" : "page"} />}
+    {(heroProps || pageSlug === "make-an-appointment") && <MicksInnerHero bundle={bundle} heading={globalText(heroHeading, bundle)} imageUrl={heroProps?.imageUrl} variant={pageSlug === "services" ? "service" : "page"} />}
     {pageSlug === "services" && servicesProps && <MicksServices bundle={bundle} ctx={ctx} props={servicesProps} />}
-    {pageSlug === "about-us" && aboutProps && <MicksAbout bundle={bundle} ctx={ctx} props={aboutProps} />}
+    {pageSlug === "about-us" && (hasSplitAbout ? <MicksAboutSections bundle={bundle} ctx={ctx} sections={sections} /> : aboutProps && <MicksAbout bundle={bundle} ctx={ctx} props={aboutProps} />)}
     {pageSlug === "diagnostics" && <MicksSmartTool bundle={bundle} kind="diagnostics" />}
     {pageSlug === "tires" && <MicksSmartTool bundle={bundle} kind="tires" />}
     {pageSlug === "specials" && specialsProps && <MicksSpecials bundle={bundle} ctx={ctx} props={specialsProps} />}
     {pageSlug === "testimonials" && reviewsProps && <MicksTestimonials bundle={bundle} ctx={ctx} props={reviewsProps} />}
     {pageSlug === "make-an-appointment" && <MicksAppointment bundle={bundle} props={bookingProps ?? undefined} contactProps={contactProps ?? undefined} />}
   </>;
+}
+
+async function MicksAboutSections({ bundle, ctx, sections }: { bundle: SiteBundle; ctx: SiteCtx; sections: PageSection[] }) {
+  const design = getDesign(bundle.theme ?? {});
+  const settings = bundle.settings;
+  const businessName = settings?.businessName ?? bundle.site.name;
+  const address = formatAddress(settings?.address);
+  const team = await getTeamProfiles(ctx);
+  return <>{sections.map((section, index) => {
+    if (section.type === "about_intro") {
+      const props = parseBlock("about_intro", section.props);
+      if (!props) return null;
+      return <section key={index} className="micks-about-page-intro section"><div className="container-site micks-about-page-grid">
+        {props.imageUrl && <img src={props.imageUrl} alt={`About ${businessName}`} />}
+        <div><div className="micks-live-title"><QuoteMark design={design} className="micks-about-quote" />{props.eyebrow && <h2>{globalText(props.eyebrow, bundle)}</h2>}</div><h3><LineBreakText text={globalText(props.heading, bundle)} /></h3><RichText text={globalText(props.body, bundle)} className="micks-about-rich-text" /><CertificationBadges design={design} className="micks-about-badges" /></div>
+      </div></section>;
+    }
+    if (section.type === "about_mission") {
+      const props = parseBlock("about_mission", section.props);
+      if (!props) return null;
+      const callAction = globalCta(design, design.callCtaHref || telHref(settings?.phone), "Call Now");
+      const scheduleAction = globalCta(design, "/make-an-appointment/", "Schedule Service");
+      const hours = groupHours(settings?.hours)[0];
+      return <section key={index} className="micks-mission section"><div className="container-site micks-mission-grid"><div><h2>{globalText(props.heading, bundle)}</h2><h3><LineBreakText text={globalText(props.body, bundle)} /></h3><div className="micks-mission-table"><b>{props.locationLabel || "Location"}</b><b>{props.phoneLabel || "Phone"}</b><b>{props.hoursLabel || "Hours"}</b><span>{address}</span><a href={telHref(settings?.phone)}>{settings?.phone}</a><span>{hours ? `${hours.days}: ${hours.time}` : ""}</span></div><div className="micks-live-buttons">{settings?.phone && <a href={callAction.href}><span>{callAction.label}</span></a>}<Link href={localSiteHref(bundle.site.slug, scheduleAction.href)}><span>{scheduleAction.label}</span></Link></div></div>{props.imageUrl && <img src={props.imageUrl} alt="Vehicle" />}</div></section>;
+    }
+    if (section.type === "about_work") {
+      const props = parseBlock("about_work", section.props);
+      if (!props) return null;
+      return <section key={index} className="micks-how-we-work section"><div className="container-site"><h2>{globalText(props.heading, bundle)}</h2>{props.imageUrl && <img src={props.imageUrl} alt={`The ${businessName} team`} />}<div className="micks-work-grid">{props.items.map(({ title, body }, itemIndex) => <div key={`${title}-${itemIndex}`}><StepListIcon design={design} label={title} /><b>{globalText(title, bundle)}</b><span>{globalText(body, bundle)}</span></div>)}</div></div></section>;
+    }
+    if (section.type === "about_owner") {
+      const props = parseBlock("about_owner", section.props);
+      if (!props) return null;
+      return <section key={index} className="micks-owner section"><div className="container-site"><div className="micks-live-title"><QuoteMark design={design} className="micks-about-quote" /><h2>{globalText(props.heading, bundle)}</h2></div><div className="micks-owner-grid">{props.imageUrl && <img src={props.imageUrl} alt={props.ownerName || "Owner"} />}<div>{props.ownerName && <p><strong>{globalText(props.ownerName, bundle)}</strong></p>}<RichText text={globalText(props.body, bundle)} className="micks-owner-rich-text" /></div></div></div></section>;
+    }
+    if (section.type === "team_gallery") {
+      const props = parseBlock("team_gallery", section.props);
+      if (!props) return null;
+      const selected = props.teamMemberIds.map((id) => team.find((member) => member.id === id)).filter((member): member is NonNullable<typeof member> => Boolean(member));
+      if (!selected.length) return null;
+      return <section key={index} className="micks-crew-gallery">{props.heading && <h2 className="text-center">{globalText(props.heading, bundle)}</h2>}<div className="container-site">{selected.map((member) => <article className="micks-crew-card" key={member.id} tabIndex={0} aria-label={`${member.name}${member.position ? `, ${member.position}` : ""}: ${member.description || ""}`}>{member.imageUrl && <img src={member.imageUrl} alt={member.name} />}<div className="micks-crew-card-overlay"><h3>{member.name}</h3>{member.position && <strong className="micks-crew-position">{member.position}</strong>}{member.description && <p>{globalText(member.description, bundle)}</p>}</div></article>)}</div></section>;
+    }
+    if (section.type === "about_cta") {
+      const props = parseBlock("about_cta", section.props);
+      if (!props) return null;
+      const action = globalCta(design, props.cta.href, props.cta.label);
+      return <section key={index} className="micks-know-cta section"><div><h2>{globalText(props.heading, bundle)}</h2>{props.body && <p>{globalText(props.body, bundle)}</p>}<Link href={localSiteHref(bundle.site.slug, action.href)}><span>{action.label}</span></Link></div></section>;
+    }
+    return null;
+  })}</>;
 }
 
 async function MicksServices({ bundle, ctx, props }: { bundle: SiteBundle; ctx: SiteCtx; props: BlockProps<"services_grid"> }) {

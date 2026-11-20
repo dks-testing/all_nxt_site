@@ -89,7 +89,7 @@ export default async function Page({ params, searchParams }: Props) {
           return <div className="cms-section-preview"><style>{`body:has(.cms-section-preview)>header,body:has(.cms-section-preview)>footer,body:has(.cms-section-preview)>.sticky{display:none!important}body:has(.cms-section-preview){background:var(--color-background);overflow-x:hidden}.cms-section-preview{min-height:100vh}`}</style><MicksSpecials ctx={ctx} bundle={bundle} props={props} /></div>;
         }
       }
-      if (design.headerStyle === "angled" && r.slug === "about-us" && selectedSection?.type === "about") {
+      if (design.headerStyle === "angled" && r.slug === "about-us" && selectedSection && new Set(["about", "about_intro", "about_mission", "about_work", "about_owner", "team_gallery", "about_cta"]).has(selectedSection.type)) {
         return <div className="cms-section-preview"><style>{`body:has(.cms-section-preview)>header,body:has(.cms-section-preview)>footer,body:has(.cms-section-preview)>.sticky{display:none!important}body:has(.cms-section-preview){background:var(--color-background);overflow-x:hidden}.cms-section-preview{min-height:100vh}`}</style><MicksContentPage pageSlug={r.slug} bundle={bundle} ctx={ctx} sections={sections.filter((section) => section.id === sectionPreview)} /></div>;
       }
       return <div className="cms-section-preview"><style>{`body:has(.cms-section-preview)>header,body:has(.cms-section-preview)>footer,body:has(.cms-section-preview)>.sticky{display:none!important}body:has(.cms-section-preview){background:var(--color-background);overflow-x:hidden}.cms-section-preview{min-height:100vh}`}</style><RenderSections sections={sections.filter((section) => section.id === sectionPreview)} ctx={ctx} bundle={bundle} pageSlug={r.slug} /></div>;
@@ -104,7 +104,7 @@ export default async function Page({ params, searchParams }: Props) {
       const templateSections: Record<string, ReadonlySet<string>> = {
         // The live About page ends with its crew/diagnostics content. Its old
         // CMS reviews and CTA blocks must not be appended after that template.
-        "about-us": new Set(["hero", "about", "reviews", "cta"]),
+        "about-us": new Set(["hero", "about", "about_intro", "about_mission", "about_work", "about_owner", "team_gallery", "about_cta", "reviews", "cta"]),
         // The services template ends with the service cards; omit its legacy CTA banner.
         services: new Set(["hero", "services_grid", "cta"]),
         // The specials page ends with its offers; omit the legacy booking form.
