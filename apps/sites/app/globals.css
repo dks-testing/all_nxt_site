@@ -1140,6 +1140,7 @@ body.micks-menu-open {
   line-height: 1;
   font-weight: 800;
   text-transform: uppercase;
+  text-wrap: balance;
 }
 
 .micks-service-prose p {
@@ -2287,11 +2288,6 @@ main > section {
   height: 57px;
 }
 
-.micks-smart-feature {
-  
-  background: #fff;
-}
-
 .micks-smart-feature>.container-site {
   max-width: var(--inner-container);
 }
@@ -2655,10 +2651,6 @@ main > section {
 /* Diagnostics live-page parity. Each layout remains a normal CMS section;
    these rules reproduce the current Elementor reference without tenant-wide
    overrides. */
-.micks-smart-feature.section {
-  padding-block: 0px;
-}
-
 .micks-smart-feature>.container-site {
   max-width: var(--inner-container);
 }
@@ -2667,7 +2659,6 @@ main > section {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0;
   align-items: stretch;
-  padding: 10px 0;
 }
 
 .micks-smart-feature h2,
@@ -2703,10 +2694,6 @@ main > section {
   text-align: center;
 }
 
-.micks-smart-feature-intro.section {
-  padding-block: 0 16px;
-}
-
 .micks-smart-feature-intro>.container-site {
   padding-inline: 10px;
 }
@@ -2719,13 +2706,13 @@ main > section {
 
 .micks-smart-feature-intro .micks-smart-kicker {
   width: 100%;
-  margin: 0 auto 20px;
+  margin: 0 auto 40px;
   color: #000;
   text-align: center;
   font-family: var(--font-heading);
   font-size: 52px;
   font-weight: 400;
-  line-height: 60px;
+  line-height: 52px;
   letter-spacing: 0;
 }
 
@@ -2763,7 +2750,6 @@ main > section {
   width: 100%;
   height: auto;
   aspect-ratio: 835 / 1024;
-  margin-top: 35px;
   border-radius: 40px;
   object-fit: cover;
 }
@@ -2886,9 +2872,9 @@ main > section {
   /* padding-block: 0 10px; */
 }
 
-.micks-smart-feature-experience+.micks-smart-feature-cta+.micks-smart-feature-trust.section {
+/* .micks-smart-feature-experience+.micks-smart-feature-cta+.micks-smart-feature-trust.section {
   padding-top: 0;
-}
+} */
 
 .micks-smart-feature-experience .micks-smart-feature-grid {
   grid-template-columns: minmax(0, 1.04fr) minmax(0, 1fr);
@@ -3053,7 +3039,6 @@ main > section {
 .micks-smart-feature-testimonial .micks-smart-feature-grid {
   align-items: center;
   gap: 20px;
-  padding:40px 0;
 }
 
 .micks-smart-feature-testimonial .micks-smart-feature-copy-wrap {
@@ -3075,7 +3060,7 @@ main > section {
   border-radius: 40px;
   color: #0c0c0c;
   background: linear-gradient(180deg, #fff 0%, rgb(106 143 181 / 30%) 100%);
-  margin-bottom:20px
+  /* margin-bottom:20px */
 }
 
 .micks-smart-feature-final .micks-smart-feature-copy-wrap {
@@ -3109,13 +3094,7 @@ main > section {
   font-size: 12px;
   line-height: 23px;
 }
-.micks-smart-feature.section.micks-smart-feature-page-tires,
-.micks-smart-feature.section.micks-smart-feature-page-diagnostics{
-  padding-top:30px;
-}
-.micks-smart-feature-cta.section.micks-smart-feature-page-diagnostics{
-  padding-top:0px;
-}
+
 @media (max-width: 1024px) {
   .micks-smart-feature-intro .micks-smart-kicker,
   .micks-smart-feature-tool .micks-smart-feature-heading h2 {
@@ -4039,13 +4018,6 @@ body.micks-tool-popup-open {
 
 .micks-smart-cta {
   padding: 65px 16px;
-  background: #fff;
-}
-
-.micks-specials-page,
-.micks-testimonials-page,
-.micks-appointment-page {
-  
   background: #fff;
 }
 
@@ -5555,18 +5527,12 @@ body.micks-tool-popup-open {
   }
 }
 
-.micks-services-index {
-  
-  background: #fff;
-  padding-top: 40;
-}
 
 .micks-services-index>div {
   max-width: var(--inner-container);
 }
 
 .micks-services-index h2 {
-  max-width: 850px;
   margin: 0 auto 12px;
   text-align: center;
   font-size: clamp(36px, 3.8vw, 50px);
@@ -5575,10 +5541,8 @@ body.micks-tool-popup-open {
 }
 
 .micks-services-intro {
-  max-width: 870px;
   margin: 0 auto 30px;
   text-align: center;
-  font-size: 14px;
   font-weight: 500;
   line-height: 1.45;
 }
@@ -5603,9 +5567,8 @@ body.micks-tool-popup-open {
 }
 
 .micks-services-grid h3 {
-  max-width: 390px;
-  font-size: clamp(31px, 3vw, 44px);
-  line-height: 1.03;
+  font-size: 52px;
+  line-height: 52px;
   text-transform: uppercase;
   text-shadow: 0 2px 5px #000;
 }
@@ -6401,10 +6364,6 @@ body.micks-tool-popup-open {
 }
 
 /* Special offers: live-site inspired featured-first layout, populated from each site's Specials collection. */
-.micks-specials-page {
-  padding-block: clamp(30px, 5vw, 30px);
-  background: #fff;
-}
 .micks-specials-page > .container-site { max-width: var(--inner-container); }
 .micks-specials-page > .container-site > h2 {
   margin: 0;
@@ -6525,12 +6484,16 @@ body.micks-tool-popup-open {
 /* Diagnostics / Drive Smarter final card backgrounds. */
 .micks-smart-feature-final.micks-smart-feature-page-diagnostics {
   background: #fff;
-  margin-bottom:10px;
+  /* margin-bottom:10px; */
 }
 
 .micks-smart-feature-final.micks-smart-feature-page-diagnostics .micks-smart-feature-grid {
   background: linear-gradient(180deg, #fff 0%, #d2dfee 100%);
-  padding:20px;
+}
+
+.micks-smart-feature-final.micks-smart-feature-page-diagnostics .micks-smart-feature-grid,
+.micks-smart-feature-final.micks-smart-feature-page-tires .micks-smart-feature-grid {
+  padding: 20px;
 }
 
 /* Contact page: full booking tool followed by the shop profile and map. */

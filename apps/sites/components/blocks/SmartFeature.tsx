@@ -30,7 +30,7 @@ export function SmartFeature({ bundle, props, pageSlug }: BlockComponentProps<"s
       : "";
 
   if (props.variant === "intro") {
-    return <section className={`micks-smart-feature micks-smart-feature-intro${pageClass} section`}>
+    return <section className={`micks-smart-feature micks-smart-feature-intro${pageClass} !pb-0 section`}>
       <div className="container-site">
         {props.eyebrow && (innerToolPage
           ? <h2 className="micks-smart-kicker">{props.eyebrow}</h2>
@@ -53,7 +53,7 @@ export function SmartFeature({ bundle, props, pageSlug }: BlockComponentProps<"s
   }
 
   if (props.variant === "tool") {
-    return <section className={`micks-smart-feature micks-smart-feature-tool${pageClass} section`} id={props.integration === "tire_finder" ? "tire-finder" : "tool"}>
+    return <section className={`micks-smart-feature micks-smart-feature-tool${pageClass} !pb-0 section`} id={props.integration === "tire_finder" ? "tire-finder" : "tool"}>
       <div className="container-site">
         <header className="micks-smart-feature-heading">
           {props.eyebrow && <p className="micks-smart-kicker">{props.eyebrow}</p>}
@@ -74,7 +74,9 @@ export function SmartFeature({ bundle, props, pageSlug }: BlockComponentProps<"s
     </section>;
   }
 
-  return <section className={`micks-smart-feature micks-smart-feature-${props.variant}${pageClass} section`}>
+  const bottomPaddingClass = innerToolPage && props.variant === "final" ? "" : " !pb-0";
+
+  return <section className={`micks-smart-feature micks-smart-feature-${props.variant}${pageClass} section${bottomPaddingClass}`}>
     <div className="container-site">
       <div className="micks-smart-feature-grid">
         <div className="micks-smart-feature-copy-wrap">
