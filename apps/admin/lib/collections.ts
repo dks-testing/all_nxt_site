@@ -62,6 +62,7 @@ export const collections: Record<string, CollectionDef> = {
       { name: "processHeading", label: "Process section heading", kind: "text", wide: true },
       { name: "processSteps", label: "Process steps", kind: "list", wide: true, help: "One per line: Step title | Description" },
       { name: "vehicleCalloutHeading", label: "Vehicle callout heading", kind: "text", wide: true },
+      { name: "vehicleCalloutBullets", label: "Vehicle callout key points", kind: "list", wide: true, help: "One per line. Shown above the callout text when the vehicle callout is enabled." },
       { name: "vehicleCalloutBody", label: "Vehicle callout text", kind: "textarea", wide: true },
       { name: "showVehicleCallout", label: "Show vehicle callout", kind: "boolean" },
       { name: "trustHeading", label: "Trust section heading", kind: "text", wide: true },

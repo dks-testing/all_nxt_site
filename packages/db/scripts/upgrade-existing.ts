@@ -12,6 +12,7 @@ const tables: Record<string, Record<string, string>> = {
     process_steps: "JSON NULL",
     vehicle_callout_heading: "VARCHAR(255) NULL",
     vehicle_callout_body: "TEXT NULL",
+    vehicle_callout_bullets: "JSON NULL",
     show_vehicle_callout: "BOOLEAN NOT NULL DEFAULT FALSE",
     trust_heading: "VARCHAR(255) NULL",
     trust_items: "JSON NULL",

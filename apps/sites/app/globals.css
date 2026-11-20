@@ -3596,7 +3596,8 @@ main > section {
   margin-top: 25px;
 }
 
-.micks-mission .micks-live-buttons a {
+.micks-mission .micks-live-buttons a,
+.micks-service-vehicle-callout .micks-live-buttons a {
   min-height: 53px;
   padding: 14px 28px;
   font-size: 18px;
@@ -5709,7 +5710,7 @@ body.micks-tool-popup-open {
 }
 
 .micks-service-vehicle-callout {
-    
+  overflow-x: clip;
   background: linear-gradient(#fff, #dce7f2);
 }
 
@@ -5723,50 +5724,29 @@ body.micks-tool-popup-open {
 .micks-service-vehicle-callout p {
   max-width: 620px;
   margin-bottom: 18px;
-  font-size: 14px;
   line-height: 1.5;
 }
 
-.micks-service-vehicle-callout img {
+.micks-service-vehicle-callout .micks-service-bullets {
+  margin-bottom: 18px;
+}
+
+.micks-service-vehicle-callout > .container-site > img {
   width: 100%;
-  max-height: 180px;
+  max-width: 470px;
+  justify-self: center;
   object-fit: contain;
 }
 
-.micks-service-vehicle-callout a {
-  display: inline-flex;
-  margin-right: 18px;
-  padding: 12px 23px;
-  color: #fff;
-  background: var(--button-bg, #d1272c);
-  transform: skewX(var(--button-skew, -9deg));
-  text-decoration: none;
-  text-transform: uppercase;
-  font-size: 14px;
-  font-style: italic;
-  font-weight: 800;
-}
-
-.micks-service-vehicle-callout a>span {
-  display: inline-block;
-  transform: skewX(var(--button-text-skew, 9deg));
-}
-
-.micks-service-vehicle-callout a:hover {
-  color: var(--button-hover-text, #fff);
-  background: var(--button-hover-bg, #a91919);
+.micks-service-vehicle-callout .micks-live-buttons {
+  flex-wrap: wrap;
 }
 
 @media (max-width: 850px) {
-  .service-btns{
-    display: flex;
+  .micks-service-vehicle-callout .micks-live-buttons {
     flex-direction: column;
     gap: 10px;
-    justify-content: center;
     align-items: center;
-  }
-  .service-btns a{
-    margin: 0;
   }
   .micks-footer-logos {
     min-height: 115px;
@@ -5817,7 +5797,7 @@ body.micks-tool-popup-open {
     height: min(100vw, 520px);
   }
 
-  .micks-service-vehicle-callout img {
+  .micks-service-vehicle-callout > .container-site > img {
     grid-row: 1;
     margin-bottom: 25px;
   }
@@ -6863,6 +6843,7 @@ body.micks-tool-popup-open {
     padding-inline: 0;
   }
   .micks-mission .micks-live-buttons a,
+  .micks-service-vehicle-callout .micks-live-buttons a,
   .micks-hero-button,
   .micks-inner-hero .micks-inner-action-primary,
   .micks-inner-hero .micks-hero-button {

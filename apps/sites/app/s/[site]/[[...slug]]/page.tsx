@@ -10,6 +10,7 @@ import { localSiteHref } from "@/lib/url";
 import { getDesign } from "@platform/db/theme";
 import { MicksInnerHero } from "@/components/MicksInnerHero";
 import { MicksContentPage } from "@/components/MicksContentPages";
+import { MicksMissionCar } from "@/components/MicksMissionCar";
 import { MicksSpecials } from "@/components/MicksSpecials";
 import { CertificationBadges } from "@/components/CertificationBadge";
 import { QuoteMark } from "@/components/QuoteMark";
@@ -17,6 +18,16 @@ import { StepListIcon } from "@/components/TrustListIcon";
 import { globalCta, globalCtaHref, globalText } from "@/lib/global-content";
 
 type Props = { params: Promise<{ site: string; slug?: string[] }>; searchParams?: Promise<Record<string, string | string[] | undefined>> };
+
+function ServiceKeyPoints({ items }: { items: string[] }) {
+  return (
+    <ul className="micks-service-bullets" role="list">
+      {items.map((item, index) => (
+        <li key={index}><CheckIcon className="h-4 w-4 shrink-0" />{item}</li>
+      ))}
+    </ul>
+  );
+}
 
 // Pages are rendered on first request, then cached until the site's tag is revalidated (ISR).
 export const dynamicParams = true;
@@ -137,10 +148,17 @@ export default async function Page({ params, searchParams }: Props) {
     const introBlocks = sectionHeadingIndex >= 0 ? contentBlocks.slice(0, sectionHeadingIndex) : contentBlocks;
     const bulletHeading = sectionHeadingIndex >= 0 ? contentBlocks[sectionHeadingIndex].replace(/^##\s+/, "") : "What we can help with";
     const serviceBullets = svc.bullets ?? [];
+    const calloutBullets = (svc.vehicleCalloutBullets ?? []).map((item) => globalText(item, bundle)).filter(Boolean);
     const closingBlocks = sectionHeadingIndex >= 0 ? contentBlocks.slice(sectionHeadingIndex + 1) : [];
     const processImage = design.serviceProcessImageUrl || "https://www.micksrepair.com/wp-content/uploads/2026/03/micks-repair-worthington-mn-sign.jpeg";
     const trustImage = design.serviceTrustImageUrl || "https://www.micksrepair.com/wp-content/uploads/2026/04/555799130_25292959790311872_8516031389215206101_n.jpg";
-    const vehicleImage = design.serviceVehicleImageUrl || "https://www.micksrepair.com/wp-content/uploads/2026/04/blue-car.webp";
+    const aboutPage = svc.showVehicleCallout ? await (ctx.preview ? getPageDraft : getPage)(ctx, "about-us") : null;
+    const mission = aboutPage?.sections.find((section) => section.type === "about_mission");
+    const legacyAbout = aboutPage?.sections.find((section) => section.type === "about");
+    const aboutVehicleImage = parseBlock("about_mission", mission?.props)?.imageUrl
+      || parseBlock("about", legacyAbout?.props)?.vehicleImageUrl;
+    const vehicleImage = aboutVehicleImage || design.aboutVehicleImageUrl || design.serviceVehicleImageUrl
+      || "https://www.micksrepair.com/wp-content/uploads/2026/04/blue-car.webp";
     const pairs = (items?: string[] | null) => (items ?? []).map((item) => {
       const [title, ...body] = item.split("|");
       return [title.trim(), body.join("|").trim()] as [string, string];
@@ -161,7 +179,7 @@ export default async function Page({ params, searchParams }: Props) {
               {introBlocks.map((block, i) => <RichText key={i} text={block} className="micks-service-prose" />)}
               {serviceBullets.length > 0 && <>
                 <h3>{bulletHeading}</h3>
-                <ul className="micks-service-bullets">{serviceBullets.map((b) => <li key={b}><CheckIcon className="h-4 w-4" />{b}</li>)}</ul>
+                <ServiceKeyPoints items={serviceBullets} />
               </>}
               {closingBlocks.map((block, i) => <RichText key={i} text={block} className="micks-service-prose" />)}
               <div className="micks-service-bottom-actions">
@@ -172,7 +190,22 @@ export default async function Page({ params, searchParams }: Props) {
           </div>
         </section>
         <section className="micks-service-process"><div className="container-site micks-service-live-grid"><img src={processImage} alt={`${bundle.settings?.businessName ?? bundle.site.name} storefront`} /><div><h2>{process.heading}</h2><div className="micks-service-step-list">{process.steps.map(([title, body]) => <div key={title}><StepListIcon design={design} label={title} /><p><strong>{title}</strong>{body}</p></div>)}</div></div></div></section>
-        {svc.showVehicleCallout && <section className="micks-service-vehicle-callout"><div className="container-site"><div><h2>{globalText(svc.vehicleCalloutHeading, bundle)}</h2><p>{globalText(svc.vehicleCalloutBody, bundle)}</p><div className="service-btns"><a href={callAction.href}><span>{callAction.label}</span></a><Link href={localSiteHref(bundle.site.slug, scheduleAction.href)}><span>{scheduleAction.label}</span></Link></div></div><img src={vehicleImage} alt="Vehicle" /></div></section>}
+        {svc.showVehicleCallout && (
+          <section className="micks-service-vehicle-callout">
+            <div className="container-site">
+              <div>
+                <h2>{globalText(svc.vehicleCalloutHeading, bundle)}</h2>
+                {calloutBullets.length > 0 && <ServiceKeyPoints items={calloutBullets} />}
+                {svc.vehicleCalloutBody && <p>{globalText(svc.vehicleCalloutBody, bundle)}</p>}
+                <div className="micks-live-buttons">
+                  <a href={callAction.href}><span>{callAction.label}</span></a>
+                  <Link href={localSiteHref(bundle.site.slug, scheduleAction.href)}><span>{scheduleAction.label}</span></Link>
+                </div>
+              </div>
+              <MicksMissionCar src={vehicleImage} />
+            </div>
+          </section>
+        )}
         <section className="micks-service-live-trust"><div className="container-site micks-service-live-grid"><div><h2>{globalText(svc.trustHeading, bundle)}</h2><div className="micks-service-step-list micks-service-trust-list">{trustItems.map(([title, body]) => <div key={title}><StepListIcon design={design} label={title} /><p><strong>{globalText(title, bundle)}</strong>{globalText(body, bundle)}</p></div>)}</div></div><img src={trustImage} alt={`${bundle.settings?.businessName ?? bundle.site.name} in the community`} /></div></section>
         <section className="micks-know-cta section"><div><h2>{globalText(svc.finalHeading, bundle)}</h2><p>{globalText(svc.finalBody, bundle)}</p><Link href={localSiteHref(bundle.site.slug, finalAction.href)}><span>{finalAction.label}</span></Link></div></section>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "Service", name: svc.name, description: svc.summary, provider: { "@type": bundle.settings?.businessType ?? "LocalBusiness", name: bundle.settings?.businessName } }).replace(/</g, "\\u003c") }} />

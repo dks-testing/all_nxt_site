@@ -7,7 +7,7 @@ export function MicksMissionCar({ src }: { src: string }) {
 
   useEffect(() => {
     const image = imageRef.current;
-    const section = image?.closest(".micks-mission");
+    const section = image?.closest("section");
     if (!image || !section) return;
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");

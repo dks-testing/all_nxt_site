@@ -298,6 +298,7 @@ export const services = mysqlTable(
     processSteps: json("process_steps").$type<string[]>(),
     vehicleCalloutHeading: varchar("vehicle_callout_heading", { length: 255 }),
     vehicleCalloutBody: text("vehicle_callout_body"),
+    vehicleCalloutBullets: json("vehicle_callout_bullets").$type<string[]>(),
     showVehicleCallout: boolean("show_vehicle_callout").notNull().default(false),
     trustHeading: varchar("trust_heading", { length: 255 }),
     trustItems: json("trust_items").$type<string[]>(),
