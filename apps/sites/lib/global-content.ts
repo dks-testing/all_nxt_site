@@ -105,7 +105,30 @@ export function globalCtaLabel(design: DesignOptions, href?: string | null, labe
   return globalCta(design, href, label).label;
 }
 
+export type SmartToolKind = "diagnostics" | "tires";
+
+export function smartToolKind(href?: string | null, label?: string | null): SmartToolKind | undefined {
+  const signal = `${href ?? ""} ${label ?? ""}`;
+  if (includesAny(signal, ["diagnostic", "start diagnosis", "pre-diagnosis"])) return "diagnostics";
+  if (includesAny(signal, ["/tires", "find my tires", "find the right tires", "tire finder"])) return "tires";
+  return undefined;
+}
+
 /** Diagnostics and tire finder intentionally share one embed configuration. */
 export function sharedToolConfig(bundle: SiteBundle) {
   return bundle.integrations.tire_finder || bundle.integrations.ai_diagnostic;
+}
+
+export function smartToolUrl(bundle: SiteBundle, kind: SmartToolKind): string | undefined {
+  const integration = kind === "diagnostics" ? "ai_diagnostic" : "tire_finder";
+  const url = bundle.integrations[integration]?.url || sharedToolConfig(bundle)?.url;
+  if (!url) return undefined;
+
+  if (/^https?:\/\/embed\.raiseahood\.com\/api\/gus-page(?:\?|$)/i.test(url)) {
+    const [path, query = ""] = url.split("?", 2);
+    const params = new URLSearchParams(query);
+    params.set("type", kind === "diagnostics" ? "gus" : "gus-tire-widget");
+    return `${path}?${params.toString()}`;
+  }
+  return url;
 }

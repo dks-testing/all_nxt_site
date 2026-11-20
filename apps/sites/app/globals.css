@@ -744,8 +744,10 @@ body.micks-menu-open {
   align-items: center;
   min-height: 43px;
   padding: 17px 22px;
+  border: 0;
   color: var(--button-text, #fff);
   background: var(--button-bg, #c62828);
+  cursor: pointer;
   transform: skewX(var(--button-skew, -15deg));
   /* transition: background-color .2s, transform .2s; */
   text-decoration: none;
@@ -2310,7 +2312,8 @@ main > section {
   object-fit: cover;
 }
 
-.micks-smart-feature h2 {
+.micks-smart-feature h2,
+.micks-smart-feature-intro .micks-smart-feature-copy-wrap>h3 {
   margin: 0 0 18px;
   font-family: var(--font-heading);
   font-size: clamp(38px, 4vw, 52px);
@@ -2327,7 +2330,9 @@ main > section {
 }
 
 .micks-smart-feature-copy-wrap>a,
-.micks-smart-tool-panel-copy>a {
+.micks-smart-feature-copy-wrap>button,
+.micks-smart-tool-panel-copy>a,
+.micks-smart-tool-panel-copy>button {
   display: inline-flex;
   justify-content: center;
   margin-top: 8px;
@@ -2340,14 +2345,20 @@ main > section {
   font-size: 14px;
   font-style: italic;
   font-weight: 800;
+  border: 0;
+  cursor: pointer;
 }
 .micks-smart-feature-copy-wrap>a:hover,
-.micks-smart-tool-panel-copy>a:hover {
+.micks-smart-feature-copy-wrap>button:hover,
+.micks-smart-tool-panel-copy>a:hover,
+.micks-smart-tool-panel-copy>button:hover {
   background: var(--button-hover-bg, #d1272c);
 }
 
 .micks-smart-feature-copy-wrap>a>span,
-.micks-smart-tool-panel-copy>a>span {
+.micks-smart-feature-copy-wrap>button>span,
+.micks-smart-tool-panel-copy>a>span,
+.micks-smart-tool-panel-copy>button>span {
   display: inline-block;
   transform: skewX(var(--button-text-skew, 9deg));
 }
@@ -2659,7 +2670,8 @@ main > section {
   padding: 10px 0;
 }
 
-.micks-smart-feature h2 {
+.micks-smart-feature h2,
+.micks-smart-feature-intro .micks-smart-feature-copy-wrap>h3 {
   margin: 0 0 14px;
   font-size: 32px;
   font-weight: 600;
@@ -2674,7 +2686,9 @@ main > section {
 }
 
 .micks-smart-feature-copy-wrap>a,
-.micks-smart-tool-panel-copy>a {
+.micks-smart-feature-copy-wrap>button,
+.micks-smart-tool-panel-copy>a,
+.micks-smart-tool-panel-copy>button {
   min-width: 0;
   margin-top: 8px;
   padding: 12px 24px;
@@ -2719,7 +2733,8 @@ main > section {
   padding-right: 0;
 }
 
-.micks-smart-feature-intro .micks-smart-feature-copy-wrap>h2 {
+.micks-smart-feature-intro .micks-smart-feature-copy-wrap>h2,
+.micks-smart-feature-intro .micks-smart-feature-copy-wrap>h3 {
   width: min(100%, 360px);
 }
 
@@ -2729,6 +2744,14 @@ main > section {
 }
 
 .micks-smart-feature-intro .micks-smart-feature-copy-wrap>a {
+  display: flex;
+  width: max-content;
+  max-width: calc(100% - 16px);
+  margin: 8px auto 14px;
+  text-align: center;
+}
+
+.micks-smart-feature-intro .micks-smart-feature-copy-wrap>button {
   display: flex;
   width: max-content;
   max-width: calc(100% - 16px);
@@ -2845,7 +2868,8 @@ main > section {
   line-height: 23px;
 }
 
-.micks-smart-feature-tool .micks-smart-tool-panel-copy>a {
+.micks-smart-feature-tool .micks-smart-tool-panel-copy>a,
+.micks-smart-feature-tool .micks-smart-tool-panel-copy>button {
   width: min(100%, 292px);
   margin-top: 0;
 }
@@ -2961,7 +2985,8 @@ main > section {
   margin-bottom: 0;
 }
 
-.micks-smart-feature-cta .micks-smart-feature-copy-wrap>a {
+.micks-smart-feature-cta .micks-smart-feature-copy-wrap>a,
+.micks-smart-feature-cta .micks-smart-feature-copy-wrap>button {
   max-width: calc(100% - 16px);
   margin-top: 12px;
 }
@@ -3159,6 +3184,7 @@ main > section {
   }
 
   .micks-smart-feature-intro .micks-smart-feature-copy-wrap>h2,
+  .micks-smart-feature-intro .micks-smart-feature-copy-wrap>h3,
   .micks-smart-feature-trust h2 {
     width: 100%;
     text-align: center;
@@ -3956,6 +3982,54 @@ main > section {
 
 .micks-smart-tool-card p {
   margin: 15px 0 22px;
+}
+
+body.micks-tool-popup-open {
+  overflow: hidden;
+}
+
+.micks-tool-popup {
+  position: fixed;
+  z-index: 10000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(0 0 0 / 75%);
+}
+
+.micks-tool-popup-dialog {
+  position: relative;
+  display: flex;
+  width: min(1080px, 100%);
+  height: min(900px, calc(100vh - 40px));
+  flex-direction: column;
+  overflow: hidden;
+  padding-top: 40px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 20px 70px rgb(0 0 0 / 35%);
+}
+
+.micks-tool-popup-close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  z-index: 1;
+  padding: 4px 10px;
+  border: 0;
+  color: #222;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.micks-tool-popup-dialog iframe {
+  width: 100%;
+  min-height: 0;
+  flex: 1;
+  border: 0;
+  background: #fff;
 }
 
 .micks-smart-experience {
