@@ -346,7 +346,8 @@ main > section {
 }
 
 .micks-dropdown-link:hover,
-.micks-dropdown-link:focus-visible {
+.micks-dropdown-link:focus-visible,
+.micks-dropdown-link[aria-current="page"] {
   color: #fff;
   background: var(--button-bg, #bd302d);
 }

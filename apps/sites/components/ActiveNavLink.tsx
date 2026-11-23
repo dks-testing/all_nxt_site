@@ -4,10 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
-export function ActiveNavLink({ href, siteSlug, childHrefs = [], children }: {
+export function ActiveNavLink({ href, siteSlug, childHrefs = [], className = "micks-nav-link", children }: {
   href: string;
   siteSlug: string;
   childHrefs?: string[];
+  className?: string;
   children: ReactNode;
 }) {
   const pathname = usePathname();
@@ -25,5 +26,5 @@ export function ActiveNavLink({ href, siteSlug, childHrefs = [], children }: {
   };
   const active = matches(href) || childHrefs.some(matches);
 
-  return <Link href={href} className="micks-nav-link" aria-current={active ? "page" : undefined}>{children}</Link>;
+  return <Link href={href} className={className} aria-current={active ? "page" : undefined}>{children}</Link>;
 }

@@ -108,7 +108,7 @@ function AngledHeader({ bundle }: { bundle: SiteBundle }) {
         <nav className="micks-primary-nav" aria-label="Main navigation">
           {links.map((item) => <div key={item.label + item.href} className="micks-nav-entry">
             <ActiveNavLink href={localSiteHref(bundle.site.slug, item.href)} siteSlug={bundle.site.slug} childHrefs={item.children?.map((child) => child.href)}>{globalText(item.label, bundle)}{item.children?.length ? <ChevronIcon className="h-4 w-4" /> : null}</ActiveNavLink>
-            {item.children?.length ? <div className="micks-dropdown">{item.children.map((child) => <Link key={child.href} href={localSiteHref(bundle.site.slug, child.href)} className="micks-dropdown-link">{globalText(child.label, bundle)}</Link>)}</div> : null}
+            {item.children?.length ? <div className="micks-dropdown">{item.children.map((child) => <ActiveNavLink key={child.href} href={localSiteHref(bundle.site.slug, child.href)} siteSlug={bundle.site.slug} className="micks-dropdown-link">{globalText(child.label, bundle)}</ActiveNavLink>)}</div> : null}
           </div>)}
         </nav>
         {settings?.phone && <a href={telHref(settings.phone)} className="micks-phone-panel" aria-label={`Call ${settings.phone}`}>
