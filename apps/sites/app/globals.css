@@ -921,6 +921,7 @@ body.micks-menu-open {
 }
 
 @media (max-width: 1024px) {
+  
   .micks-home-hero {
     margin-top: -120px;
     padding-top: 135px;
@@ -6261,6 +6262,48 @@ body.micks-tool-popup-open {
   }
 }
 
+/* Keep the service-page call to action and certification row within the copy column. */
+.micks-service-bottom-actions {
+  flex-wrap: wrap;
+}
+
+.micks-service-bottom-actions > .micks-hero-button {
+  max-width: 100%;
+}
+
+.micks-service-badges {
+  --certification-badge-size: clamp(56px, 8vw, 82px);
+  gap: clamp(12px, 2.4vw, 22px);
+  max-width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .micks-service-badges {
+    margin: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .micks-service-bottom-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .micks-service-bottom-actions > .micks-hero-button {
+    box-sizing: border-box;
+    width: min(100%, 340px);
+    align-self: center;
+  }
+
+  .micks-service-badges {
+    --certification-badge-size: clamp(52px, 14vw, 68px);
+    width: 100%;
+    justify-content: center;
+    gap: clamp(12px, 4vw, 20px);
+  }
+}
+
 /* Final cascade overrides for elements whose legacy replica rules appear later
    in this stylesheet. */
 .micks-work-grid>div {
@@ -6477,6 +6520,9 @@ body.micks-tool-popup-open {
   .micks-footer-main-grid{
     grid-template-columns: 1fr;
     gap:20px;
+  }
+  .micks-services-grid a{
+    font-size: 16px;
   }
   .micks-offer-secondary-grid { grid-template-columns: 1fr; }
   .micks-services-grid{ grid-template-columns: 1fr; }
