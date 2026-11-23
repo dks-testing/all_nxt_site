@@ -100,15 +100,16 @@ export function Cta({ bundle, props }: BlockComponentProps<"cta">) {
   );
 }
 
-export function RichTextBlock({ props }: BlockComponentProps<"rich_text">) {
+export function RichTextBlock({ props, pageSlug }: BlockComponentProps<"rich_text">) {
   const content = props.items ?? [{ heading: props.heading, headingTag: props.headingTag, body: props.body }];
+  const isLegalPage = pageSlug === "terms-conditions" || pageSlug === "privacy-policy";
   return (
     <section className="section">
-      <div className="container-site max-w-3xl">
+      <div className={isLegalPage ? "container-site" : "container-site max-w-3xl"}>
         {content.map((item, index) => {
           const HeadingTag = item.headingTag;
           return <div key={index}>
-            {item.heading && <HeadingTag className="mb-6 block text-3xl font-bold uppercase md:text-4xl">{item.heading}</HeadingTag>}
+            {item.heading && <HeadingTag className="mb-4 block text-lg font-semibold uppercase md:text-xl lg:text-[24px]">{item.heading}</HeadingTag>}
             <RichText text={item.body} />
           </div>;
         })}
