@@ -105,6 +105,11 @@ export function globalCtaLabel(design: DesignOptions, href?: string | null, labe
   return globalCta(design, href, label).label;
 }
 
+export function serviceCardLabel(design: DesignOptions): string {
+  const label = design.serviceCardCtaLabel?.trim();
+  return !label || /^learn more$/i.test(label) ? "Read More" : label;
+}
+
 export type SmartToolKind = "diagnostics" | "tires";
 
 export function smartToolKind(href?: string | null, label?: string | null): SmartToolKind | undefined {

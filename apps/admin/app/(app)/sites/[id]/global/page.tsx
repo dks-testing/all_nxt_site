@@ -52,7 +52,7 @@ export default async function GlobalSettingsPage({ params }: { params: Promise<{
             </div>)}
             <div className="grid gap-3 rounded-xl border border-slate-200 p-4 lg:grid-cols-[150px_1fr_1.3fr] lg:items-end">
               <strong className="pb-2 text-sm">Service cards</strong>
-              <Input label="Button label" name="serviceCardCtaLabel" defaultValue={design.serviceCardCtaLabel ?? "Learn More"} required />
+              <Input label="Button label" name="serviceCardCtaLabel" defaultValue={design.serviceCardCtaLabel && !/^learn more$/i.test(design.serviceCardCtaLabel.trim()) ? design.serviceCardCtaLabel : "Read More"} required />
               <p className="pb-2 text-xs text-slate-500">Each card automatically links to its own service page, so only one shared label is needed.</p>
             </div>
           </div>

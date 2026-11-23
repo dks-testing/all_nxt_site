@@ -38,7 +38,8 @@ export async function saveGlobalSettings(fd: FormData) {
     const callCtaHref = str(fd, "callCtaHref").trim();
     const aboutCtaLabel = str(fd, "aboutCtaLabel").trim() || "About Us";
     const servicesCtaLabel = str(fd, "servicesCtaLabel").trim() || "View Services";
-    const serviceCardCtaLabel = str(fd, "serviceCardCtaLabel").trim() || "Learn More";
+    const submittedServiceCardCtaLabel = str(fd, "serviceCardCtaLabel").trim();
+    const serviceCardCtaLabel = !submittedServiceCardCtaLabel || /^learn more$/i.test(submittedServiceCardCtaLabel) ? "Read More" : submittedServiceCardCtaLabel;
     const callCtaLabel = str(fd, "callCtaLabel").trim() || "Call Now";
     const toolUrl = str(fd, "toolEmbedUrl").trim();
     const toolEnabled = bool(fd, "toolEnabled");

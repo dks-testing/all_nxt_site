@@ -10,7 +10,7 @@ import { MicksInnerHero } from "./MicksInnerHero";
 import { BookingFormClient } from "./BookingFormClient";
 import { CertificationBadges } from "./CertificationBadge";
 import { QuoteMark } from "./QuoteMark";
-import { globalCta, globalText, sharedToolConfig } from "@/lib/global-content";
+import { globalCta, globalText, serviceCardLabel, sharedToolConfig } from "@/lib/global-content";
 import { StepListIcon } from "./TrustListIcon";
 import { MicksSpecials } from "./MicksSpecials";
 import { MicksTestimonials } from "./MicksTestimonials";
@@ -123,7 +123,7 @@ export async function MicksServices({ bundle, ctx, props }: { bundle: SiteBundle
         <h3>{service.name}</h3>
         {service.summary && <p>{globalText(service.summary, bundle)}</p>}
         <Link href={localSiteHref(bundle.site.slug, `/${service.slug}/`)} style={{ transform: "skewX(var(--button-skew))" }}>
-          <span style={{ transform: "skewX(var(--button-text-skew))" }}>{design.serviceCardCtaLabel || "Learn More"}</span>
+          <span style={{ transform: "skewX(var(--button-text-skew))" }}>{serviceCardLabel(design)}</span>
         </Link>
       </article>;
     })}</div>
