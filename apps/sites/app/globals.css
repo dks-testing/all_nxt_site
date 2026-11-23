@@ -2594,10 +2594,6 @@ main > section {
     grid-template-columns: 1fr;
     padding-block: 12px;
   }
-
-  .micks-footer-facebook {
-    justify-content: flex-start;
-  }
 }
 
 @media (max-width: 700px) {
@@ -3223,7 +3219,7 @@ main > section {
 .micks-shared-banner {
   box-sizing: border-box;
   min-height: 498px;
-  padding: 190px 0 54px;
+  padding: 190px 20px 54px;
   background-position: center;
 }
 
@@ -3265,7 +3261,7 @@ main > section {
 @media (max-width: 1024px) {
   .micks-shared-banner {
     min-height: 0;
-    padding: 155px 0 35px;
+    padding: 155px 20px 35px;
   }
 
   .micks-shared-banner .micks-inner-hero-content h1 {
@@ -3275,7 +3271,7 @@ main > section {
 
 @media (max-width: 700px) {
   .micks-shared-banner {
-    padding: 125px 0 25px;
+    padding: 125px 20px 25px;
   }
 
   .micks-shared-banner .micks-inner-hero-content h1 {
@@ -3397,6 +3393,7 @@ main > section {
 .micks-footer-bottom {
   color:var(--color-text);
   background: #fff;
+  padding:0 20px;
 }
 
 .micks-footer-bottom>div {
@@ -5763,7 +5760,9 @@ body.micks-tool-popup-open {
     width: 180px;
   }
 
-  .micks-footer-main-grid,
+  /* .micks-footer-main-grid{
+    grid-template-columns: 1.5fr 1fr;
+  } */
   .micks-about-page-grid,
   .micks-mission-grid,
   .micks-owner-grid,
@@ -5780,7 +5779,7 @@ body.micks-tool-popup-open {
     grid-template-columns: 1fr;
   }
 
-  .micks-services-grid,
+ 
   .micks-service-live-grid,
   .micks-service-live-trust .micks-service-live-grid,
   .micks-service-vehicle-callout>div {
@@ -6193,6 +6192,21 @@ body.micks-tool-popup-open {
 }
 
 @media (max-width: 1024px) {
+  .micks-header-shape:before{
+    transform: none;
+    border-radius: 0;
+  }
+  main > section{
+    padding-block: 40px;
+  }
+  .micks-header-outer{
+    padding-top: 0px;
+  }
+  .micks-footer-legal{
+    flex-direction: column;
+    align-items: start;
+    gap: 0px;
+  }
   .micks-home-social-proof .micks-home-logos {
     --certification-badge-size: 73px;
     gap: 8px;
@@ -6280,12 +6294,12 @@ body.micks-tool-popup-open {
   }
 
   .micks-footer-bottom>div {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1.8fr 1fr;
     padding-block: 12px;
   }
 
   .micks-footer-facebook {
-    justify-content: flex-start;
+    /* justify-content: flex-start; */
   }
 
   .micks-owner {
@@ -6450,7 +6464,12 @@ body.micks-tool-popup-open {
 .micks-offer-compact .micks-offer-actions { padding-top: 12px; }
 .micks-specials-page .micks-specials-empty { padding: 45px 15px; text-align: center; }
 @media (max-width: 767px) {
+  .micks-footer-main-grid{
+    grid-template-columns: 1fr;
+    gap:20px;
+  }
   .micks-offer-secondary-grid { grid-template-columns: 1fr; }
+  .micks-services-grid{ grid-template-columns: 1fr; }
   .micks-offer-card, .micks-offer-featured { min-height: 0; border-radius: 19px; }
   .micks-offer-content, .micks-offer-compact .micks-offer-content { padding: 23px 22px; }
   .micks-offer-included ul { column-count: 1; width: fit-content; max-width: 100%; margin: 16px auto 0; font-size: 14px; }
