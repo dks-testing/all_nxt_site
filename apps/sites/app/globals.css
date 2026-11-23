@@ -615,6 +615,9 @@ body.micks-menu-open {
 }
 
 @media (max-width: 1024px) {
+  .micks-inner-hero-content{
+    padding-inline: 20px;
+  }
   .micks-primary-nav,
   .micks-phone-panel {
     display: none;
@@ -6782,7 +6785,14 @@ button:hover{
 }
 
 @media (max-width: 767px) {
-  
+  .micks-footer-bottom > div{
+    grid-template-columns: 1fr;
+    
+  }
+  .micks-services-grid h3{
+    font-size: 35px;
+    line-height: 35px;
+  }
   .micks-know-cta h2, .micks-smart-cta h2,
   .micks-service-live-grid h2, .micks-service-vehicle-callout h2{
     font-size: 28px;
@@ -6865,7 +6875,7 @@ button:hover{
 
   .micks-footer-legal {
     flex-direction: column;
-    text-align: center;
+    align-items: center;
     gap:2px;
   }
   .micks-home-copy .micks-contact-strips,
