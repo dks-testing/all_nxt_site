@@ -6697,6 +6697,9 @@ button:hover{
 
 .faq-container { max-width: var(--inner-container); }
 .faq-heading { margin-bottom: 32px; text-align: center; font-size: 2rem; font-weight: 700; text-transform: uppercase; display:none;}
+.faq-section{
+  padding-bottom: 0
+}
 .faq-list { display: grid; gap: 10px; }
 .faq-item { min-width: 0; }
 .faq-question {

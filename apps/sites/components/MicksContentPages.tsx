@@ -60,7 +60,7 @@ export async function MicksContentPage({ pageSlug, bundle, ctx, sections }: { pa
   </>;
 }
 
-async function MicksAboutSections({ bundle, ctx, sections }: { bundle: SiteBundle; ctx: SiteCtx; sections: PageSection[] }) {
+export async function MicksAboutSections({ bundle, ctx, sections }: { bundle: SiteBundle; ctx: SiteCtx; sections: PageSection[] }) {
   const design = getDesign(bundle.theme ?? {});
   const settings = bundle.settings;
   const businessName = settings?.businessName ?? bundle.site.name;
@@ -110,7 +110,7 @@ async function MicksAboutSections({ bundle, ctx, sections }: { bundle: SiteBundl
   })}</>;
 }
 
-async function MicksServices({ bundle, ctx, props }: { bundle: SiteBundle; ctx: SiteCtx; props: BlockProps<"services_grid"> }) {
+export async function MicksServices({ bundle, ctx, props }: { bundle: SiteBundle; ctx: SiteCtx; props: BlockProps<"services_grid"> }) {
   const design = getDesign(bundle.theme ?? {});
   const services = await getServices(ctx);
   const visibleServices = props.limit ? services.slice(0, props.limit) : services;
@@ -130,7 +130,7 @@ async function MicksServices({ bundle, ctx, props }: { bundle: SiteBundle; ctx: 
   </div></section>;
 }
 
-async function MicksAbout({ bundle, ctx, props }: { bundle: SiteBundle; ctx: SiteCtx; props: BlockProps<"about"> }) {
+export async function MicksAbout({ bundle, ctx, props }: { bundle: SiteBundle; ctx: SiteCtx; props: BlockProps<"about"> }) {
   const design = getDesign(bundle.theme ?? {});
   const settings = bundle.settings;
   const name = settings?.businessName ?? bundle.site.name;

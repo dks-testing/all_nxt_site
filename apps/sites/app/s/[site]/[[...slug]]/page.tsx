@@ -108,28 +108,11 @@ export default async function Page({ params, searchParams }: Props) {
     // Diagnostics and Tires are composed from normal CMS sections so their
     // content, visibility, and ordering stay editable. Remaining replicas are
     // migrated separately.
-    const micksPages = ["about-us", "services", "specials", "testimonials", "make-an-appointment"];
-    if (design.headerStyle === "angled" && micksPages.includes(r.slug)) {
-      // Keep the reference-design page template, but render any additional CMS
-      // sections instead of silently dropping them on these legacy routes.
-      const templateSections: Record<string, ReadonlySet<string>> = {
-        // The live About page ends with its crew/diagnostics content. Its old
-        // CMS reviews and CTA blocks must not be appended after that template.
-        "about-us": new Set(["hero", "about", "about_intro", "about_mission", "about_work", "about_owner", "team_gallery", "about_cta", "reviews", "cta"]),
-        // The services template ends with the service cards; omit its legacy CTA banner.
-        services: new Set(["hero", "services_grid", "cta"]),
-        // The specials page ends with its offers; omit the legacy booking form.
-        specials: new Set(["hero", "specials", "booking_form"]),
-        testimonials: new Set(["hero", "reviews"]),
-        "make-an-appointment": new Set(["hero", "booking_form", "contact_map"]),
-      };
-      const extraSections = sections.filter((section) => !templateSections[r.slug]?.has(section.type));
-      return <>
-        <MicksContentPage pageSlug={r.slug} bundle={bundle} ctx={ctx} sections={sections} />
-        {extraSections.length > 0 && <RenderSections sections={extraSections} ctx={ctx} bundle={bundle} pageSlug={r.slug} />}
-      </>;
-    }
-    return <RenderSections sections={sections} ctx={ctx} bundle={bundle} pageSlug={r.slug} />;
+    const splitAboutTypes = new Set(["about_intro", "about_mission", "about_work", "about_owner", "team_gallery", "about_cta"]);
+    const orderedSections = r.slug === "about-us" && sections.some((section) => splitAboutTypes.has(section.type))
+      ? sections.filter((section) => section.type !== "about")
+      : sections;
+    return <RenderSections sections={orderedSections} ctx={ctx} bundle={bundle} pageSlug={r.slug} />;
   }
 
   const svc = r.service;
