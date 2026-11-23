@@ -51,7 +51,7 @@ function backgroundStyle(src?: string | null): CSSProperties | undefined {
 }
 
 function OfferCard({ item, bundle, featured, fallbackImage }: { item: Offer; bundle: SiteBundle; featured?: boolean; fallbackImage?: string | null }) {
-  const content = { ...item, title: globalText(item.title, bundle), discount: globalText(item.discount, bundle) || null, description: globalText(item.description, bundle) || null };
+  const content = { ...item, title: globalText(item.title, bundle), tagline: globalText(item.tagline, bundle).trim(), discount: globalText(item.discount, bundle) || null, description: globalText(item.description, bundle) || null };
   const prices = offerPrices(content);
   const copy = offerContent(content);
   const phone = telHref(bundle.settings?.phone);
@@ -78,6 +78,7 @@ function OfferCard({ item, bundle, featured, fallbackImage }: { item: Offer; bun
             </p>
           ) : content.discount ? <p className="micks-offer-pricing">{content.discount}</p> : null}
           <h3>{content.title}</h3>
+          {content.tagline && <p className="micks-offer-tagline">{content.tagline}</p>}
           {copy.intro && <p className="micks-offer-intro">{copy.intro}</p>}
         </div>
         {copy.items.length > 0 && (

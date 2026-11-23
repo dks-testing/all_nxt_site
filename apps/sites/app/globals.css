@@ -6398,7 +6398,8 @@ body.micks-tool-popup-open {
   font: 800 clamp(24px, 2.85vw, 32px)/1.13 var(--font-heading), Impact, sans-serif;
   text-transform: uppercase;
 }
-.micks-offer-intro { margin: 3px auto 0; color: #fff; font-size: 17px; line-height: 1.5; font-weight: 500; }
+.micks-offer-tagline,
+.micks-offer-intro { margin: 3px auto 0; color: #fff; line-height: 1.5; font-weight: 500; }
 .micks-offer-included { flex: 1; border-top: 3px solid #fff; margin-top: 16px; padding-top: 14px; }
 .micks-offer-included h4 {
   margin: 0;
@@ -6455,7 +6456,7 @@ body.micks-tool-popup-open {
   .micks-offer-included ul { column-count: 1; width: fit-content; max-width: 100%; margin: 16px auto 0; font-size: 14px; }
   .micks-offer-compact .micks-offer-included { margin-inline: -22px; padding-inline: 22px; }
   .micks-offer-compact .micks-offer-included ul { margin-top: 8px; }
-  .micks-offer-intro, .micks-offer-note { font-size: 14px; }
+  .micks-offer-tagline, .micks-offer-intro, .micks-offer-note { font-size: 14px; }
   .micks-offer-actions { padding-top: 16px; }
   .micks-offer-call, .micks-offer-code { min-width: 0; min-height: 44px; padding-inline: 18px; font-size: 13px; }
   .micks-header-shape:before{border-radius:0;}

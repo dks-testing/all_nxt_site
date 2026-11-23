@@ -22,6 +22,7 @@ const tables: Record<string, Record<string, string>> = {
     final_cta_href: "VARCHAR(1024) NULL",
   },
   specials: {
+    tagline: "TEXT NULL",
     included_heading: "VARCHAR(255) NULL",
     cta_label: "VARCHAR(64) NULL",
     cta_href: "VARCHAR(1024) NULL",

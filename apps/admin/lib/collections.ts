@@ -84,6 +84,7 @@ export const collections: Record<string, CollectionDef> = {
     sortable: true,
     fields: [
       { name: "title", label: "Title", kind: "text", required: true },
+      { name: "tagline", label: "Tagline", kind: "text", wide: true },
       { name: "discount", label: "Offer price and savings", kind: "text", help: "Enter the current price, regular/value price, and savings. The preview uses the same VALUE/NORMALLY · NOW · SAVE format as the live offer card." },
       { name: "couponCode", label: "Coupon code", kind: "text" },
       { name: "validUntil", label: "Valid until", kind: "date" },

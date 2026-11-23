@@ -318,6 +318,7 @@ export const specials = mysqlTable(
     id: id(),
     siteId: siteId(),
     title: varchar("title", { length: 191 }).notNull(),
+    tagline: text("tagline"),
     description: text("description"),
     discount: varchar("discount", { length: 64 }),
     couponCode: varchar("coupon_code", { length: 64 }),
