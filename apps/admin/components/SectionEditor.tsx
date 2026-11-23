@@ -21,6 +21,17 @@ function readField(data: FormData, field: Field) {
   if (field.kind === "image") return raw.trim();
   if (field.kind === "image-list") return data.getAll(name).map(String);
   if (field.kind === "team") return data.getAll(name).map(String).filter(Boolean);
+  if (field.kind === "rich-text-items") {
+    const headings = data.getAll(`${name}.heading`).map(String);
+    const headingTags = data.getAll(`${name}.headingTag`).map(String);
+    const bodies = data.getAll(`${name}.body`).map(String);
+    if (headings.length !== headingTags.length || headings.length !== bodies.length) throw new Error("Rich-text content sections are incomplete");
+    return headings.map((heading, index) => ({
+      heading: heading.trim(),
+      headingTag: headingTags[index],
+      body: bodies[index].trim(),
+    })).filter((item) => item.heading || item.body);
+  }
   if (field.kind === "list") return raw.split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
   if (field.kind === "pairs") return raw.split(/\r?\n/).map((item) => item.trim()).filter(Boolean).map((item) => {
     const [first, ...rest] = item.split("|");

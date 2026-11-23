@@ -313,6 +313,17 @@ function readField(fd: FormData, f: Field): unknown {
     case "image": return raw.trim();
     case "image-list": return fd.getAll(`p:${f.path}`).map(String);
     case "team": return fd.getAll(`p:${f.path}`).map(String).filter(Boolean);
+    case "rich-text-items": {
+      const headings = fd.getAll(`p:${f.path}.heading`).map(String);
+      const headingTags = fd.getAll(`p:${f.path}.headingTag`).map(String);
+      const bodies = fd.getAll(`p:${f.path}.body`).map(String);
+      if (headings.length !== headingTags.length || headings.length !== bodies.length) throw new Error("Rich-text content sections are incomplete");
+      return headings.map((heading, index) => ({
+        heading: heading.trim(),
+        headingTag: headingTags[index],
+        body: bodies[index].trim(),
+      })).filter((item) => item.heading || item.body);
+    }
     case "list": return lines(raw);
     case "pairs": return lines(raw).map((l) => {
       const [a, ...b] = l.split("|");

@@ -7,6 +7,7 @@ import { z } from "zod";
  */
 
 const link = z.object({ label: z.string().min(1), href: z.string().min(1) });
+const richTextHeadingTags = ["h1", "h2", "h3", "h4", "h5", "h6", "strong", "b"] as const;
 
 export function splitLegacyOffer(props: unknown): unknown {
   if (!props || typeof props !== "object" || Array.isArray(props)) return props;
@@ -142,7 +143,16 @@ export const blockSchemas = {
     cta: link,
     variant: z.enum(["primary", "dark", "light"]).default("primary"),
   }),
-  rich_text: z.object({ heading: z.string().optional(), body: z.string().default("") }),
+  rich_text: z.object({
+    heading: z.string().optional(),
+    headingTag: z.enum(richTextHeadingTags).default("h1"),
+    body: z.string().default(""),
+    items: z.array(z.object({
+      heading: z.string().default(""),
+      headingTag: z.enum(richTextHeadingTags).default("h2"),
+      body: z.string().default(""),
+    })).optional(),
+  }),
   embed: z.preprocess(splitLegacyOffer, z.object({
     heading: z.string().optional(),
     body: z.string().optional(),
@@ -208,7 +218,8 @@ export type Field =
   | { path: string; label: string; kind: "team"; help?: string }
   | { path: string; label: string; kind: "select"; options: string[] }
   | { path: string; label: string; kind: "list"; help?: string } // string[] one per line
-  | { path: string; label: string; kind: "pairs"; keys: [string, string]; help?: string }; // [{a,b}] "a | b" per line
+  | { path: string; label: string; kind: "pairs"; keys: [string, string]; help?: string } // [{a,b}] "a | b" per line
+  | { path: string; label: string; kind: "rich-text-items"; help?: string };
 
 export const blockFields: Record<BlockType, Field[]> = {
   hero: [
@@ -334,8 +345,7 @@ export const blockFields: Record<BlockType, Field[]> = {
     { path: "variant", label: "Style", kind: "select", options: ["primary", "dark", "light"] },
   ],
   rich_text: [
-    { path: "heading", label: "Heading", kind: "text" },
-    { path: "body", label: "Body (blank line = paragraph, '- ' = bullet, **bold**)", kind: "textarea" },
+    { path: "items", label: "Content sections", kind: "rich-text-items", help: "Blank line = paragraph; start bullets with '- ' or '• '; wrap text in **double asterisks** for bold." },
   ],
   embed: [
     { path: "heading", label: "Heading", kind: "text" },

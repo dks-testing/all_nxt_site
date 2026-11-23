@@ -57,6 +57,7 @@ function TeamProfilePicker({ value, profiles, publicOrigin, siteId, changed }: {
 }
 
 function fieldGroup(field: Field): Group {
+  if (field.path === "headingTag") return "Content";
   if (field.kind === "image" || field.kind === "image-list") return "Images";
   if (/cta|button|reviewUrl/i.test(field.path)) return "Buttons";
   if (/variant|layout|showRating|badges/i.test(field.path) || field.kind === "boolean" || field.kind === "select") return "Design";
@@ -64,9 +65,60 @@ function fieldGroup(field: Field): Group {
   return "Content";
 }
 
+type RichTextItem = { heading: string; headingTag: string; body: string };
+const richTextHeadingTags = ["h1", "h2", "h3", "h4", "h5", "h6", "strong", "b"];
+
+function richTextItems(value: unknown): RichTextItem[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((item) => {
+    const row = item && typeof item === "object" ? item as Record<string, unknown> : {};
+    return {
+      heading: typeof row.heading === "string" ? row.heading : "",
+      headingTag: typeof row.headingTag === "string" ? row.headingTag : "h2",
+      body: typeof row.body === "string" ? row.body : "",
+    };
+  });
+}
+
+function initialRichTextItems(value: unknown, props: Record<string, unknown>): RichTextItem[] {
+  if (Array.isArray(value)) return richTextItems(value);
+  const heading = typeof props.heading === "string" ? props.heading : "";
+  return [{
+    heading,
+    headingTag: heading ? String(props.headingTag ?? "h1") : "h2",
+    body: typeof props.body === "string" ? props.body : "",
+  }];
+}
+
+function RichTextItemsEditor({ name, label, value, help, changed }: { name: string; label: string; value: RichTextItem[]; help?: string; changed: () => void }) {
+  const [items, setItems] = useState(value);
+  const update = (index: number, key: keyof RichTextItem, nextValue: string) => {
+    setItems((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, [key]: nextValue } : item));
+    changed();
+  };
+  return <div className="sm:col-span-2">
+    <div className="mb-2 flex items-center justify-between gap-3">
+      <span className="label">{label}</span>
+      <button type="button" className="btn btn-secondary btn-sm" onClick={() => { setItems((current) => [...current, { heading: "", headingTag: "h2", body: "" }]); changed(); }}>+ Add heading and text</button>
+    </div>
+    {help && <p className="help mb-3">{help}</p>}
+    <div className="space-y-4">
+      {items.map((item, index) => (
+        <fieldset key={index} className="grid gap-3 rounded-lg border border-slate-200 p-4 sm:grid-cols-2">
+          <legend className="px-1 text-xs font-semibold text-slate-500">Content section {index + 1}</legend>
+          <label className="block"><span className="label">Heading</span><input name={`${name}.heading`} value={item.heading} onChange={(event) => update(index, "heading", event.target.value)} className="input" /></label>
+          <label className="block"><span className="label">Heading tag</span><select name={`${name}.headingTag`} value={item.headingTag} onChange={(event) => update(index, "headingTag", event.target.value)} className="input">{richTextHeadingTags.map((tag) => <option key={tag}>{tag}</option>)}</select></label>
+          <label className="block sm:col-span-2"><span className="label">Body</span><textarea name={`${name}.body`} value={item.body} onChange={(event) => update(index, "body", event.target.value)} rows={5} className="input" /></label>
+          <div className="sm:col-span-2"><button type="button" className="btn btn-danger btn-sm" onClick={() => { setItems((current) => current.filter((_, itemIndex) => itemIndex !== index)); changed(); }}>Remove section</button></div>
+        </fieldset>
+      ))}
+    </div>
+  </div>;
+}
+
 function FieldInput({ f, value, siteId, media, publicOrigin, changed, imageCount, imageLabels, onCrewCountChange, teamProfiles }: { f: Field; value: unknown; siteId: string; media: MediaAsset[]; publicOrigin: string; changed: () => void; imageCount?: number; imageLabels?: string[]; onCrewCountChange?: (count: number) => void; teamProfiles: TeamProfileOption[] }) {
   const name = `p:${f.path}`;
-  const wide = f.kind === "textarea" || f.kind === "list" || f.kind === "pairs";
+  const wide = f.kind === "textarea" || f.kind === "list" || f.kind === "pairs" || f.kind === "rich-text-items";
   const cls = wide ? "sm:col-span-2" : "";
   switch (f.kind) {
     case "image":
@@ -87,6 +139,8 @@ function FieldInput({ f, value, siteId, media, publicOrigin, changed, imageCount
       const pairs = Array.isArray(value) ? value as Record<string, string>[] : [];
       return <PairListEditor name={name} label={f.label} value={pairs} keys={f.keys} help={f.help} />;
     }
+    case "rich-text-items":
+      return <RichTextItemsEditor name={name} label={f.label} value={richTextItems(value)} help={f.help} changed={changed} />;
     default:
       return <label className={`block ${cls}`}><span className="label">{f.label}</span><input name={name} type={f.kind === "number" ? "number" : "text"} defaultValue={value === undefined || value === null ? "" : String(value)} className="input" onInput={changed} /></label>;
   }
@@ -121,7 +175,10 @@ export function SectionFields({ type, props, siteId, media, publicOrigin, teamPr
           : type === "embed" && props.variant === "micks-ai" && f.path === "toolDescription"
             ? "Try our AI diagnostic tool for an instant initial check before coming in.\nFree, efficient, and time-saving."
             : undefined;
-        return <FieldInput key={f.path} f={f} value={get(fieldProps, f.path) ?? fallback} siteId={siteId} media={media} publicOrigin={publicOrigin} changed={changed} imageCount={crewCount} imageLabels={crew.map((member, index) => member.title || `Crew photo ${index + 1}`)} onCrewCountChange={setCrewCount} teamProfiles={teamProfiles} />;
+        const fieldValue = type === "rich_text" && f.kind === "rich-text-items"
+          ? initialRichTextItems(get(fieldProps, f.path), props)
+          : get(fieldProps, f.path) ?? fallback;
+        return <FieldInput key={f.path} f={f} value={fieldValue} siteId={siteId} media={media} publicOrigin={publicOrigin} changed={changed} imageCount={crewCount} imageLabels={crew.map((member, index) => member.title || `Crew photo ${index + 1}`)} onCrewCountChange={setCrewCount} teamProfiles={teamProfiles} />;
       })}
     </div>)}
     {active === "Advanced" && <p className="mt-4 rounded-lg bg-amber-50 p-3 text-xs text-amber-800">Advanced settings can affect layout or third-party integrations. Change them only when needed.</p>}

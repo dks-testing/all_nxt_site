@@ -47,8 +47,9 @@ export function RichText({ text, className = "prose-site" }: { text?: string | n
     <div className={className}>
       {blocks.map((b, i) => {
         const lines = b.split("\n");
-        if (lines.every((l) => l.trim().startsWith("- ")))
-          return <ul key={i}>{lines.map((l, j) => <li key={j}>{inline(l.trim().slice(2))}</li>)}</ul>;
+        const bulletPrefix = /^(?:-|\*|•)\s+/;
+        if (lines.every((line) => bulletPrefix.test(line.trim())))
+          return <ul key={i}>{lines.map((line, j) => <li key={j}>{inline(line.trim().replace(bulletPrefix, ""))}</li>)}</ul>;
         return <p key={i}>{lines.map((l, j) => <Fragment key={j}>{j > 0 && <br />}{inline(l)}</Fragment>)}</p>;
       })}
     </div>
