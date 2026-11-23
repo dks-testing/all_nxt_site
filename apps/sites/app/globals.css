@@ -418,10 +418,6 @@ main > section {
   cursor: pointer;
 }
 
-.micks-mobile-submenu > summary::-webkit-details-marker {
-  display: none;
-}
-
 .micks-mobile-menu-layer {
   position: fixed;
   inset: 0;
@@ -520,7 +516,7 @@ main > section {
 }
 
 .micks-mobile-menu-links > a,
-.micks-mobile-submenu > summary {
+.micks-mobile-menu-item-row > a {
   display: flex;
   min-height: 35px;
   align-items: center;
@@ -534,25 +530,36 @@ main > section {
   text-transform: uppercase;
 }
 
-.micks-mobile-submenu > summary {
-  cursor: pointer;
-  list-style: none;
+.micks-mobile-menu-item-row {
+  display: flex;
+  align-items: center;
 }
 
-.micks-mobile-submenu > summary svg {
+.micks-mobile-menu-item-row > a {
+  flex: 1;
+}
+
+.micks-mobile-submenu-toggle {
+  display: flex;
+  width: 40px;
+  min-height: 35px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.micks-mobile-submenu-toggle svg {
   width: 17px;
   height: 17px;
-  margin-right: 1px;
   transition: transform 160ms ease;
 }
 
-.micks-mobile-submenu[open] > summary svg { transform: rotate(180deg); }
+.micks-mobile-submenu-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
 
-.micks-mobile-submenu > div {
-  /* padding: 0 0 8px 14px; */
-}
-
-.micks-mobile-submenu > div a {
+.micks-mobile-submenu-links a {
   display: block;
   padding: 6px 0;
   font-size: 18px;

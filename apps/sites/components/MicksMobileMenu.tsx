@@ -13,6 +13,7 @@ type MobileLink = {
 export function MicksMobileMenu({ name, logoUrl, homeHref, links }: { name: string; logoUrl?: string | null; homeHref: string; links: MobileLink[] }) {
   const [visible, setVisible] = useState(false);
   const [closing, setClosing] = useState(false);
+  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function openMenu() {
@@ -59,13 +60,31 @@ export function MicksMobileMenu({ name, logoUrl, homeHref, links }: { name: stri
         </div>
         <button type="button" className="micks-mobile-menu-close" aria-label="Close menu" onClick={closeMenu} />
         <div className="micks-mobile-menu-links">
-          {links.map((item) => item.children?.length ? <details className="micks-mobile-submenu" key={item.href + item.label}>
-            <summary><span>{item.label}</span><ChevronIcon /></summary>
-            <div>
-              <Link href={item.href} onClick={closeMenu}>{item.label} Overview</Link>
-              {item.children.map((child) => <Link href={child.href} key={child.href} onClick={closeMenu}>{child.label}</Link>)}
-            </div>
-          </details> : <Link href={item.href} key={item.href + item.label} onClick={closeMenu}>{item.label}</Link>)}
+          {links.map((item, index) => {
+            if (!item.children?.length) {
+              return <Link href={item.href} key={item.href + item.label} onClick={closeMenu}>{item.label}</Link>;
+            }
+            const submenuId = `micks-mobile-submenu-${index}`;
+            const isOpen = openSubmenu === submenuId;
+            return <div className="micks-mobile-menu-item" key={item.href + item.label}>
+              <div className="micks-mobile-menu-item-row">
+                <Link href={item.href} onClick={closeMenu}>{item.label}</Link>
+                <button
+                  type="button"
+                  className="micks-mobile-submenu-toggle"
+                  aria-label={`${isOpen ? "Hide" : "Show"} ${item.label} submenu`}
+                  aria-expanded={isOpen}
+                  aria-controls={submenuId}
+                  onClick={() => setOpenSubmenu(isOpen ? null : submenuId)}
+                >
+                  <ChevronIcon />
+                </button>
+              </div>
+              {isOpen && <div id={submenuId} className="micks-mobile-submenu-links">
+                {item.children.map((child) => <Link href={child.href} key={child.href} onClick={closeMenu}>{child.label}</Link>)}
+              </div>}
+            </div>;
+          })}
         </div>
       </nav>
     </div>}
