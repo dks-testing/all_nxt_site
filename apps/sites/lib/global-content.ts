@@ -1,4 +1,5 @@
 import type { DesignOptions, SiteBundle } from "@platform/db";
+import { escapeHtmlText, richTextHtmlPrefix } from "@platform/db/rich-text";
 
 // Name substitutions belong to visible copy only. Rewriting URLs or layout keys such
 // as "micks-home" breaks images and can hide entire sections during Zod parsing.
@@ -13,15 +14,17 @@ export function getOwnerName(bundle: SiteBundle): string {
 }
 
 /** Replaces tokens and legacy shop references in *displayed text*. */
-export function globalText(value: string | null | undefined, bundle: SiteBundle): string {
+export function globalText(value: string | null | undefined, bundle: SiteBundle, escapeHtml = false): string {
   if (!value) return value ?? "";
+  if (value.startsWith(richTextHtmlPrefix)) return value;
   const businessName = bundle.settings?.businessName?.trim() || bundle.site.name;
   const ownerName = getOwnerName(bundle);
-  return value.replace(GLOBAL_NAME_PATTERN, (match) => (
-    /ownerName/i.test(match) || (!/businessName|shopName|repair/i.test(match) && /^mick/i.test(match))
+  return value.replace(GLOBAL_NAME_PATTERN, (match) => {
+    const replacement = /ownerName/i.test(match) || (!/businessName|shopName|repair/i.test(match) && /^mick/i.test(match))
       ? ownerName
-      : businessName
-  ));
+      : businessName;
+    return escapeHtml ? escapeHtmlText(replacement) : replacement;
+  });
 }
 
 // CMS keys which contain text shown to visitors. URLs, image paths, class names,

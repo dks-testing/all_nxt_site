@@ -15,7 +15,7 @@ export function DiagnosticsSmartIntro({ bundle, props }: Pick<BlockComponentProp
           {props.cta && props.cta.href && <FeatureLink bundle={bundle} href={props.cta.href}>{props.cta.label}</FeatureLink>}
           {(props.calloutHeading || props.calloutBody) && <aside className="micks-diagnostics-intro-callout">
             {props.calloutHeading && <strong>{props.calloutHeading}</strong>}
-            {props.calloutBody && <span>{props.calloutBody}</span>}
+            {props.calloutBody && <RichText text={props.calloutBody} bundle={bundle} />}
           </aside>}
           {props.supportText && <p className="micks-diagnostics-intro-support">{props.supportText}</p>}
         </div>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getServices, getSpecials, getTestimonials, getFaqs, getCaseStudies } from "@/lib/data";
-import { telHref, formatAddress, groupHours } from "@/lib/format";
+import { RichText, telHref, formatAddress, groupHours } from "@/lib/format";
+import { richTextPlainText } from "@platform/db/rich-text-html";
 import { ArrowIcon, Stars, PhoneIcon, PinIcon, ClockIcon, WrenchIcon } from "../Icons";
 import type { BlockComponentProps } from "./types";
 import { localSiteHref } from "@/lib/url";
@@ -18,7 +19,7 @@ export async function ServicesGrid({ ctx, bundle, props }: BlockComponentProps<"
       <div className="container-site">
         <div className="mb-10 text-center">
           <h2 className="text-3xl font-bold uppercase md:text-4xl">{props.heading}</h2>
-          {props.subheading && <p className="mx-auto mt-3 max-w-2xl text-lg text-[var(--color-muted)]">{props.subheading}</p>}
+          {props.subheading && <RichText text={props.subheading} className="mx-auto mt-3 max-w-2xl text-lg text-[var(--color-muted)]" bundle={bundle} />}
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {items.map((s) => (
@@ -45,6 +46,7 @@ export async function Specials({ ctx, bundle, props }: BlockComponentProps<"spec
     <section className="section bg-[var(--color-surface)]">
       <div className="container-site">
         <h2 className="mb-10 text-center text-3xl font-bold uppercase md:text-4xl">{props.heading}</h2>
+        {props.subheading && <RichText text={props.subheading} className="mx-auto mb-8 max-w-2xl text-center text-lg text-[var(--color-muted)]" bundle={bundle} />}
         <div className="grid gap-6 md:grid-cols-3">
           {items.map((sp) => {
             const paragraphs = (sp.description ?? "").split(/\r?\n\s*\r?\n/).map((part) => part.trim()).filter(Boolean);
@@ -111,7 +113,7 @@ export async function Reviews({ ctx, bundle, props }: BlockComponentProps<"revie
                   <svg className="micks-google-mark" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285f4" d="M43.61 24.46c0-1.36-.12-2.66-.35-3.92H24v7.43h11a9.4 9.4 0 0 1-4.08 6.18v5.14h6.61c3.87-3.56 6.08-8.81 6.08-14.83Z"/><path fill="#34a853" d="M24 44c5.51 0 10.13-1.83 13.51-4.96l-6.61-5.14c-1.83 1.23-4.17 1.97-6.9 1.97-5.32 0-9.84-3.59-11.46-8.43H5.7v5.3A20.4 20.4 0 0 0 24 44Z"/><path fill="#fbbc05" d="M12.54 27.44a12.3 12.3 0 0 1 0-7.88v-5.3H5.7a20 20 0 0 0 0 18.48l6.84-5.3Z"/><path fill="#ea4335" d="M24 11.13c3.01 0 5.69 1.03 7.82 3.05l5.86-5.86A19.64 19.64 0 0 0 24 3a20.4 20.4 0 0 0-18.3 11.26l6.84 5.3c1.62-4.84 6.14-8.43 11.46-8.43Z"/></svg>
                 </figcaption>
                 <Stars value={t.rating} className="h-[18px] w-[18px]" />
-                <blockquote tabIndex={0} aria-label={`Review by ${t.author}`}>{globalText(t.body, bundle)}</blockquote>
+                <blockquote tabIndex={0} aria-label={`Review by ${t.author}`}><RichText text={globalText(t.body, bundle)} bundle={bundle} /></blockquote>
               </figure>)}
             </div>}
           </div>
@@ -139,7 +141,7 @@ export async function Reviews({ ctx, bundle, props }: BlockComponentProps<"revie
             {items.map((t) => (
               <figure key={t.id} className={micks ? "micks-review-card" : "rounded-site bg-[var(--color-surface)] p-6"}>
                 <Stars value={t.rating} />
-                <blockquote className="mt-3 text-[var(--color-text)]">&ldquo;{globalText(t.body, bundle)}&rdquo;</blockquote>
+                <blockquote className="mt-3 text-[var(--color-text)]">&ldquo;<RichText text={globalText(t.body, bundle)} bundle={bundle} />&rdquo;</blockquote>
                 <figcaption className="mt-4 text-sm font-bold">{t.author}{t.source === "google" && <span className="font-normal text-[var(--color-muted)]"> · Google</span>}</figcaption>
               </figure>
             ))}
@@ -163,7 +165,7 @@ export async function CaseStudies({ ctx, bundle, props }: BlockComponentProps<"c
     <section className={micks ? "micks-cases section" : "section bg-[var(--color-secondary)] text-white"}>
       <div className="container-site">
         <h2 className="text-center text-3xl font-bold uppercase md:text-4xl">{props.heading}</h2>
-        {props.subheading && <p className="micks-cases-intro">{props.subheading}</p>}
+        {props.subheading && <RichText text={props.subheading} className="micks-cases-intro" bundle={bundle} />}
         <div className={micks ? "micks-case-grid" : "mt-10 grid gap-6 md:grid-cols-3"}>
           {items.map((c, index) => (
             <article key={c.id} className={micks ? "micks-case-card" : "rounded-site bg-white/5 p-6 ring-1 ring-white/10"}>
@@ -171,16 +173,16 @@ export async function CaseStudies({ ctx, bundle, props }: BlockComponentProps<"c
               <div className={micks ? "micks-case-body" : ""}>
               {micks && c.imageUrl && <div className="micks-case-image">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={c.imageUrl} alt="" /></div>}
               <h3 className="mb-4 text-xl font-bold uppercase leading-tight text-[var(--color-accent)]">{globalText(c.title, bundle)}</h3>
-              {micks ? <p className="micks-case-summary">{globalText([c.problem, c.diagnosis, c.fix].filter(Boolean).join(" "), bundle)}</p> : <dl className="space-y-3 text-sm text-white/85">
-                <div><dt className="font-bold uppercase text-white">Problem</dt><dd>{globalText(c.problem, bundle)}</dd></div>
-                {c.diagnosis && <div><dt className="font-bold uppercase text-white">Diagnosis</dt><dd>{globalText(c.diagnosis, bundle)}</dd></div>}
-                {c.fix && <div><dt className="font-bold uppercase text-white">Fix</dt><dd>{globalText(c.fix, bundle)}</dd></div>}
+              {micks ? <div className="micks-case-summary">{[c.problem, c.diagnosis, c.fix].filter(Boolean).map((text, textIndex) => <RichText key={`${c.id}-${textIndex}`} text={globalText(text, bundle)} bundle={bundle} />)}</div> : <dl className="space-y-3 text-sm text-white/85">
+                <div><dt className="font-bold uppercase text-white">Problem</dt><dd><RichText text={globalText(c.problem, bundle)} bundle={bundle} /></dd></div>
+                {c.diagnosis && <div><dt className="font-bold uppercase text-white">Diagnosis</dt><dd><RichText text={globalText(c.diagnosis, bundle)} bundle={bundle} /></dd></div>}
+                {c.fix && <div><dt className="font-bold uppercase text-white">Fix</dt><dd><RichText text={globalText(c.fix, bundle)} bundle={bundle} /></dd></div>}
               </dl>}
               </div>
             </article>
           ))}
         </div>
-        {props.closingText && <p className="micks-cases-closing">{props.closingText}</p>}
+        {props.closingText && <RichText text={props.closingText} className="micks-cases-closing" bundle={bundle} />}
       </div>
     </section>
   );
@@ -192,7 +194,14 @@ export async function Faq({ ctx, bundle, props }: BlockComponentProps<"faq">) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: items.map((f) => ({ "@type": "Question", name: globalText(f.question, bundle), acceptedAnswer: { "@type": "Answer", text: globalText(f.answer, bundle) } })),
+    mainEntity: items.map((f) => ({
+      "@type": "Question",
+      name: globalText(f.question, bundle),
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: richTextPlainText(globalText(f.answer, bundle), (text) => globalText(text, bundle, true)),
+      },
+    })),
   };
   return (
     <section className="section faq-section">
@@ -207,7 +216,7 @@ export async function Faq({ ctx, bundle, props }: BlockComponentProps<"faq">) {
                   <span className="faq-toggle" aria-hidden="true" />
                 </span>
               </summary>
-              <p className="faq-answer">{globalText(f.answer, bundle)}</p>
+              <div className="faq-answer"><RichText text={globalText(f.answer, bundle)} bundle={bundle} /></div>
             </details>
           ))}
         </div>

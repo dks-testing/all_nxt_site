@@ -8,7 +8,7 @@ import { CertificationBadges } from "../CertificationBadge";
 import { QuoteMark } from "../QuoteMark";
 import { globalCta, globalCtaHref, globalCtaLabel, sharedToolConfig } from "@/lib/global-content";
 
-export function TrustCards({ props }: BlockComponentProps<"trust_cards">) {
+export function TrustCards({ bundle, props }: BlockComponentProps<"trust_cards">) {
   if (!props.items.length) return null;
   return (
     <section className="section bg-[var(--color-surface)]">
@@ -22,6 +22,7 @@ export function TrustCards({ props }: BlockComponentProps<"trust_cards">) {
             </div>
           ))}
         </div>
+        {props.closingText && <RichText text={props.closingText} className="mt-6 text-center text-[var(--color-muted)]" bundle={bundle} />}
       </div>
     </section>
   );
@@ -45,7 +46,7 @@ export function About({ bundle, props }: BlockComponentProps<"about">) {
               {props.eyebrow && <p className="micks-section-kicker">{props.eyebrow}</p>}
             </div>
             <h2>{props.heading}</h2>
-            <RichText text={props.body} className="prose-site" />
+            <RichText text={props.body} className="prose-site" bundle={bundle} />
             <div className="micks-about-actions">
               {props.cta && <Link href={localSiteHref(bundle.site.slug, globalCtaHref(design, props.cta.href, props.cta.label))} className="btn btn-primary"><span>{globalCtaLabel(design, props.cta.href, props.cta.label)}</span></Link>}
               <CertificationBadges design={design} className="micks-about-action-certifications" />
@@ -61,7 +62,7 @@ export function About({ bundle, props }: BlockComponentProps<"about">) {
         <div className={props.imageUrl ? "" : "mx-auto max-w-3xl"}>
           <p className="eyebrow mb-3">About us</p>
           <h2 className="mb-6 text-3xl font-bold uppercase md:text-4xl">{props.heading}</h2>
-          <RichText text={props.body} className="prose-site text-lg text-[var(--color-muted)]" />
+          <RichText text={props.body} className="prose-site text-lg text-[var(--color-muted)]" bundle={bundle} />
           {props.highlights.length > 0 && (
             <ul className="mt-6 grid gap-3 sm:grid-cols-2">
               {props.highlights.map((h) => (
@@ -92,7 +93,7 @@ export function Cta({ bundle, props }: BlockComponentProps<"cta">) {
       <div className="container-site flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
         <div>
           <h2 className="text-2xl font-bold uppercase md:text-3xl">{props.heading}</h2>
-          {props.body && <p className="mt-2 max-w-2xl opacity-90">{props.body}</p>}
+          {props.body && <RichText text={props.body} className="mt-2 max-w-2xl opacity-90" bundle={bundle} />}
         </div>
         <Link href={localSiteHref(bundle.site.slug, globalCtaHref(design, props.cta.href, props.cta.label))} className={btn}>{globalCtaLabel(design, props.cta.href, props.cta.label)}</Link>
       </div>
@@ -100,7 +101,7 @@ export function Cta({ bundle, props }: BlockComponentProps<"cta">) {
   );
 }
 
-export function RichTextBlock({ props, pageSlug }: BlockComponentProps<"rich_text">) {
+export function RichTextBlock({ bundle, props, pageSlug }: BlockComponentProps<"rich_text">) {
   const content = props.items ?? [{ heading: props.heading, headingTag: props.headingTag, body: props.body }];
   const isLegalPage = pageSlug === "terms-conditions" || pageSlug === "privacy-policy";
   return (
@@ -110,7 +111,7 @@ export function RichTextBlock({ props, pageSlug }: BlockComponentProps<"rich_tex
           const HeadingTag = item.headingTag;
           return <div key={index}>
             {item.heading && <HeadingTag className="mb-4 block text-lg font-semibold uppercase md:text-xl lg:text-[24px]">{item.heading}</HeadingTag>}
-            <RichText text={item.body} />
+            <RichText text={item.body} bundle={bundle} />
           </div>;
         })}
       </div>
@@ -130,15 +131,16 @@ export function Embed({ bundle, props, id }: BlockComponentProps<"embed">) {
       <section id={anchor} className="micks-ai-section">
         <div className="container-site micks-ai-grid">
           <div className="micks-ai-copy">
-            <h2>{props.heading}{props.body && <span>{props.body}</span>}</h2>
+            <h2>{props.heading}</h2>
+            {props.body && <RichText text={props.body} className="micks-ai-intro-copy" bundle={bundle} />}
             <div className="micks-tool-card">
               {props.cta ? <Link href={localSiteHref(bundle.site.slug, globalCtaHref(design, props.cta.href, props.cta.label))}>{globalCtaLabel(design, props.cta.href, props.cta.label)}</Link> : <strong>{design.diagnosticsCtaLabel || "Start Diagnostics"}</strong>}
             </div>
-            {props.toolDescription && <p className="micks-tool-description">{props.toolDescription}</p>}
+            {props.toolDescription && <RichText text={props.toolDescription} className="micks-tool-description" bundle={bundle} />}
             {(props.offerAmount || props.offerHeading || props.offerBody) && (
               <>
                 <div className="micks-ai-offer"><strong>{props.offerAmount}{props.offerAmount && props.offerHeading && <br />}{props.offerHeading}</strong></div>
-                {props.offerBody && <span className="micks-ai-offer-description">{props.offerBody}</span>}
+                {props.offerBody && <RichText text={props.offerBody} className="micks-ai-offer-description" bundle={bundle} />}
               </>
             )}
           </div>
@@ -165,7 +167,7 @@ export function Embed({ bundle, props, id }: BlockComponentProps<"embed">) {
     <section id={anchor} className="section bg-[var(--color-surface)]">
       <div className="container-site">
         {props.heading && <h2 className="mb-3 text-center text-3xl font-bold uppercase">{props.heading}</h2>}
-        {props.body && <p className="mx-auto mb-8 max-w-2xl text-center text-lg text-[var(--color-muted)]">{props.body}</p>}
+        {props.body && <RichText text={props.body} className="mx-auto mb-8 max-w-2xl text-center text-lg text-[var(--color-muted)]" bundle={bundle} />}
         {url ? (
           <iframe src={url} title={props.heading ?? cfg?.label ?? "Embedded tool"} className="w-full rounded-site border-0 bg-white shadow" style={{ height: props.height }} loading="lazy" />
         ) : (

@@ -18,6 +18,7 @@ import { MicksContactDetails } from "./MicksContactDetails";
 import { MicksMissionCar } from "./MicksMissionCar";
 import type { BlockProps } from "@platform/db/blocks";
 import { parseBlock } from "@platform/db/blocks";
+import { richTextHtmlPrefix } from "@platform/db/rich-text";
 
 const WP = "https://www.micksrepair.com/wp-content/uploads";
 
@@ -72,7 +73,7 @@ export async function MicksAboutSections({ bundle, ctx, sections }: { bundle: Si
       if (!props) return null;
       return <section key={index} className="micks-about-page-intro section"><div className="container-site micks-about-page-grid">
         {props.imageUrl && <img src={props.imageUrl} alt={`About ${businessName}`} />}
-        <div><div className="micks-live-title"><QuoteMark design={design} className="micks-about-quote" />{props.eyebrow && <h2>{globalText(props.eyebrow, bundle)}</h2>}</div><h3><LineBreakText text={globalText(props.heading, bundle)} /></h3><RichText text={globalText(props.body, bundle)} className="micks-about-rich-text" /><CertificationBadges design={design} className="micks-about-badges" /></div>
+        <div><div className="micks-live-title"><QuoteMark design={design} className="micks-about-quote" />{props.eyebrow && <h2>{globalText(props.eyebrow, bundle)}</h2>}</div><h3><LineBreakText text={globalText(props.heading, bundle)} /></h3><RichText text={globalText(props.body, bundle)} className="micks-about-rich-text" bundle={bundle} /><CertificationBadges design={design} className="micks-about-badges" /></div>
       </div></section>;
     }
     if (section.type === "about_mission") {
@@ -81,7 +82,7 @@ export async function MicksAboutSections({ bundle, ctx, sections }: { bundle: Si
       const callAction = globalCta(design, design.callCtaHref || telHref(settings?.phone), "Call Now");
       const scheduleAction = globalCta(design, "/make-an-appointment/", "Schedule Service");
       const hours = groupHours(settings?.hours)[0];
-      return <section key={index} className="micks-mission section"><div className="container-site micks-mission-grid"><div><h2>{globalText(props.heading, bundle)}</h2><h3><LineBreakText text={globalText(props.body, bundle)} /></h3><div className="micks-mission-table"><b>{props.locationLabel || "Location"}</b><b>{props.phoneLabel || "Phone"}</b><b>{props.hoursLabel || "Hours"}</b><span>{address}</span><a href={telHref(settings?.phone)}>{settings?.phone}</a><span>{hours ? `${hours.days}: ${hours.time}` : ""}</span></div><div className="micks-live-buttons">{settings?.phone && <a href={callAction.href}><span>{callAction.label}</span></a>}<Link href={localSiteHref(bundle.site.slug, scheduleAction.href)}><span>{scheduleAction.label}</span></Link></div></div>{props.imageUrl && <MicksMissionCar src={props.imageUrl} />}</div></section>;
+      return <section key={index} className="micks-mission section"><div className="container-site micks-mission-grid"><div><h2>{globalText(props.heading, bundle)}</h2><RichText text={globalText(props.body, bundle)} className="micks-mission-rich-text" bundle={bundle} /><div className="micks-mission-table"><b>{props.locationLabel || "Location"}</b><b>{props.phoneLabel || "Phone"}</b><b>{props.hoursLabel || "Hours"}</b><span>{address}</span><a href={telHref(settings?.phone)}>{settings?.phone}</a><span>{hours ? `${hours.days}: ${hours.time}` : ""}</span></div><div className="micks-live-buttons">{settings?.phone && <a href={callAction.href}><span>{callAction.label}</span></a>}<Link href={localSiteHref(bundle.site.slug, scheduleAction.href)}><span>{scheduleAction.label}</span></Link></div></div>{props.imageUrl && <MicksMissionCar src={props.imageUrl} />}</div></section>;
     }
     if (section.type === "about_work") {
       const props = parseBlock("about_work", section.props);
@@ -91,20 +92,20 @@ export async function MicksAboutSections({ bundle, ctx, sections }: { bundle: Si
     if (section.type === "about_owner") {
       const props = parseBlock("about_owner", section.props);
       if (!props) return null;
-      return <section key={index} className="micks-owner section"><div className="container-site"><div className="micks-live-title"><QuoteMark design={design} className="micks-about-quote" /><h2>{globalText(props.heading, bundle)}</h2></div><div className="micks-owner-grid">{props.imageUrl && <img src={props.imageUrl} alt={props.ownerName || "Owner"} />}<div>{props.ownerName && <p><strong>{globalText(props.ownerName, bundle)}</strong></p>}<RichText text={globalText(props.body, bundle)} className="micks-owner-rich-text" /></div></div></div></section>;
+      return <section key={index} className="micks-owner section"><div className="container-site"><div className="micks-live-title"><QuoteMark design={design} className="micks-about-quote" /><h2>{globalText(props.heading, bundle)}</h2></div><div className="micks-owner-grid">{props.imageUrl && <img src={props.imageUrl} alt={props.ownerName || "Owner"} />}<div>{props.ownerName && <p><strong>{globalText(props.ownerName, bundle)}</strong></p>}<RichText text={globalText(props.body, bundle)} className="micks-owner-rich-text" bundle={bundle} /></div></div></div></section>;
     }
     if (section.type === "team_gallery") {
       const props = parseBlock("team_gallery", section.props);
       if (!props) return null;
       const selected = props.teamMemberIds.map((id) => team.find((member) => member.id === id)).filter((member): member is NonNullable<typeof member> => Boolean(member));
       if (!selected.length) return null;
-      return <section key={index} className="micks-crew-gallery">{props.heading && <h2 className="text-center">{globalText(props.heading, bundle)}</h2>}<div className="container-site">{selected.map((member) => <article className="micks-crew-card" key={member.id} tabIndex={0} aria-label={`${member.name}${member.position ? `, ${member.position}` : ""}: ${member.description || ""}`}>{member.imageUrl && <img src={member.imageUrl} alt={member.name} />}<div className="micks-crew-card-overlay"><h3>{member.name}</h3>{member.position && <strong className="micks-crew-position">{member.position}</strong>}{member.description && <p>{globalText(member.description, bundle)}</p>}</div></article>)}</div></section>;
+      return <section key={index} className="micks-crew-gallery">{props.heading && <h2 className="text-center">{globalText(props.heading, bundle)}</h2>}<div className="container-site">{selected.map((member) => <article className="micks-crew-card" key={member.id} tabIndex={0} aria-label={`${member.name}${member.position ? `, ${member.position}` : ""}`}>{member.imageUrl && <img src={member.imageUrl} alt={member.name} />}<div className="micks-crew-card-overlay"><h3>{member.name}</h3>{member.position && <strong className="micks-crew-position">{member.position}</strong>}{member.description && <RichText text={globalText(member.description, bundle)} bundle={bundle} />}</div></article>)}</div></section>;
     }
     if (section.type === "about_cta") {
       const props = parseBlock("about_cta", section.props);
       if (!props) return null;
       const action = globalCta(design, props.cta.href, props.cta.label);
-      return <section key={index} className="micks-know-cta section"><div><h2>{globalText(props.heading, bundle)}</h2>{props.body && <p>{globalText(props.body, bundle)}</p>}<Link href={localSiteHref(bundle.site.slug, action.href)}><span>{action.label}</span></Link></div></section>;
+      return <section key={index} className="micks-know-cta section"><div><h2>{globalText(props.heading, bundle)}</h2>{props.body && <RichText text={globalText(props.body, bundle)} bundle={bundle} />}<Link href={localSiteHref(bundle.site.slug, action.href)}><span>{action.label}</span></Link></div></section>;
     }
     return null;
   })}</>;
@@ -116,7 +117,7 @@ export async function MicksServices({ bundle, ctx, props }: { bundle: SiteBundle
   const visibleServices = props.limit ? services.slice(0, props.limit) : services;
   return <section className="micks-services-index section"><div className="container-site">
     <h2><LineBreakText text={globalText(props.heading, bundle)} /></h2>
-    {props.subheading && <p className="micks-services-intro">{globalText(props.subheading, bundle)}</p>}
+    {props.subheading && <RichText text={globalText(props.subheading, bundle)} className="micks-services-intro" bundle={bundle} />}
     <div className="micks-services-grid">{visibleServices.map((service) => {
       const image = service.imageUrl;
       return <article key={service.id} style={{ backgroundImage: `linear-gradient(180deg,#0002 10%,#000e 100%),url(${JSON.stringify(image)})` }}>
@@ -145,7 +146,9 @@ export async function MicksAbout({ bundle, ctx, props }: { bundle: SiteBundle; c
     ? selectedIds.map((id) => teamProfiles.find((member) => member.id === id)).filter((member): member is NonNullable<typeof member> => Boolean(member)).map((member) => ({ name: member.name, position: member.position, description: member.description ?? "", imageUrl: member.imageUrl }))
     : props.crew.map((member, index) => ({ name: member.title, position: null, description: member.body, imageUrl: props.crewImageUrls?.[index] ?? legacyCrewImages[index] }));
   const workItems = props.workItems ?? design.aboutWorkItems ?? [];
-  const ownerParagraphs = globalText(props.ownerBody, bundle).split(/\n{2,}/).filter(Boolean);
+  const ownerBody = globalText(props.ownerBody, bundle);
+  const ownerHasRichText = ownerBody.startsWith(richTextHtmlPrefix);
+  const ownerParagraphs = ownerHasRichText ? [] : ownerBody.split(/\n{2,}/).filter(Boolean);
   const [ownerLabel, ...ownerIntroParts] = (ownerParagraphs[0] ?? "").split("\n");
   const ownerIntro = ownerIntroParts.join("\n");
   const callAction = globalCta(design, design.callCtaHref || telHref(settings?.phone), props.callCtaLabel || "Call Now");
@@ -155,15 +158,15 @@ export async function MicksAbout({ bundle, ctx, props }: { bundle: SiteBundle; c
     <section className="micks-about-page-intro section"><div className="container-site micks-about-page-grid">
       {owner && <img src={owner} alt={`Mick Eggers at ${name}`} />}
       <div><div className="micks-live-title"><QuoteMark design={design} className="micks-about-quote" /><h2>{props.eyebrow}</h2></div><h3><LineBreakText text={globalText(props.heading, bundle)} /></h3>
-        {globalText(props.body, bundle).split(/\n{2,}/).filter(Boolean).map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+        <RichText text={globalText(props.body, bundle)} className="micks-about-rich-text" bundle={bundle} />
         <CertificationBadges design={design} className="micks-about-badges" />
       </div>
     </div></section>
-    <section className="micks-mission section"><div className="container-site micks-mission-grid"><div><h2>{props.missionHeading}</h2><h3><LineBreakText text={props.missionBody || ""} /></h3><div className="micks-mission-table"><b>{props.locationLabel || "Location"}</b><b>{props.phoneLabel || "Phone"}</b><b>{props.hoursLabel || "Hours"}</b><span>{address}</span><a href={telHref(settings?.phone)}>{settings?.phone}</a><span>{groupHours(settings?.hours)[0]?.days}: {groupHours(settings?.hours)[0]?.time}</span></div><div className="micks-live-buttons">{settings?.phone && <a href={callAction.href}><span>{callAction.label}</span></a>}<Link href={localSiteHref(bundle.site.slug, scheduleAction.href)}><span>{scheduleAction.label}</span></Link></div></div>{car && <MicksMissionCar src={car} />}</div></section>
+    <section className="micks-mission section"><div className="container-site micks-mission-grid"><div><h2>{props.missionHeading}</h2><RichText text={props.missionBody} className="micks-mission-rich-text" bundle={bundle} /><div className="micks-mission-table"><b>{props.locationLabel || "Location"}</b><b>{props.phoneLabel || "Phone"}</b><b>{props.hoursLabel || "Hours"}</b><span>{address}</span><a href={telHref(settings?.phone)}>{settings?.phone}</a><span>{groupHours(settings?.hours)[0]?.days}: {groupHours(settings?.hours)[0]?.time}</span></div><div className="micks-live-buttons">{settings?.phone && <a href={callAction.href}><span>{callAction.label}</span></a>}<Link href={localSiteHref(bundle.site.slug, scheduleAction.href)}><span>{scheduleAction.label}</span></Link></div></div>{car && <MicksMissionCar src={car} />}</div></section>
     <section className="micks-how-we-work section"><div className="container-site"><h2>{props.workHeading}</h2>{team && <img src={team} alt={`The ${name} team`} />}<div className="micks-work-grid">{workItems.map(({ title, body }, index) => <div key={`${title}-${index}`}><StepListIcon design={design} label={title} /><b>{globalText(title, bundle)}</b><span>{globalText(body, bundle)}</span></div>)}</div></div></section>
-    <section className="micks-owner section"><div className="container-site"><div className="micks-live-title"><QuoteMark design={design} className="micks-about-quote" /><h2>{props.ownerHeading}</h2></div><div className="micks-owner-grid">{owner && <img src={owner} alt="Mick Eggers" />}<div>{ownerLabel && <p><strong>{ownerLabel}</strong>{ownerIntro && <><br />{ownerIntro}</>}</p>}{ownerParagraphs.slice(1).map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div></div></div></section>
+    <section className="micks-owner section"><div className="container-site"><div className="micks-live-title"><QuoteMark design={design} className="micks-about-quote" /><h2>{props.ownerHeading}</h2></div><div className="micks-owner-grid">{owner && <img src={owner} alt="Mick Eggers" />}<div>{ownerHasRichText ? <RichText text={ownerBody} className="micks-owner-rich-text" bundle={bundle} /> : <>{ownerLabel && <p><strong>{ownerLabel}</strong>{ownerIntro && <><br />{ownerIntro}</>}</p>}{ownerParagraphs.slice(1).map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</>}</div></div></div></section>
     {crew.length > 0 && <section className="micks-crew-gallery"><div className="container-site">{crew.map((member) => <article className="micks-crew-card" key={member.name} tabIndex={0} aria-label={`${member.name}${member.position ? `, ${member.position}` : ""}: ${member.description}`}>{member.imageUrl && <img src={member.imageUrl} alt={member.name} />}<div className="micks-crew-card-overlay"><h3>{member.name}</h3>{member.position && <strong className="micks-crew-position">{member.position}</strong>}<p>{member.description}</p></div></article>)}</div></section>}
-    <section className="micks-know-cta section"><div><h2>{props.finalHeading}</h2><p>{props.finalBody}</p><Link href={localSiteHref(bundle.site.slug, finalAction.href)}><span>{finalAction.label}</span></Link></div></section>
+    <section className="micks-know-cta section"><div><h2>{props.finalHeading}</h2><RichText text={props.finalBody} bundle={bundle} /><Link href={localSiteHref(bundle.site.slug, finalAction.href)}><span>{finalAction.label}</span></Link></div></section>
   </>;
 }
 

@@ -9,6 +9,8 @@
     ".": "./src/index.ts",
     "./schema": "./src/schema.ts",
     "./blocks": "./src/blocks.ts",
+    "./rich-text": "./src/rich-text.ts",
+    "./rich-text-html": "./src/rich-text-html.ts",
     "./preview": "./src/preview.ts",
     "./booking": "./src/booking.ts",
     "./booking-fields": "./src/booking-fields.ts",
@@ -33,13 +35,15 @@
     "drizzle-orm": "^0.45.4",
     "mysql2": "^3.24.6",
     "zod": "^4.6.7",
-    "bcryptjs": "^3.0.3"
+    "bcryptjs": "^3.0.3",
+    "sanitize-html": "2.18.2"
   },
   "devDependencies": {
     "drizzle-kit": "^0.31.11",
     "tsx": "^4.23.15",
     "typescript": "~5.9.3",
     "@types/node": "^24.0.0",
-    "dotenv": "^17.0.0"
+    "dotenv": "^17.0.0",
+    "@types/sanitize-html": "^2.16.2"
   }
 }

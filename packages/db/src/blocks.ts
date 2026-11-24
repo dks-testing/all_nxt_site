@@ -213,19 +213,20 @@ export const blockLabels: Record<BlockType, string> = {
 
 /** Field descriptors that the admin turns into a form. `path` is dot-notation into props. */
 export type Field =
-  | { path: string; label: string; kind: "text" | "textarea" | "url" | "image" | "number" | "boolean" }
+  | { path: string; label: string; kind: "text" | "textarea" | "url" | "image" | "number" | "boolean"; help?: string }
   | { path: string; label: string; kind: "image-list"; help?: string }
   | { path: string; label: string; kind: "team"; help?: string }
   | { path: string; label: string; kind: "select"; options: string[] }
   | { path: string; label: string; kind: "list"; help?: string } // string[] one per line
   | { path: string; label: string; kind: "pairs"; keys: [string, string]; help?: string } // [{a,b}] "a | b" per line
+  | { path: string; label: string; kind: "rich-text" }
   | { path: string; label: string; kind: "rich-text-items"; help?: string };
 
 export const blockFields: Record<BlockType, Field[]> = {
   hero: [
     { path: "eyebrow", label: "Eyebrow (small text above heading)", kind: "text" },
-    { path: "heading", label: "Heading", kind: "text" },
-    { path: "subheading", label: "Subheading", kind: "textarea" },
+    { path: "heading", label: "Heading", kind: "text", help: "Use <br> to start a new line." },
+    { path: "subheading", label: "Subheading", kind: "rich-text" },
     { path: "primaryCta.label", label: "Primary button label", kind: "text" },
     { path: "primaryCta.href", label: "Primary button link", kind: "text" },
     { path: "secondaryCta.label", label: "Secondary button label", kind: "text" },
@@ -240,12 +241,12 @@ export const blockFields: Record<BlockType, Field[]> = {
   trust_cards: [
     { path: "heading", label: "Heading", kind: "text" },
     { path: "items", label: "Cards", kind: "pairs", keys: ["title", "body"], help: "One per line: Title | Text" },
-    { path: "closingText", label: "Closing statement below cards", kind: "textarea" },
+    { path: "closingText", label: "Closing statement below cards", kind: "rich-text" },
   ],
   about: [
     { path: "eyebrow", label: "Eyebrow", kind: "text" },
     { path: "heading", label: "Heading", kind: "text" },
-    { path: "body", label: "Body (blank line = new paragraph)", kind: "textarea" },
+    { path: "body", label: "Body", kind: "rich-text" },
     { path: "imageUrl", label: "Image", kind: "image" },
     { path: "highlights", label: "Highlights", kind: "list", help: "One per line" },
     { path: "cta.label", label: "Button label", kind: "text" },
@@ -253,7 +254,7 @@ export const blockFields: Record<BlockType, Field[]> = {
     { path: "certificationLogoUrl", label: "Certification logo", kind: "image" },
     { path: "variant", label: "Layout", kind: "select", options: ["default", "micks-home"] },
     { path: "missionHeading", label: "Mission heading", kind: "text" },
-    { path: "missionBody", label: "Mission text", kind: "textarea" },
+    { path: "missionBody", label: "Mission text", kind: "rich-text" },
     { path: "locationLabel", label: "Location column label", kind: "text" },
     { path: "phoneLabel", label: "Phone column label", kind: "text" },
     { path: "hoursLabel", label: "Hours column label", kind: "text" },
@@ -262,22 +263,22 @@ export const blockFields: Record<BlockType, Field[]> = {
     { path: "workHeading", label: "How we work heading", kind: "text" },
     { path: "workItems", label: "How we work items", kind: "pairs", keys: ["title", "body"], help: "One per line: Heading | Description" },
     { path: "ownerHeading", label: "Owner / crew heading", kind: "text" },
-    { path: "ownerBody", label: "Owner biography", kind: "textarea" },
+    { path: "ownerBody", label: "Owner biography", kind: "rich-text" },
     { path: "teamMemberIds", label: "Team members shown on this page", kind: "team", help: "Select profiles and use the arrows to set their display order." },
     { path: "finalHeading", label: "Final call-to-action heading", kind: "text" },
-    { path: "finalBody", label: "Final call-to-action text", kind: "textarea" },
+    { path: "finalBody", label: "Final call-to-action text", kind: "rich-text" },
     { path: "finalCta.label", label: "Final button label", kind: "text" },
     { path: "finalCta.href", label: "Final button link", kind: "text" },
   ],
   about_intro: [
     { path: "eyebrow", label: "Eyebrow", kind: "text" },
     { path: "heading", label: "Heading", kind: "text" },
-    { path: "body", label: "Body", kind: "textarea" },
+    { path: "body", label: "Body", kind: "rich-text" },
     { path: "imageUrl", label: "Introduction image", kind: "image" },
   ],
   about_mission: [
     { path: "heading", label: "Mission heading", kind: "text" },
-    { path: "body", label: "Mission text", kind: "textarea" },
+    { path: "body", label: "Mission text", kind: "rich-text" },
     { path: "imageUrl", label: "Vehicle image", kind: "image" },
     { path: "locationLabel", label: "Location column label", kind: "text" },
     { path: "phoneLabel", label: "Phone column label", kind: "text" },
@@ -291,7 +292,7 @@ export const blockFields: Record<BlockType, Field[]> = {
   about_owner: [
     { path: "heading", label: "Section heading", kind: "text" },
     { path: "ownerName", label: "Owner name", kind: "text" },
-    { path: "body", label: "Owner biography", kind: "textarea" },
+    { path: "body", label: "Owner biography", kind: "rich-text" },
     { path: "imageUrl", label: "Owner image", kind: "image" },
   ],
   team_gallery: [
@@ -300,18 +301,18 @@ export const blockFields: Record<BlockType, Field[]> = {
   ],
   about_cta: [
     { path: "heading", label: "Heading", kind: "text" },
-    { path: "body", label: "Text", kind: "textarea" },
+    { path: "body", label: "Text", kind: "rich-text" },
     { path: "cta.label", label: "Button label", kind: "text" },
     { path: "cta.href", label: "Button link", kind: "text" },
   ],
   services_grid: [
     { path: "heading", label: "Heading", kind: "text" },
-    { path: "subheading", label: "Subheading", kind: "textarea" },
+    { path: "subheading", label: "Subheading", kind: "rich-text" },
     { path: "limit", label: "Max services shown (empty = all)", kind: "number" },
   ],
   specials: [
     { path: "heading", label: "Heading", kind: "text" },
-    { path: "subheading", label: "Subheading", kind: "textarea" },
+    { path: "subheading", label: "Subheading", kind: "rich-text" },
   ],
   reviews: [
     { path: "heading", label: "Heading", kind: "text" },
@@ -322,8 +323,8 @@ export const blockFields: Record<BlockType, Field[]> = {
   ],
   case_studies: [
     { path: "heading", label: "Heading", kind: "text" },
-    { path: "subheading", label: "Intro text", kind: "textarea" },
-    { path: "closingText", label: "Closing text", kind: "textarea" },
+    { path: "subheading", label: "Intro text", kind: "rich-text" },
+    { path: "closingText", label: "Closing text", kind: "rich-text" },
     { path: "labels", label: "Card category labels", kind: "list", help: "One label per card, in case-study order" },
     { path: "variant", label: "Layout", kind: "select", options: ["default", "micks-home"] },
   ],
@@ -339,17 +340,17 @@ export const blockFields: Record<BlockType, Field[]> = {
   ],
   cta: [
     { path: "heading", label: "Heading", kind: "text" },
-    { path: "body", label: "Body", kind: "textarea" },
+    { path: "body", label: "Body", kind: "rich-text" },
     { path: "cta.label", label: "Button label", kind: "text" },
     { path: "cta.href", label: "Button link", kind: "text" },
     { path: "variant", label: "Style", kind: "select", options: ["primary", "dark", "light"] },
   ],
   rich_text: [
-    { path: "items", label: "Content sections", kind: "rich-text-items", help: "Blank line = paragraph; start bullets with '- ' or '• '; wrap text in **double asterisks** for bold." },
+    { path: "items", label: "Content sections", kind: "rich-text-items", help: "Use the Body toolbar to format text and insert images." },
   ],
   embed: [
     { path: "heading", label: "Heading", kind: "text" },
-    { path: "body", label: "Intro text", kind: "textarea" },
+    { path: "body", label: "Intro text", kind: "rich-text" },
     { path: "integration", label: "Source", kind: "select", options: ["tire_finder", "ai_diagnostic", "custom"] },
     { path: "url", label: "Iframe URL (custom, or overrides integration)", kind: "url" },
     { path: "height", label: "Height (px)", kind: "number" },
@@ -357,17 +358,17 @@ export const blockFields: Record<BlockType, Field[]> = {
     { path: "imageUrl", label: "Feature image", kind: "image" },
     { path: "cta.label", label: "Button label", kind: "text" },
     { path: "cta.href", label: "Button link", kind: "text" },
-    { path: "toolDescription", label: "Tool description", kind: "textarea" },
+    { path: "toolDescription", label: "Tool description", kind: "rich-text" },
     { path: "offerAmount", label: "Offer Amount", kind: "text" },
     { path: "offerHeading", label: "Offer heading", kind: "text" },
-    { path: "offerBody", label: "Offer text", kind: "textarea" },
+    { path: "offerBody", label: "Offer text", kind: "rich-text" },
   ],
   smart_feature: [
     { path: "eyebrow", label: "Eyebrow", kind: "text" },
     { path: "heading", label: "Heading", kind: "text" },
-    { path: "body", label: "Body (blank line = new paragraph)", kind: "textarea" },
+    { path: "body", label: "Body", kind: "rich-text" },
     { path: "calloutHeading", label: "Callout heading", kind: "text" },
-    { path: "calloutBody", label: "Callout text", kind: "textarea" },
+    { path: "calloutBody", label: "Callout text", kind: "rich-text" },
     { path: "supportText", label: "Supporting text", kind: "text" },
     { path: "imageUrl", label: "Primary image", kind: "image" },
     { path: "secondaryImageUrl", label: "Secondary image", kind: "image" },

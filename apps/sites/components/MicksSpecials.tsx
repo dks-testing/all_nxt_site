@@ -3,7 +3,7 @@ import type { SiteBundle } from "@platform/db";
 import { getDesign } from "@platform/db/theme";
 import type { BlockProps } from "@platform/db/blocks";
 import { getSpecials, type SiteCtx } from "@/lib/data";
-import { telHref } from "@/lib/format";
+import { RichText, telHref } from "@/lib/format";
 import { localSiteHref } from "@/lib/url";
 import { globalCta, globalText } from "@/lib/global-content";
 
@@ -111,7 +111,7 @@ export async function MicksSpecials({ bundle, ctx, props }: { bundle: SiteBundle
     <section className="micks-specials-page section">
       <div className="container-site">
         <h2>{heading}</h2>
-        <p className="micks-specials-subtitle">{props.subheading}</p>
+        {props.subheading && <RichText text={props.subheading} className="micks-specials-subtitle" bundle={bundle} />}
         {featured ? (
           <div className="micks-specials-offers">
             <OfferCard item={featured} bundle={bundle} featured fallbackImage={fallbackImage} />

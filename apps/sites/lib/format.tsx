@@ -1,5 +1,8 @@
-import type { Address, DayHours } from "@platform/db";
+import type { Address, DayHours, SiteBundle } from "@platform/db";
 import { Fragment } from "react";
+import { legacyRichTextHtml, richTextHtmlPrefix } from "@platform/db/rich-text";
+import { sanitizeRichTextHtml } from "@platform/db/rich-text-html";
+import { globalText } from "./global-content";
 
 export const telHref = (phone?: string | null) => (phone ? `tel:${phone.replace(/[^\d+]/g, "")}` : undefined);
 
@@ -35,23 +38,17 @@ const DAY_SCHEMA: Record<string, string> = { Mon: "Monday", Tue: "Tuesday", Wed:
 export const schemaHours = (hours?: DayHours[] | null) =>
   (hours ?? []).filter((h) => !h.closed && h.open && h.close).map((h) => ({ "@type": "OpeningHoursSpecification", dayOfWeek: DAY_SCHEMA[h.day], opens: h.open, closes: h.close }));
 
-/** Very small, safe text renderer: blank line = paragraph, "- " lines = bullets, **bold**. No HTML passthrough. */
-export function RichText({ text, className = "prose-site" }: { text?: string | null; className?: string }) {
+export function RichText({ text, className = "prose-site", bundle }: { text?: string | null; className?: string; bundle?: SiteBundle }) {
   if (!text) return null;
-  const inline = (s: string) =>
-    s.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
-      part.startsWith("**") && part.endsWith("**") ? <strong key={i}>{part.slice(2, -2)}</strong> : <Fragment key={i}>{part}</Fragment>,
-    );
-  const blocks = text.replace(/\r/g, "").split(/\n{2,}/);
-  return (
-    <div className={className}>
-      {blocks.map((b, i) => {
-        const lines = b.split("\n");
-        const bulletPrefix = /^(?:-|\*|•)\s+/;
-        if (lines.every((line) => bulletPrefix.test(line.trim())))
-          return <ul key={i}>{lines.map((line, j) => <li key={j}>{inline(line.trim().replace(bulletPrefix, ""))}</li>)}</ul>;
-        return <p key={i}>{lines.map((l, j) => <Fragment key={j}>{j > 0 && <br />}{inline(l)}</Fragment>)}</p>;
-      })}
-    </div>
-  );
+  if (!text.startsWith(richTextHtmlPrefix)) {
+    return <div className={className} dangerouslySetInnerHTML={{ __html: legacyRichTextHtml(text) }} />;
+  }
+  const html = sanitizeRichTextHtml(text.slice(richTextHtmlPrefix.length), bundle && ((copy) => globalText(copy, bundle, true)));
+  return html ? <div className={`${className} rich-text-content`} dangerouslySetInnerHTML={{ __html: html }} /> : null;
+}
+
+export function TextWithBreaks({ text }: { text: string }) {
+  return <>{text.split(/(<br\s*\/?>|\r\n|\r|\n)/gi).map((part, index) =>
+    /^(?:<br\s*\/?>|\r\n|\r|\n)$/i.test(part) ? <br key={index} /> : <Fragment key={index}>{part}</Fragment>,
+  )}</>;
 }

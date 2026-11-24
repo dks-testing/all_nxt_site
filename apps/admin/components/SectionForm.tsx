@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { blockFields, splitLegacyOffer, type BlockType, type Field } from "@platform/db/blocks";
 import { MediaPicker, type MediaAsset } from "./MediaPicker";
 import { PairListEditor } from "./PairListEditor";
+import { RichTextEditor } from "./RichTextEditor";
 
 function get(obj: Record<string, unknown>, path: string): unknown {
   return path.split(".").reduce<unknown>((o, k) => (o && typeof o === "object" ? (o as Record<string, unknown>)[k] : undefined), obj);
@@ -90,26 +91,35 @@ function initialRichTextItems(value: unknown, props: Record<string, unknown>): R
   }];
 }
 
-function RichTextItemsEditor({ name, label, value, help, changed }: { name: string; label: string; value: RichTextItem[]; help?: string; changed: () => void }) {
-  const [items, setItems] = useState(value);
-  const update = (index: number, key: keyof RichTextItem, nextValue: string) => {
-    setItems((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, [key]: nextValue } : item));
+function RichTextItemsEditor({ name, label, value, siteId, publicOrigin, help, changed }: { name: string; label: string; value: RichTextItem[]; siteId: string; publicOrigin: string; help?: string; changed: () => void }) {
+  const [items, setItems] = useState(() => value.map((item, id) => ({ ...item, id })));
+  const nextId = useRef(value.length);
+  const group = useRef<HTMLDivElement>(null);
+
+  function addItem() {
+    const id = nextId.current++;
+    setItems((current) => [...current, { id, heading: "", headingTag: "h2", body: "" }]);
     changed();
-  };
-  return <div className="sm:col-span-2">
+  }
+
+  return <div ref={group} className="sm:col-span-2">
     <div className="mb-2 flex items-center justify-between gap-3">
       <span className="label">{label}</span>
-      <button type="button" className="btn btn-secondary btn-sm" onClick={() => { setItems((current) => [...current, { heading: "", headingTag: "h2", body: "" }]); changed(); }}>+ Add heading and text</button>
+      <button type="button" className="btn btn-secondary btn-sm" onClick={addItem}>+ Add heading and text</button>
     </div>
     {help && <p className="help mb-3">{help}</p>}
     <div className="space-y-4">
       {items.map((item, index) => (
-        <fieldset key={index} className="grid gap-3 rounded-lg border border-slate-200 p-4 sm:grid-cols-2">
+        <fieldset key={item.id} className="grid gap-3 rounded-lg border border-slate-200 p-4 sm:grid-cols-2">
           <legend className="px-1 text-xs font-semibold text-slate-500">Content section {index + 1}</legend>
-          <label className="block"><span className="label">Heading</span><input name={`${name}.heading`} value={item.heading} onChange={(event) => update(index, "heading", event.target.value)} className="input" /></label>
-          <label className="block"><span className="label">Heading tag</span><select name={`${name}.headingTag`} value={item.headingTag} onChange={(event) => update(index, "headingTag", event.target.value)} className="input">{richTextHeadingTags.map((tag) => <option key={tag}>{tag}</option>)}</select></label>
-          <label className="block sm:col-span-2"><span className="label">Body</span><textarea name={`${name}.body`} value={item.body} onChange={(event) => update(index, "body", event.target.value)} rows={5} className="input" /></label>
-          <div className="sm:col-span-2"><button type="button" className="btn btn-danger btn-sm" onClick={() => { setItems((current) => current.filter((_, itemIndex) => itemIndex !== index)); changed(); }}>Remove section</button></div>
+          <label className="block"><span className="label">Heading</span><input name={`${name}.heading`} defaultValue={item.heading} onInput={changed} className="input" /></label>
+          <label className="block"><span className="label">Heading tag</span><select name={`${name}.headingTag`} defaultValue={item.headingTag} onChange={changed} className="input">{richTextHeadingTags.map((tag) => <option key={tag}>{tag}</option>)}</select></label>
+          <RichTextEditor name={`${name}.body`} label="Body" value={item.body} siteId={siteId} publicOrigin={publicOrigin} className="sm:col-span-2" />
+          <div className="sm:col-span-2"><button type="button" className="btn btn-danger btn-sm" onClick={() => {
+            setItems((current) => current.filter(({ id }) => id !== item.id));
+            changed();
+            group.current?.dispatchEvent(new Event("input", { bubbles: true }));
+          }}>Remove section</button></div>
         </fieldset>
       ))}
     </div>
@@ -118,7 +128,7 @@ function RichTextItemsEditor({ name, label, value, help, changed }: { name: stri
 
 function FieldInput({ f, value, siteId, media, publicOrigin, changed, imageCount, imageLabels, onCrewCountChange, teamProfiles }: { f: Field; value: unknown; siteId: string; media: MediaAsset[]; publicOrigin: string; changed: () => void; imageCount?: number; imageLabels?: string[]; onCrewCountChange?: (count: number) => void; teamProfiles: TeamProfileOption[] }) {
   const name = `p:${f.path}`;
-  const wide = f.kind === "textarea" || f.kind === "list" || f.kind === "pairs" || f.kind === "rich-text-items";
+  const wide = f.kind === "textarea" || f.kind === "rich-text" || f.kind === "list" || f.kind === "pairs" || f.kind === "rich-text-items";
   const cls = wide ? "sm:col-span-2" : "";
   switch (f.kind) {
     case "image":
@@ -133,6 +143,8 @@ function FieldInput({ f, value, siteId, media, publicOrigin, changed, imageCount
       return <label className={`block ${cls}`}><span className="label">{f.label}</span><select name={name} defaultValue={String(value ?? f.options[0])} className="input" onChange={changed}>{f.options.map((o) => <option key={o}>{o}</option>)}</select></label>;
     case "textarea":
       return <label className={`block ${cls}`}><span className="label">{f.label}</span><textarea name={name} defaultValue={String(value ?? "")} rows={5} className="input" onInput={changed} /></label>;
+    case "rich-text":
+      return <RichTextEditor name={name} label={f.label} value={String(value ?? "")} siteId={siteId} publicOrigin={publicOrigin} className={cls} />;
     case "list":
       return <label className={`block ${cls}`}><span className="label">{f.label}</span><textarea name={name} defaultValue={Array.isArray(value) ? value.join("\n") : ""} rows={4} className="input" onInput={changed} />{f.help && <p className="help">{f.help}</p>}</label>;
     case "pairs": {
@@ -140,9 +152,9 @@ function FieldInput({ f, value, siteId, media, publicOrigin, changed, imageCount
       return <PairListEditor name={name} label={f.label} value={pairs} keys={f.keys} help={f.help} />;
     }
     case "rich-text-items":
-      return <RichTextItemsEditor name={name} label={f.label} value={richTextItems(value)} help={f.help} changed={changed} />;
+      return <RichTextItemsEditor name={name} label={f.label} value={richTextItems(value)} siteId={siteId} publicOrigin={publicOrigin} help={f.help} changed={changed} />;
     default:
-      return <label className={`block ${cls}`}><span className="label">{f.label}</span><input name={name} type={f.kind === "number" ? "number" : "text"} defaultValue={value === undefined || value === null ? "" : String(value)} className="input" onInput={changed} /></label>;
+      return <label className={`block ${cls}`}><span className="label">{f.label}</span><input name={name} type={f.kind === "number" ? "number" : "text"} defaultValue={value === undefined || value === null ? "" : String(value)} className="input" onInput={changed} />{f.help && <p className="help">{f.help}</p>}</label>;
   }
 }
 

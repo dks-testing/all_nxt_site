@@ -5,7 +5,7 @@ import { getDesign } from "@platform/db/theme";
 import type { BlockProps } from "@platform/db/blocks";
 import type { BlockComponentProps } from "./types";
 import { localSiteHref } from "@/lib/url";
-import { telHref } from "@/lib/format";
+import { RichText, TextWithBreaks, telHref } from "@/lib/format";
 import { MicksInnerHero } from "../MicksInnerHero";
 import { CertificationBadges, getActiveCertificationBadges } from "../CertificationBadge";
 import { globalCta, globalText } from "@/lib/global-content";
@@ -43,8 +43,8 @@ export async function Hero({ ctx, bundle, props, index, pageSlug, integratedTrus
           <div className="micks-home-top">
             <div className="micks-home-copy">
               {props.eyebrow && <p className="micks-home-eyebrow">{props.eyebrow}</p>}
-              <h1 className="micks-home-title">{heading}</h1>
-              {sub && <p className="micks-home-subtitle">{sub}</p>}
+              <h1 className="micks-home-title"><TextWithBreaks text={heading} /></h1>
+              {sub && <RichText text={sub} className="micks-home-subtitle" bundle={bundle} />}
               <div className="micks-home-actions">
                 {primary && <Link className="micks-hero-button" href={localSiteHref(bundle.site.slug, primary.href)}><span>{primary.label}</span></Link>}
                 {secondary && <Link className="micks-hero-button" href={localSiteHref(bundle.site.slug, secondary.href)}><span>{secondary.label}</span></Link>}
@@ -69,7 +69,7 @@ export async function Hero({ ctx, bundle, props, index, pageSlug, integratedTrus
               <h2>{item.title}</h2><div className="micks-home-card-rule" /><p>{item.body}</p>
             </article>)}
           </div>}
-          {cards.length > 0 && <p className="micks-home-closing">{integratedTrust?.closingText || "We diagnose it clearly, explain it simply.\nWe treat every repair like we’re spending our own money."}</p>}
+          {cards.length > 0 && <RichText text={integratedTrust?.closingText || "We diagnose it clearly, explain it simply.\nWe treat every repair like we’re spending our own money."} className="micks-home-closing" bundle={bundle} />}
         </div>
       </section>
     );
@@ -90,8 +90,8 @@ export async function Hero({ ctx, bundle, props, index, pageSlug, integratedTrus
       </>}
       <div className="container-site relative"><div className="max-w-3xl">
         {props.eyebrow && <p className="eyebrow mb-4 !text-[var(--color-accent)]">{props.eyebrow}</p>}
-        <h1 className={`font-bold uppercase leading-[1.05] ${big ? "text-4xl md:text-6xl" : "text-3xl md:text-5xl"}`}>{heading}</h1>
-        {sub && <p className="mt-5 max-w-2xl text-lg text-white/85 md:text-xl">{sub}</p>}
+        <h1 className={`font-bold uppercase leading-[1.05] ${big ? "text-4xl md:text-6xl" : "text-3xl md:text-5xl"}`}><TextWithBreaks text={heading} /></h1>
+        {sub && <RichText text={sub} className="mt-5 max-w-2xl text-lg text-white/85 md:text-xl" bundle={bundle} />}
         {(primary || secondary || tertiary) && <div className="mt-8 flex flex-wrap gap-3">
           {primary && <Link href={localSiteHref(bundle.site.slug, primary.href)} className="btn btn-primary"><span>{primary.label}</span></Link>}
           {secondary && <Link href={localSiteHref(bundle.site.slug, secondary.href)} className="btn btn-outline text-white"><span>{secondary.label}</span></Link>}

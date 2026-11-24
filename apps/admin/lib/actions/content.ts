@@ -8,6 +8,7 @@ import {
   type DayHours, type MenuItem, type ThemeColors,
 } from "@platform/db";
 import { blockSchemas, blockFields, defaultBlockProps, isBlockType, type Field } from "@platform/db/blocks";
+import { cleanRichText } from "@platform/db/rich-text-html";
 import { fontOptions } from "@platform/db/theme";
 import { fieldsSchema } from "@platform/db/booking-fields";
 import { requireSiteAccess, requireSuperAdmin } from "../auth";
@@ -313,6 +314,7 @@ function readField(fd: FormData, f: Field): unknown {
     case "image": return raw.trim();
     case "image-list": return fd.getAll(`p:${f.path}`).map(String);
     case "team": return fd.getAll(`p:${f.path}`).map(String).filter(Boolean);
+    case "rich-text": return cleanRichText(raw) || undefined;
     case "rich-text-items": {
       const headings = fd.getAll(`p:${f.path}.heading`).map(String);
       const headingTags = fd.getAll(`p:${f.path}.headingTag`).map(String);
@@ -321,7 +323,7 @@ function readField(fd: FormData, f: Field): unknown {
       return headings.map((heading, index) => ({
         heading: heading.trim(),
         headingTag: headingTags[index],
-        body: bodies[index].trim(),
+        body: cleanRichText(bodies[index]),
       })).filter((item) => item.heading || item.body);
     }
     case "list": return lines(raw);

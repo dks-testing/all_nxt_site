@@ -179,7 +179,7 @@ export default async function Page({ params, searchParams }: Props) {
               <div>
                 <h2>{globalText(svc.vehicleCalloutHeading, bundle)}</h2>
                 {calloutBullets.length > 0 && <ServiceKeyPoints items={calloutBullets} />}
-                {svc.vehicleCalloutBody && <p>{globalText(svc.vehicleCalloutBody, bundle)}</p>}
+                {svc.vehicleCalloutBody && <RichText text={globalText(svc.vehicleCalloutBody, bundle)} bundle={bundle} />}
                 <div className="micks-live-buttons">
                   <a href={callAction.href}><span>{callAction.label}</span></a>
                   <Link href={localSiteHref(bundle.site.slug, scheduleAction.href)}><span>{scheduleAction.label}</span></Link>
@@ -190,7 +190,7 @@ export default async function Page({ params, searchParams }: Props) {
           </section>
         )}
         <section className="micks-service-live-trust"><div className="container-site micks-service-live-grid"><div><h2>{globalText(svc.trustHeading, bundle)}</h2><div className="micks-service-step-list micks-service-trust-list">{trustItems.map(([title, body]) => <div key={title}><StepListIcon design={design} label={title} /><p><strong>{globalText(title, bundle)}</strong>{globalText(body, bundle)}</p></div>)}</div></div><img src={trustImage} alt={`${bundle.settings?.businessName ?? bundle.site.name} in the community`} /></div></section>
-        <section className="micks-know-cta section"><div><h2>{globalText(svc.finalHeading, bundle)}</h2><p>{globalText(svc.finalBody, bundle)}</p><Link href={localSiteHref(bundle.site.slug, finalAction.href)}><span>{finalAction.label}</span></Link></div></section>
+        <section className="micks-know-cta section"><div><h2>{globalText(svc.finalHeading, bundle)}</h2><RichText text={globalText(svc.finalBody, bundle)} bundle={bundle} /><Link href={localSiteHref(bundle.site.slug, finalAction.href)}><span>{finalAction.label}</span></Link></div></section>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "Service", name: svc.name, description: svc.summary, provider: { "@type": bundle.settings?.businessType ?? "LocalBusiness", name: bundle.settings?.businessName } }).replace(/</g, "\\u003c") }} />
       </>
     );

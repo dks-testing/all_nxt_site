@@ -6,6 +6,7 @@ import Link from "next/link";
 import { localSiteHref } from "@/lib/url";
 import { getDesign } from "@platform/db/theme";
 import { globalCta } from "@/lib/global-content";
+import { RichText } from "@/lib/format";
 
 export function BookingForm({ bundle, props }: BlockComponentProps<"booking_form">) {
   const b = bundle.booking;
@@ -16,7 +17,7 @@ export function BookingForm({ bundle, props }: BlockComponentProps<"booking_form
       <div className="container-site max-w-4xl">
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-bold uppercase md:text-4xl">{props.heading}</h2>
-          {props.subheading && <p className="mt-3 text-lg text-[var(--color-muted)]">{props.subheading}</p>}
+          {props.subheading && <RichText text={props.subheading} className="mt-3 text-lg text-[var(--color-muted)]" bundle={bundle} />}
         </div>
         <BookingFormClient siteSlug={bundle.site.slug} slots={buildSlots(rules)} closedDays={rules.closedDays} disabledDates={b?.disabledDates ?? []} leadDays={b?.leadDays ?? 0} confirmation={b?.confirmationMessage ?? "Thanks! We'll be in touch shortly to confirm."} fields={b?.formFields ?? []} appearance={b?.appearance} />
       </div>

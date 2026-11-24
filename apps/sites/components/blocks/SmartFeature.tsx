@@ -38,11 +38,11 @@ export function SmartFeature({ bundle, props, pageSlug }: BlockComponentProps<"s
         <div className="micks-smart-feature-grid">
           <div className="micks-smart-feature-copy-wrap flex flex-col justify-center h-full">
             {innerToolPage ? <h3>{props.heading}</h3> : <h2>{props.heading}</h2>}
-            <RichText text={props.body} className="micks-smart-feature-copy" />
+            <RichText text={props.body} className="micks-smart-feature-copy" bundle={bundle} />
             {cta}
             {(props.calloutHeading || props.calloutBody) && <aside className="micks-smart-feature-callout">
               {props.calloutHeading && <strong>{props.calloutHeading}</strong>}
-              {props.calloutBody && <span>{props.calloutBody}</span>}
+              {props.calloutBody && <RichText text={props.calloutBody} bundle={bundle} />}
             </aside>}
             {props.supportText && <p className="micks-smart-support">{props.supportText}</p>}
           </div>
@@ -58,7 +58,7 @@ export function SmartFeature({ bundle, props, pageSlug }: BlockComponentProps<"s
         <header className="micks-smart-feature-heading">
           {props.eyebrow && <p className="micks-smart-kicker">{props.eyebrow}</p>}
           <h2>{props.heading}</h2>
-          <RichText text={props.body} className="micks-smart-feature-copy" />
+          <RichText text={props.body} className="micks-smart-feature-copy" bundle={bundle} />
         </header>
         <div className="micks-smart-tool-panel">
           {props.secondaryImageUrl && <img className="micks-smart-tool-photo" src={props.secondaryImageUrl} alt="Vehicle diagnostic scan" />}
@@ -82,7 +82,7 @@ export function SmartFeature({ bundle, props, pageSlug }: BlockComponentProps<"s
         <div className="micks-smart-feature-copy-wrap">
           {props.eyebrow && <p className="micks-smart-kicker">{props.eyebrow}</p>}
           <h2>{props.heading}</h2>
-          <RichText text={props.body} className="micks-smart-feature-copy" />
+          <RichText text={props.body} className="micks-smart-feature-copy" bundle={bundle} />
           {cta}
           {props.supportText && <p className="micks-smart-support">{props.supportText}</p>}
           {props.showCertifications && <CertificationBadges design={design} className="micks-smart-feature-certifications" />}
@@ -93,7 +93,7 @@ export function SmartFeature({ bundle, props, pageSlug }: BlockComponentProps<"s
       </div>
       {(props.calloutHeading || props.calloutBody) && <aside className="micks-smart-feature-callout">
         {props.calloutHeading && <strong>{props.calloutHeading}</strong>}
-        {props.calloutBody && <span>{props.calloutBody}</span>}
+        {props.calloutBody && <RichText text={props.calloutBody} bundle={bundle} />}
       </aside>}
     </div>
   </section>;

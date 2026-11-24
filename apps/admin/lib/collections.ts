@@ -1,9 +1,10 @@
 import { services, specials, faqs, testimonials, caseStudies, banners, redirects, teamProfiles } from "@platform/db";
+import { cleanRichText } from "@platform/db/rich-text-html";
 
 export type CField = {
   name: string;
   label: string;
-  kind: "text" | "textarea" | "url" | "image" | "number" | "boolean" | "date" | "datetime" | "select" | "list";
+  kind: "text" | "textarea" | "rich-text" | "url" | "image" | "number" | "boolean" | "date" | "datetime" | "select" | "list";
   options?: string[];
   required?: boolean;
   help?: string;
@@ -35,7 +36,7 @@ export const collections: Record<string, CollectionDef> = {
     fields: [
       { name: "name", label: "Name / heading", kind: "text", required: true },
       { name: "position", label: "Position", kind: "text" },
-      { name: "description", label: "Description", kind: "textarea", wide: true },
+      { name: "description", label: "Description", kind: "rich-text", wide: true },
       { name: "imageUrl", label: "Photo", kind: "image", help: "Choose an existing Media Library image or upload a new one." },
       { name: "isActive", label: "Available to display", kind: "boolean" },
     ],
@@ -52,7 +53,7 @@ export const collections: Record<string, CollectionDef> = {
       { name: "name", label: "Name", kind: "text", required: true },
       { name: "slug", label: "URL slug", kind: "text", required: true, help: "Page lives at /slug/. Keep old WordPress slugs to preserve SEO." },
       { name: "summary", label: "Summary", kind: "textarea", wide: true },
-      { name: "body", label: "Page body", kind: "textarea", wide: true, help: "Blank line = new paragraph, '- ' = bullet, **bold**" },
+      { name: "body", label: "Page body", kind: "rich-text", wide: true },
       { name: "bullets", label: "Key points", kind: "list", wide: true, help: "One per line" },
       { name: "imageUrl", label: "Image", kind: "image" },
       { name: "priceFrom", label: "Starting price", kind: "text" },
@@ -63,12 +64,12 @@ export const collections: Record<string, CollectionDef> = {
       { name: "processSteps", label: "Process steps", kind: "list", wide: true, help: "One per line: Step title | Description" },
       { name: "vehicleCalloutHeading", label: "Vehicle callout heading", kind: "text", wide: true },
       { name: "vehicleCalloutBullets", label: "Vehicle callout key points", kind: "list", wide: true, help: "One per line. Shown above the callout text when the vehicle callout is enabled." },
-      { name: "vehicleCalloutBody", label: "Vehicle callout text", kind: "textarea", wide: true },
+      { name: "vehicleCalloutBody", label: "Vehicle callout text", kind: "rich-text", wide: true },
       { name: "showVehicleCallout", label: "Show vehicle callout", kind: "boolean" },
       { name: "trustHeading", label: "Trust section heading", kind: "text", wide: true },
       { name: "trustItems", label: "Trust points", kind: "list", wide: true, help: "One per line: Title | Description" },
       { name: "finalHeading", label: "Final call-to-action heading", kind: "text", wide: true },
-      { name: "finalBody", label: "Final call-to-action text", kind: "textarea", wide: true },
+      { name: "finalBody", label: "Final call-to-action text", kind: "rich-text", wide: true },
       { name: "finalCtaLabel", label: "Final button label", kind: "text" },
       { name: "finalCtaHref", label: "Final button link", kind: "text" },
       { name: "isActive", label: "Visible on site", kind: "boolean" },
@@ -107,7 +108,7 @@ export const collections: Record<string, CollectionDef> = {
     sortable: true,
     fields: [
       { name: "question", label: "Question", kind: "text", required: true, wide: true },
-      { name: "answer", label: "Answer", kind: "textarea", required: true, wide: true },
+      { name: "answer", label: "Answer", kind: "rich-text", required: true, wide: true },
     ],
   },
   testimonials: {
@@ -123,7 +124,7 @@ export const collections: Record<string, CollectionDef> = {
       { name: "rating", label: "Rating (1-5)", kind: "number" },
       { name: "source", label: "Source", kind: "select", options: ["manual", "google"] },
       { name: "reviewDate", label: "Review date", kind: "date" },
-      { name: "body", label: "Review", kind: "textarea", required: true, wide: true },
+      { name: "body", label: "Review", kind: "rich-text", required: true, wide: true },
       { name: "isActive", label: "Visible on site", kind: "boolean" },
     ],
   },
@@ -136,9 +137,9 @@ export const collections: Record<string, CollectionDef> = {
     sortable: true,
     fields: [
       { name: "title", label: "Title", kind: "text", required: true, wide: true },
-      { name: "problem", label: "Problem", kind: "textarea", required: true, wide: true },
-      { name: "diagnosis", label: "Diagnosis", kind: "textarea", wide: true },
-      { name: "fix", label: "Fix", kind: "textarea", wide: true },
+      { name: "problem", label: "Problem", kind: "rich-text", required: true, wide: true },
+      { name: "diagnosis", label: "Diagnosis", kind: "rich-text", wide: true },
+      { name: "fix", label: "Fix", kind: "rich-text", wide: true },
       { name: "imageUrl", label: "Image", kind: "image" },
     ],
   },
@@ -151,8 +152,8 @@ export const collections: Record<string, CollectionDef> = {
     subtitle: "placement",
     sortable: true,
     fields: [
-      { name: "heading", label: "Heading", kind: "text", required: true, wide: true },
-      { name: "subheading", label: "Subheading", kind: "textarea", wide: true },
+      { name: "heading", label: "Heading", kind: "text", required: true, wide: true, help: "Use <br> to start a new line." },
+      { name: "subheading", label: "Subheading", kind: "rich-text", wide: true },
       { name: "placement", label: "Placement", kind: "select", options: ["hero", "top_bar", "promo"] },
       { name: "imageUrl", label: "Image", kind: "image" },
       { name: "ctaLabel", label: "Button label", kind: "text" },
@@ -200,6 +201,9 @@ export function parseCollectionForm(def: CollectionDef, fd: FormData) {
         break;
       case "select":
         out[f.name] = f.options?.includes(raw) ? (f.name === "code" ? Number(raw) : raw) : f.options?.[0];
+        break;
+      case "rich-text":
+        out[f.name] = cleanRichText(raw) || null;
         break;
       default:
         if (f.name === "discount" && raw) {

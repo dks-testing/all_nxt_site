@@ -16,7 +16,8 @@
     "zod": "^4.6.7",
     "bcryptjs": "^3.0.3",
     "jose": "^6.2.16",
-    "sharp": "^0.35.5"
+    "sharp": "^0.35.5",
+    "tinymce": "8.10.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.5",

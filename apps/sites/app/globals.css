@@ -139,6 +139,10 @@ h4 {
     border-color: transparent;
   }
 
+  :where(.rich-text-content) > p {
+    margin-block-end: 1em;
+  }
+
   .prose-site p {
     margin-bottom: 1rem;
     line-height: 1.7;
@@ -157,6 +161,31 @@ h4 {
 a, a:hover{
   transition:all .3s ease-in-out;
 }
+.rich-text-content :is(h1, h2, h3, h4, h5, h6) {
+  margin-block: 1em .5em;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.rich-text-content h1 { font-size: 2em; }
+.rich-text-content h2 { font-size: 1.65em; }
+.rich-text-content h3 { font-size: 1.4em; }
+.rich-text-content h4 { font-size: 1.2em; }
+.rich-text-content h5 { font-size: 1.1em; }
+.rich-text-content h6 { font-size: 1em; }
+.rich-text-content :is(ul, ol) { padding-inline-start: 1.25em; margin-block-end: 1em; }
+.rich-text-content ul { list-style: disc; }
+.rich-text-content ol { list-style: decimal; }
+.rich-text-content a { text-decoration: underline; }
+.rich-text-content img { max-width: 100%; height: auto; }
+
+/* Match TinyMCE's gap between paragraphs, including when older copy is loaded in the editor. */
+:is(.rich-text-content, .prose-site, .micks-about-copy .prose-site, .micks-about-rich-text, .micks-owner-rich-text, .micks-smart-feature-copy) {
+  & > p:has(+ p) { margin-block-end: 1rem; }
+  & > p + p { margin-block-start: 0; }
+}
+
+.rich-text-content > p:empty::before { content: "\00a0"; }
+
 details>summary {
   list-style: none;
   cursor: pointer;
@@ -2539,7 +2568,7 @@ main > section {
 }
 
 .micks-footer-contact-list dt {
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .micks-footer-bottom>div {
@@ -2814,7 +2843,7 @@ main > section {
   line-height: 52px;
 }
 
-.micks-smart-feature-tool .micks-smart-feature-heading .micks-smart-feature-copy p {
+.micks-smart-feature-tool .micks-smart-feature-heading .micks-smart-feature-copy > p:last-child {
   margin-bottom: 0;
 }
 
@@ -3563,6 +3592,15 @@ main > section {
   line-height: 1.35;
   text-transform: uppercase;
 }
+
+.micks-mission-rich-text {
+  margin: 14px 0;
+  font-size: 31px;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.micks-mission-rich-text > p + p { margin-block-start: 1rem; }
 
 .micks-mission-grid>img {
   width: 100%;
