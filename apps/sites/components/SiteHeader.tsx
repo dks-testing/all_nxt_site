@@ -101,7 +101,7 @@ function AngledHeader({ bundle }: { bundle: SiteBundle }) {
   return (
     <header className="micks-header-outer sticky top-0 z-40">
       <div className="micks-header-shape">
-        <Link href={localSiteHref(bundle.site.slug, "/")} className="micks-logo" aria-label={`${name} home`}>
+        <Link href={localSiteHref(bundle.site.slug, "/")} className="site-logo" aria-label={`${name} home`}>
           {theme?.logoUrl ? <img src={theme.logoUrl} alt={name} className="h-full w-full object-contain" /> :
             <span className="font-[family-name:var(--font-heading)] text-3xl font-black italic text-black">{name}</span>}
         </Link>

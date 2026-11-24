@@ -2,9 +2,10 @@ import Link from "next/link";
 import { getDb, sites, domains, siteMembers, themes, eq, desc, inArray } from "@platform/db";
 import { requireUser } from "@/lib/auth";
 import { publicUrl, previewUrl } from "@/lib/site-url";
-import { setStatus, cloneSiteAction } from "@/lib/actions/sites";
+import { setStatus } from "@/lib/actions/sites";
 import { PageHeader, StatusBadge, Empty } from "@/components/ui";
 import { SubmitButton } from "@/components/ConfirmButton";
+import { CloneSiteDialog } from "@/components/CloneSiteDialog";
 import { SiteIdentity } from "@/components/SiteIdentity";
 
 export const metadata = { title: "Sites" };
@@ -78,20 +79,7 @@ export default async function SitesPage({ searchParams }: { searchParams: Promis
                             <><input type="hidden" name="status" value="PUBLISHED" /><SubmitButton className="btn btn-primary btn-sm">Publish</SubmitButton></>
                           )}
                         </form>
-                        {isSuper && (
-                          <details className="relative">
-                            <summary className="btn btn-secondary btn-sm list-none">Clone</summary>
-                            <form action={cloneSiteAction} className="card absolute right-0 z-10 mt-1 w-72 space-y-3 p-4 shadow-lg">
-                              <input type="hidden" name="sourceId" value={s.id} />
-                              <p className="text-sm font-semibold">Clone “{s.name}”</p>
-                              <label className="block"><span className="label">New site name</span><input name="name" required className="input" placeholder="Smith Auto Care" /></label>
-                              <label className="block"><span className="label">Slug</span><input name="slug" className="input" placeholder="smith-auto-care" /></label>
-                              <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="includeTestimonials" /> Copy testimonials</label>
-                              <p className="help">Copies pages, branding, services and settings as a draft. Bookings and analytics IDs are not copied.</p>
-                              <SubmitButton className="btn btn-primary w-full">Clone site</SubmitButton>
-                            </form>
-                          </details>
-                        )}
+                        {isSuper && <CloneSiteDialog sourceId={s.id} siteName={s.name} />}
                       </div>
                     </td>
                   </tr>

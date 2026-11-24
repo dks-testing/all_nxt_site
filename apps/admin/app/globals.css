@@ -32,6 +32,9 @@ select,
 textarea {
   outline-offset: 2px;
 }
+button:hover{
+  cursor: pointer;
+}
 
 @layer components {
   .admin-page { width: 100%; margin-inline: auto; padding: 1.5rem 1rem 3rem; }
