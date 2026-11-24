@@ -19,6 +19,7 @@ const colorFields: [keyof ThemeColors, string, string][] = [
   ["surface", "Panel background", "Cards, dropdown hover states, and light content panels."],
   ["text", "Body text", "Default headings and paragraph text."],
   ["muted", "Muted text", "Supporting copy, captions, and secondary information."],
+  ["testimonialsBackground", "Testimonials section bg", "Background color for the testimonials section."],
 ];
 
 const componentColorFields = [
@@ -30,6 +31,8 @@ const componentColorFields = [
   ["navButtonText", "Navigation button text", "Phone number and hours inside the header button."],
   ["navButtonHoverBackground", "Navigation button hover", "Header phone/call button background on hover."],
   ["navButtonHoverText", "Navigation hover text", "Header phone/call button text on hover."],
+  ["trustCardHoverBackground", "Trust / value card hover", "Background color when hovering the Trust / Value cards."],
+  ["trustCardHeadingColor", "Trust / value card headings", "Heading text color for the Trust / Value cards."],
   ["badgeBackground", "Badge background", "Background for small promotional or navigation badges."],
   ["badgeText", "Badge text", "Text displayed inside small badges."],
 ] as const;
@@ -72,6 +75,8 @@ export function ThemeEditor({ siteId, initial, action, media, publicOrigin }: Pr
     buttonBackground: c.primary, buttonText: c.primaryForeground, buttonHoverBackground: c.primary, buttonHoverText: c.primaryForeground,
     navButtonBackground: design.buttonBackground ?? c.primary, navButtonText: design.buttonText ?? c.primaryForeground,
     navButtonHoverBackground: design.buttonHoverBackground ?? c.primary, navButtonHoverText: design.buttonHoverText ?? c.primaryForeground,
+    trustCardHoverBackground: design.trustCardHoverBackground ?? design.buttonHoverBackground ?? c.primary,
+    trustCardHeadingColor: design.trustCardHeadingColor ?? c.primaryForeground,
     badgeBackground: c.accent, badgeText: c.primaryForeground,
   };
   const designColor = (key: (typeof componentColorFields)[number][0]) => typeof design[key] === "string" ? design[key] as string : componentFallbacks[key];

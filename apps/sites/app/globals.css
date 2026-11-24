@@ -905,7 +905,7 @@ body.micks-menu-open {
 
 .micks-home-trust-card:hover {
   /* background: #6a8fb5; */
-  background: var(--button-hover-bg);
+  background: var(--trust-card-hover-bg, var(--button-hover-bg));
 }
 
 .micks-home-trust-card h2 {
@@ -914,6 +914,7 @@ body.micks-menu-open {
   align-items: center;
   min-height: 82px;
   margin: 0 0 12px;
+  color: var(--trust-card-heading-color, var(--color-primary-foreground));
   font: 800 clamp(21px, 2.2vw, 32px)/1.31 var(--font-heading), Impact, sans-serif;
   text-transform: uppercase;
 }
@@ -1565,12 +1566,15 @@ main > section {
   border: 3px solid #fff;
   border-radius: 17px;
   color: #fff;
-  background: #7198bd;
+  background: var(--trust-card-hover-bg);
   text-align: center;
   font: 800 clamp(40px, 4.1vw, 52px)/1.28 var(--font-heading), sans-serif;
   white-space: pre-line;
   text-transform: uppercase;
   text-wrap: balance;
+}
+.micks-ai-offer strong:hover{
+  background: #5A4E4E;
 }
 
 .micks-ai-offer-description {
@@ -1707,7 +1711,7 @@ main > section {
   padding-top: 35px;
   overflow: visible;
   border-radius: 12px;
-  background: #7198bd;
+  background: var(--testimonials-bg);
 }
 
 .micks-case-label {
@@ -1764,7 +1768,7 @@ main > section {
 
 .micks-reviews {
   color: #fff;
-  background: #738fb3;
+  background: var(--testimonials-bg);
 }
 
 .micks-reviews>.container-site {
@@ -2266,7 +2270,6 @@ main > section {
   min-height: 415px;
   padding-top: 0;
   border-radius: 15px;
-  background: #6a8fb5;
 }
 
 
@@ -4136,7 +4139,7 @@ body.micks-tool-popup-open {
 .micks-testimonials-page.section {
   padding: 72px 24px 78px;
   color: #fff;
-  background: #6d92b7;
+  background: var(--testimonials-bg, #6d92b7);
 }
 .micks-testimonials-page > .container-site { max-width: 1128px; }
 .micks-testimonials-page > .container-site > h2 {

@@ -90,6 +90,7 @@ async function main() {
       surface: "#f3f4f6",
       text: "#111827",
       muted: "#4b5563",
+      testimonialsBackground: "#6d92b7",
     },
     fonts: { heading: "Nike Futura ND", body: "Poppins" },
     radius: "0.5rem",

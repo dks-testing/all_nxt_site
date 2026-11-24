@@ -115,6 +115,7 @@ export async function saveTheme(fd: FormData) {
     const colors: ThemeColors = {
       primary: hex("primary"), primaryForeground: hex("primaryForeground"), secondary: hex("secondary"), accent: hex("accent"),
       background: hex("background"), surface: hex("surface"), text: hex("text"), muted: hex("muted"),
+      testimonialsBackground: hex("testimonialsBackground"),
     };
     const font = (k: string) => {
       const v = str(fd, k);
@@ -199,6 +200,8 @@ export async function saveTheme(fd: FormData) {
       buttonHoverBackground: hex("buttonHoverBackground"), buttonHoverText: hex("buttonHoverText"),
       navButtonBackground: hex("navButtonBackground"), navButtonText: hex("navButtonText"),
       navButtonHoverBackground: hex("navButtonHoverBackground"), navButtonHoverText: hex("navButtonHoverText"),
+      trustCardHoverBackground: hex("trustCardHoverBackground"),
+      trustCardHeadingColor: hex("trustCardHeadingColor"),
       badgeBackground: hex("badgeBackground"), badgeText: hex("badgeText"),
       buttonSkew: skew, buttonTextSkew: textSkew, buttonHoverTranslateY: translate,
       footerRedlineHiddenPages: previousTheme?.design?.footerRedlineHiddenPages ?? [],

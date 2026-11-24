@@ -349,7 +349,7 @@ export const blockFields: Record<BlockType, Field[]> = {
     { path: "items", label: "Content sections", kind: "rich-text-items", help: "Use the Body toolbar to format text and insert images." },
   ],
   embed: [
-    { path: "heading", label: "Heading", kind: "text" },
+    { path: "heading", label: "Heading", kind: "text", help: "Use <br> or press Enter to start a new line." },
     { path: "body", label: "Intro text", kind: "rich-text" },
     { path: "integration", label: "Source", kind: "select", options: ["tire_finder", "ai_diagnostic", "custom"] },
     { path: "url", label: "Iframe URL (custom, or overrides integration)", kind: "url" },

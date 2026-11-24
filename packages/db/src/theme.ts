@@ -15,6 +15,7 @@ export const defaultColors: ThemeColors = {
   surface: "#f1f5f9",
   text: "#0f172a",
   muted: "#475569",
+  testimonialsBackground: "#6d92b7",
 };
 
 export const defaultFonts: ThemeFonts = { heading: "Montserrat", body: "Inter" };
@@ -48,6 +49,7 @@ export function themeToCss(t: { colors?: Partial<ThemeColors> | null; fonts?: Pa
     "--color-surface": safeColor(c.surface, defaultColors.surface),
     "--color-text": safeColor(c.text, defaultColors.text),
     "--color-muted": safeColor(c.muted, defaultColors.muted),
+    "--testimonials-bg": safeColor(c.testimonialsBackground, defaultColors.testimonialsBackground ?? "#6d92b7"),
     "--font-heading": `"${safeFont(f.heading, defaultFonts.heading)}", system-ui, sans-serif`,
     "--font-body": `"${safeFont(f.body, defaultFonts.body)}", system-ui, sans-serif`,
     "--radius": radius,
@@ -60,6 +62,8 @@ export function themeToCss(t: { colors?: Partial<ThemeColors> | null; fonts?: Pa
     "--nav-button-text": safeColor(design.navButtonText, safeColor(design.buttonText, c.primaryForeground)),
     "--nav-button-hover-bg": safeColor(design.navButtonHoverBackground, safeColor(design.buttonHoverBackground, c.primary)),
     "--nav-button-hover-text": safeColor(design.navButtonHoverText, safeColor(design.buttonHoverText, c.primaryForeground)),
+    "--trust-card-hover-bg": safeColor(design.trustCardHoverBackground, safeColor(design.buttonHoverBackground, c.primary)),
+    "--trust-card-heading-color": safeColor(design.trustCardHeadingColor, c.primaryForeground),
     "--button-skew": `${skew}deg`,
     "--button-text-skew": `${textSkew}deg`,
     "--button-hover-y": `${translate}px`,

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { RichText } from "@/lib/format";
+import { RichText, TextWithBreaks } from "@/lib/format";
 import { CheckIcon, WrenchIcon } from "../Icons";
 import type { BlockComponentProps } from "./types";
 import { localSiteHref } from "@/lib/url";
@@ -45,7 +45,7 @@ export function About({ bundle, props }: BlockComponentProps<"about">) {
               <QuoteMark design={design} className="micks-about-quote" />
               {props.eyebrow && <p className="micks-section-kicker">{props.eyebrow}</p>}
             </div>
-            <h2>{props.heading}</h2>
+            <h2><TextWithBreaks text={props.heading ?? ""} /></h2>
             <RichText text={props.body} className="prose-site" bundle={bundle} />
             <div className="micks-about-actions">
               {props.cta && <Link href={localSiteHref(bundle.site.slug, globalCtaHref(design, props.cta.href, props.cta.label))} className="btn btn-primary"><span>{globalCtaLabel(design, props.cta.href, props.cta.label)}</span></Link>}
@@ -131,7 +131,7 @@ export function Embed({ bundle, props, id }: BlockComponentProps<"embed">) {
       <section id={anchor} className="micks-ai-section">
         <div className="container-site micks-ai-grid">
           <div className="micks-ai-copy">
-            <h2>{props.heading}</h2>
+            <h2><TextWithBreaks text={props.heading ?? ""} /></h2>
             {props.body && <RichText text={props.body} className="micks-ai-intro-copy" bundle={bundle} />}
             <div className="micks-tool-card">
               {props.cta ? <Link href={localSiteHref(bundle.site.slug, globalCtaHref(design, props.cta.href, props.cta.label))}>{globalCtaLabel(design, props.cta.href, props.cta.label)}</Link> : <strong>{design.diagnosticsCtaLabel || "Start Diagnostics"}</strong>}
@@ -155,7 +155,7 @@ export function Embed({ bundle, props, id }: BlockComponentProps<"embed">) {
         <div className="container-site micks-tires-grid">
           {props.imageUrl && <div className="micks-tire-image">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={props.imageUrl} alt={`Wheel alignment at ${bundle.settings?.businessName ?? bundle.site.name}`} /></div>}
           <div className="micks-tire-copy">
-            <h2>{props.heading}</h2>
+            <h2><TextWithBreaks text={props.heading ?? ""} /></h2>
             {props.cta && <Link href={localSiteHref(bundle.site.slug, globalCtaHref(design, props.cta.href, props.cta.label))} className="btn btn-primary"><span>{globalCtaLabel(design, props.cta.href, props.cta.label)}</span></Link>}
             {props.body && <RichText text={props.body} className="prose-site" />}
           </div>
@@ -166,7 +166,7 @@ export function Embed({ bundle, props, id }: BlockComponentProps<"embed">) {
   return (
     <section id={anchor} className="section bg-[var(--color-surface)]">
       <div className="container-site">
-        {props.heading && <h2 className="mb-3 text-center text-3xl font-bold uppercase">{props.heading}</h2>}
+        {props.heading && <h2 className="mb-3 text-center text-3xl font-bold uppercase"><TextWithBreaks text={props.heading} /></h2>}
         {props.body && <RichText text={props.body} className="mx-auto mb-8 max-w-2xl text-center text-lg text-[var(--color-muted)]" bundle={bundle} />}
         {url ? (
           <iframe src={url} title={props.heading ?? cfg?.label ?? "Embedded tool"} className="w-full rounded-site border-0 bg-white shadow" style={{ height: props.height }} loading="lazy" />

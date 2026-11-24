@@ -34,6 +34,7 @@ export type ThemeColors = {
   surface: string;
   text: string;
   muted: string;
+  testimonialsBackground: string;
 };
 export type ThemeFonts = { heading: string; body: string };
 export type MenuItem = { label: string; href: string; badge?: string; children?: MenuItem[] };
@@ -121,6 +122,8 @@ export type DesignOptions = {
   navButtonText?: string;
   navButtonHoverBackground?: string;
   navButtonHoverText?: string;
+  trustCardHoverBackground?: string;
+  trustCardHeadingColor?: string;
   buttonSkew?: number;
   buttonTextSkew?: number;
   buttonHoverTranslateY?: number;

@@ -142,7 +142,7 @@ function FieldInput({ f, value, siteId, media, publicOrigin, changed, imageCount
     case "select":
       return <label className={`block ${cls}`}><span className="label">{f.label}</span><select name={name} defaultValue={String(value ?? f.options[0])} className="input" onChange={changed}>{f.options.map((o) => <option key={o}>{o}</option>)}</select></label>;
     case "textarea":
-      return <label className={`block ${cls}`}><span className="label">{f.label}</span><textarea name={name} defaultValue={String(value ?? "")} rows={5} className="input" onInput={changed} /></label>;
+      return <label className={`block ${cls}`}><span className="label">{f.label}</span><textarea name={name} defaultValue={String(value ?? "")} rows={5} className="input" onInput={changed} />{f.help && <p className="help">{f.help}</p>}</label>;
     case "rich-text":
       return <RichTextEditor name={name} label={f.label} value={String(value ?? "")} siteId={siteId} publicOrigin={publicOrigin} className={cls} />;
     case "list":
