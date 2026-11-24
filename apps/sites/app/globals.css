@@ -3339,7 +3339,7 @@ main > section {
 }
 
 .micks-footer-logo-band {
-  background: #f5f5f5;
+  background: var(--footer-logo-band-bg, #f5f5f5);
   padding-inline:20px;
 }
 

@@ -16,6 +16,7 @@ export const defaultColors: ThemeColors = {
   text: "#0f172a",
   muted: "#475569",
   testimonialsBackground: "#6d92b7",
+  footerLogoBandBackground: "#f5f5f5",
 };
 
 export const defaultFonts: ThemeFonts = { heading: "Montserrat", body: "Inter" };
@@ -50,6 +51,7 @@ export function themeToCss(t: { colors?: Partial<ThemeColors> | null; fonts?: Pa
     "--color-text": safeColor(c.text, defaultColors.text),
     "--color-muted": safeColor(c.muted, defaultColors.muted),
     "--testimonials-bg": safeColor(c.testimonialsBackground, defaultColors.testimonialsBackground ?? "#6d92b7"),
+    "--footer-logo-band-bg": safeColor(c.footerLogoBandBackground, defaultColors.footerLogoBandBackground),
     "--font-heading": `"${safeFont(f.heading, defaultFonts.heading)}", system-ui, sans-serif`,
     "--font-body": `"${safeFont(f.body, defaultFonts.body)}", system-ui, sans-serif`,
     "--radius": radius,

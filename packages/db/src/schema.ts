@@ -35,6 +35,7 @@ export type ThemeColors = {
   text: string;
   muted: string;
   testimonialsBackground: string;
+  footerLogoBandBackground: string;
 };
 export type ThemeFonts = { heading: string; body: string };
 export type MenuItem = { label: string; href: string; badge?: string; children?: MenuItem[] };

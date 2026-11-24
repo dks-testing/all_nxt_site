@@ -116,6 +116,7 @@ export async function saveTheme(fd: FormData) {
       primary: hex("primary"), primaryForeground: hex("primaryForeground"), secondary: hex("secondary"), accent: hex("accent"),
       background: hex("background"), surface: hex("surface"), text: hex("text"), muted: hex("muted"),
       testimonialsBackground: hex("testimonialsBackground"),
+      footerLogoBandBackground: hex("footerLogoBandBackground"),
     };
     const font = (k: string) => {
       const v = str(fd, k);

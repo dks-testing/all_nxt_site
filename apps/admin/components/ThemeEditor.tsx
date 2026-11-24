@@ -20,6 +20,7 @@ const colorFields: [keyof ThemeColors, string, string][] = [
   ["text", "Body text", "Default headings and paragraph text."],
   ["muted", "Muted text", "Supporting copy, captions, and secondary information."],
   ["testimonialsBackground", "Testimonials section bg", "Background color for the testimonials section."],
+  ["footerLogoBandBackground", "Footer logo band", "Background color for the footer logo and certification badge band."],
 ];
 
 const componentColorFields = [
