@@ -58,7 +58,11 @@ export type BookingAppearance = {
   landingHeading?: string;
   appointmentHeading?: string;
 };
+export const globalButtonKeys = ["schedule", "diagnostics", "tires", "about", "services", "call", "serviceCard"] as const;
+export type GlobalButton = (typeof globalButtonKeys)[number];
+
 export type DesignOptions = {
+  disabledGlobalButtons?: GlobalButton[];
   headerStyle?: "standard" | "angled";
   heroStyle?: "classic" | "micks-overlay";
   quoteSvgUrl?: string;

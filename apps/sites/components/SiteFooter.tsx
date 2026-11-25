@@ -71,7 +71,7 @@ export function SiteFooter({ bundle }: { bundle: SiteBundle }) {
           © {new Date().getFullYear()} {name}. All rights reserved.
         </div>
       </footer>
-      {settings?.phone && (
+      {settings?.phone && mobileCall && (
         <a href={mobileCall.href} className="mobile-fixed-call sm:hidden" aria-label={`Make a call to ${settings.phone}`}>
           <span><PhoneIcon />{settings.phone}</span><strong>{mobileCall.label}</strong>
         </a>
@@ -163,6 +163,6 @@ function MicksFooter({ bundle }: { bundle: SiteBundle }) {
         </div>
       </div>
     </footer>
-    {settings?.phone && <a href={mobileCall.href} className="mobile-fixed-call sm:hidden" aria-label={`Make a call to ${settings.phone}`}><span><PhoneIcon />{settings.phone}</span><strong>{mobileCall.label}</strong></a>}
+    {settings?.phone && mobileCall && <a href={mobileCall.href} className="mobile-fixed-call sm:hidden" aria-label={`Make a call to ${settings.phone}`}><span><PhoneIcon />{settings.phone}</span><strong>{mobileCall.label}</strong></a>}
   </>;
 }

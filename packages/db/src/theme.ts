@@ -1,4 +1,4 @@
-import type { ThemeColors, ThemeFonts, DesignOptions } from "./schema";
+import type { ThemeColors, ThemeFonts, DesignOptions, GlobalButton } from "./schema";
 
 export const fontOptions = ["Inter", "Roboto", "Open Sans", "Montserrat", "Poppins", "Oswald", "Lato", "Barlow", "Source Sans 3", "Merriweather", "Nike Futura ND"] as const;
 
@@ -28,6 +28,10 @@ const safeFont = (f: string | undefined, fallback: string) =>
 
 /** Builds CSS variables from an allowlisted set of design options (never raw input). */
 export function getDesign(t?: { design?: DesignOptions | null }): DesignOptions { return t?.design ?? {}; }
+
+export function isGlobalButtonEnabled(design: DesignOptions, button: GlobalButton) {
+  return !design.disabledGlobalButtons?.includes(button);
+}
 
 export function getButtonHoverBackground(theme: { colors?: Partial<ThemeColors> | null; design?: DesignOptions | null } = {}) {
   return safeColor(theme.design?.buttonHoverBackground, theme.colors?.primary ?? defaultColors.primary);

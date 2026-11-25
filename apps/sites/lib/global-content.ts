@@ -1,5 +1,6 @@
 import type { DesignOptions, SiteBundle } from "@platform/db";
 import { escapeHtmlText, richTextHtmlPrefix } from "@platform/db/rich-text";
+import { isGlobalButtonEnabled } from "@platform/db/theme";
 
 // Name substitutions belong to visible copy only. Rewriting URLs or layout keys such
 // as "micks-home" breaks images and can hide entire sections during Zod parsing.
@@ -76,36 +77,42 @@ function includesAny(value: string, terms: string[]) {
   return terms.some((term) => normalized.includes(term));
 }
 
-/** Resolves a repeated action to its one site-wide label and destination. */
-export function globalCta(design: DesignOptions, href?: string | null, label?: string | null) {
+const sharedCtas = {
+  call: { href: "#", label: "Call Now" },
+  schedule: { href: "/make-an-appointment/", label: "Schedule Service" },
+  diagnostics: { href: "/diagnostics/", label: "Start Diagnostics" },
+  tires: { href: "/tires/", label: "Find the Right Tires" },
+  about: { href: "/about-us/", label: "About Us" },
+  services: { href: "/services/", label: "View Services" },
+};
+type SharedCta = keyof typeof sharedCtas;
+const sharedCtaKeys = Object.keys(sharedCtas) as SharedCta[];
+
+function globalCtaKind(design: DesignOptions, href?: string | null, label?: string | null): SharedCta | undefined {
   const signal = `${href ?? ""} ${label ?? ""}`;
-  if (includesAny(signal, ["tel:", "call now", "call us", "make a call"])) {
-    return { href: design.callCtaHref || href || "#", label: design.callCtaLabel || "Call Now" };
-  }
-  if (includesAny(signal, ["make-an-appointment", "schedule service", "book appointment", "book service"])) {
-    return { href: design.scheduleCtaHref || "/make-an-appointment/", label: design.scheduleCtaLabel || "Schedule Service" };
-  }
-  if (includesAny(signal, ["diagnostic", "start diagnosis", "pre-diagnosis"])) {
-    return { href: design.diagnosticsCtaHref || "/diagnostics/", label: design.diagnosticsCtaLabel || "Start Diagnostics" };
-  }
-  if (includesAny(signal, ["/tires", "find my tires", "find the right tires", "tire finder"])) {
-    return { href: design.tiresCtaHref || "/tires/", label: design.tiresCtaLabel || "Find the Right Tires" };
-  }
-  if (/\/about-us\/?(?:[#?].*)?$/i.test(href || "") || includesAny(label || "", ["about us", "our story"])) {
-    return { href: design.aboutCtaHref || "/about-us/", label: design.aboutCtaLabel || "About Us" };
-  }
-  if (/\/services\/?(?:[#?].*)?$/i.test(href || "") || includesAny(label || "", ["view services", "our services"])) {
-    return { href: design.servicesCtaHref || "/services/", label: design.servicesCtaLabel || "View Services" };
-  }
-  return { href: href || "#", label: label || "Learn More" };
+  if (includesAny(signal, ["tel:", "call now", "call us", "make a call"])) return "call";
+  if (includesAny(signal, ["make-an-appointment", "schedule service", "book appointment", "book service"])) return "schedule";
+  if (includesAny(signal, ["diagnostic", "start diagnosis", "pre-diagnosis"])) return "diagnostics";
+  if (includesAny(signal, ["/tires", "find my tires", "find the right tires", "tire finder"])) return "tires";
+  if (/\/about-us\/?(?:[#?].*)?$/i.test(href || "") || includesAny(label || "", ["about us", "our story"])) return "about";
+  if (/\/services\/?(?:[#?].*)?$/i.test(href || "") || includesAny(label || "", ["view services", "our services"])) return "services";
+  return sharedCtaKeys.find((key) => href && href !== "#" && href === design[`${key}CtaHref`])
+    ?? sharedCtaKeys.find((key) => label?.trim() && label.trim().toLowerCase() === design[`${key}CtaLabel`]?.trim().toLowerCase());
 }
 
-export function globalCtaHref(design: DesignOptions, href?: string | null, label?: string | null) {
-  return globalCta(design, href, label).href;
+export function isGlobalCtaEnabled(design: DesignOptions, href?: string | null, label?: string | null) {
+  const kind = globalCtaKind(design, href, label);
+  return !kind || isGlobalButtonEnabled(design, kind);
 }
 
-export function globalCtaLabel(design: DesignOptions, href?: string | null, label?: string | null) {
-  return globalCta(design, href, label).label;
+/** Resolves a repeated action to its site-wide label and destination when enabled. */
+export function globalCta(design: DesignOptions, href?: string | null, label?: string | null, kind = globalCtaKind(design, href, label)) {
+  if (!kind) return { href: href || "#", label: label || "Learn More" };
+  if (!isGlobalButtonEnabled(design, kind)) return null;
+  return {
+    href: design[`${kind}CtaHref`] || (kind === "call" && href) || sharedCtas[kind].href,
+    label: design[`${kind}CtaLabel`] || sharedCtas[kind].label,
+  };
 }
 
 export function serviceCardLabel(design: DesignOptions): string {

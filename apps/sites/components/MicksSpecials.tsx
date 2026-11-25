@@ -5,7 +5,7 @@ import type { BlockProps } from "@platform/db/blocks";
 import { getSpecials, type SiteCtx } from "@/lib/data";
 import { RichText, telHref } from "@/lib/format";
 import { localSiteHref } from "@/lib/url";
-import { globalCta, globalText } from "@/lib/global-content";
+import { globalCta, globalText, isGlobalCtaEnabled } from "@/lib/global-content";
 
 /** All offers come from this website's Specials collection. The first visible offer is featured. */
 type Offer = Awaited<ReturnType<typeof getSpecials>>[number];
@@ -59,10 +59,10 @@ function OfferCard({ item, bundle, featured, fallbackImage }: { item: Offer; bun
   const defaultAction = phone
     ? globalCta(design, design.callCtaHref || phone, "Call Us")
     : globalCta(design, "/make-an-appointment/", "Book Now");
-  const ctaHref = localSiteHref(bundle.site.slug, defaultAction.href);
   const image = item.imageUrl || fallbackImage;
-  const actionHref = item.ctaHref ? localSiteHref(bundle.site.slug, item.ctaHref) : ctaHref;
-  const actionLabel = globalText(item.ctaLabel, bundle).trim() || defaultAction.label;
+  const actionSource = item.ctaHref || defaultAction?.href;
+  const actionHref = actionSource && localSiteHref(bundle.site.slug, actionSource);
+  const actionLabel = globalText(item.ctaLabel, bundle).trim() || defaultAction?.label || "Call Us";
   const couponLabel = globalText(item.couponButtonLabel, bundle).trim() || "CODE";
   const couponHref = item.couponButtonHref ? localSiteHref(bundle.site.slug, item.couponButtonHref) : null;
   return (
@@ -89,7 +89,7 @@ function OfferCard({ item, bundle, featured, fallbackImage }: { item: Offer; bun
         )}
         {copy.note && <p className="micks-offer-note">{copy.note}</p>}
         <div className="micks-offer-actions">
-          <a className="micks-offer-call" href={actionHref}><span>{actionLabel}</span></a>
+          {actionHref && (!item.ctaHref || isGlobalCtaEnabled(design, item.ctaHref, item.ctaLabel)) && <a className="micks-offer-call" href={actionHref}><span>{actionLabel}</span></a>}
           {item.couponCode && (couponHref
             ? <a className="micks-offer-code" href={couponHref}><span>{couponLabel} &ldquo;{item.couponCode}&rdquo;</span></a>
             : <span className="micks-offer-code"><span>{couponLabel} &ldquo;{item.couponCode}&rdquo;</span></span>)}

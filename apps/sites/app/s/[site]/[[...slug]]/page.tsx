@@ -7,7 +7,7 @@ import { RenderSections } from "@/components/RenderSections";
 import { RichText, telHref } from "@/lib/format";
 import { CheckIcon, PhoneIcon } from "@/components/Icons";
 import { localSiteHref } from "@/lib/url";
-import { getDesign } from "@platform/db/theme";
+import { getDesign, isGlobalButtonEnabled } from "@platform/db/theme";
 import { MicksInnerHero } from "@/components/MicksInnerHero";
 import { MicksContentPage } from "@/components/MicksContentPages";
 import { MicksMissionCar } from "@/components/MicksMissionCar";
@@ -15,7 +15,7 @@ import { MicksSpecials } from "@/components/MicksSpecials";
 import { CertificationBadges } from "@/components/CertificationBadge";
 import { QuoteMark } from "@/components/QuoteMark";
 import { StepListIcon } from "@/components/TrustListIcon";
-import { globalCta, globalCtaHref, globalText } from "@/lib/global-content";
+import { globalCta, globalText } from "@/lib/global-content";
 
 type Props = { params: Promise<{ site: string; slug?: string[] }>; searchParams?: Promise<Record<string, string | string[] | undefined>> };
 
@@ -165,7 +165,7 @@ export default async function Page({ params, searchParams }: Props) {
               </>}
               {closingBlocks.map((block, i) => <RichText key={i} text={block} className="micks-service-prose" />)}
               <div className="micks-service-bottom-actions">
-                <Link href={localSiteHref(bundle.site.slug, scheduleAction.href)} className="micks-hero-button"><span>{scheduleAction.label}</span></Link>
+                {scheduleAction && <Link href={localSiteHref(bundle.site.slug, scheduleAction.href)} className="micks-hero-button"><span>{scheduleAction.label}</span></Link>}
                 <CertificationBadges design={design} className="micks-service-badges" />
               </div>
             </div>
@@ -179,17 +179,17 @@ export default async function Page({ params, searchParams }: Props) {
                 <h2>{globalText(svc.vehicleCalloutHeading, bundle)}</h2>
                 {calloutBullets.length > 0 && <ServiceKeyPoints items={calloutBullets} />}
                 {svc.vehicleCalloutBody && <RichText text={globalText(svc.vehicleCalloutBody, bundle)} bundle={bundle} />}
-                <div className="micks-live-buttons">
-                  <a href={callAction.href}><span>{callAction.label}</span></a>
-                  <Link href={localSiteHref(bundle.site.slug, scheduleAction.href)}><span>{scheduleAction.label}</span></Link>
-                </div>
+                {(callAction || scheduleAction) && <div className="micks-live-buttons">
+                  {callAction && <a href={callAction.href}><span>{callAction.label}</span></a>}
+                  {scheduleAction && <Link href={localSiteHref(bundle.site.slug, scheduleAction.href)}><span>{scheduleAction.label}</span></Link>}
+                </div>}
               </div>
               <MicksMissionCar src={vehicleImage} animate={vehicleSettings?.animateVehicleImage} />
             </div>
           </section>
         )}
         <section className="micks-service-live-trust"><div className="container-site micks-service-live-grid"><div><h2>{globalText(svc.trustHeading, bundle)}</h2><div className="micks-service-step-list micks-service-trust-list">{trustItems.map(([title, body]) => <div key={title}><StepListIcon design={design} label={title} /><p><strong>{globalText(title, bundle)}</strong>{globalText(body, bundle)}</p></div>)}</div></div><img src={trustImage} alt={`${bundle.settings?.businessName ?? bundle.site.name} in the community`} /></div></section>
-        <section className="micks-know-cta section"><div><h2>{globalText(svc.finalHeading, bundle)}</h2><RichText text={globalText(svc.finalBody, bundle)} bundle={bundle} /><Link href={localSiteHref(bundle.site.slug, finalAction.href)}><span>{finalAction.label}</span></Link></div></section>
+        <section className="micks-know-cta section"><div><h2>{globalText(svc.finalHeading, bundle)}</h2><RichText text={globalText(svc.finalBody, bundle)} bundle={bundle} />{finalAction && <Link href={localSiteHref(bundle.site.slug, finalAction.href)}><span>{finalAction.label}</span></Link>}</div></section>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "Service", name: svc.name, description: svc.summary, provider: { "@type": bundle.settings?.businessType ?? "LocalBusiness", name: bundle.settings?.businessName } }).replace(/</g, "\\u003c") }} />
       </>
     );
@@ -201,10 +201,10 @@ export default async function Page({ params, searchParams }: Props) {
           <nav className="mb-4 text-sm text-white/70"><Link href={localSiteHref(bundle.site.slug, "/services/")} className="hover:text-white">Services</Link> / {svc.name}</nav>
           <h1 className="max-w-3xl text-4xl font-bold uppercase md:text-5xl">{svc.name}</h1>
             {svc.summary && <p className="mt-4 max-w-2xl text-lg text-white/85">{globalText(svc.summary, bundle)}</p>}
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href={localSiteHref(bundle.site.slug, scheduleAction.href)} className="btn btn-primary"><span>{scheduleAction.label}</span></Link>
-            {phone && <a href={telHref(phone)} className="btn btn-outline text-white"><PhoneIcon className="h-4 w-4" /><span>{phone}</span></a>}
-          </div>
+          {(scheduleAction || (phone && callAction)) && <div className="mt-8 flex flex-wrap gap-3">
+            {scheduleAction && <Link href={localSiteHref(bundle.site.slug, scheduleAction.href)} className="btn btn-primary"><span>{scheduleAction.label}</span></Link>}
+            {phone && callAction && <a href={telHref(phone)} className="btn btn-outline text-white"><PhoneIcon className="h-4 w-4" /><span>{phone}</span></a>}
+          </div>}
         </div>
       </section>
       <section className="section">
@@ -227,7 +227,7 @@ export default async function Page({ params, searchParams }: Props) {
             <ul className="space-y-2">
               {others.map((o) => <li key={o.id}><Link href={localSiteHref(bundle.site.slug, `/${o.slug}/`)} className="font-semibold hover:text-[var(--color-primary)]">{o.name}</Link></li>)}
             </ul>
-            <Link href={localSiteHref(bundle.site.slug, "/services/")} className="mt-5 inline-block text-sm font-bold uppercase text-[var(--color-primary)]">All services →</Link>
+            {isGlobalButtonEnabled(design, "services") && <Link href={localSiteHref(bundle.site.slug, "/services/")} className="mt-5 inline-block text-sm font-bold uppercase text-[var(--color-primary)]">All services →</Link>}
           </aside>
         </div>
       </section>

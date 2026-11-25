@@ -4,7 +4,7 @@ import { resolve4, resolveCname } from "node:dns/promises";
 import { revalidatePath } from "next/cache";
 import {
   getDb, and, eq, asc, siteSettings, themes, media, pages, pageSections, menus, domains, redirects, bookingSettings, appointments, services,
-  integrations, users, siteMembers, integrationTypes, appointmentStatus, siteRoles, audit,
+  integrations, users, siteMembers, integrationTypes, appointmentStatus, siteRoles, audit, globalButtonKeys,
   type DayHours, type MenuItem, type ThemeColors,
 } from "@platform/db";
 import { blockSchemas, blockFields, defaultBlockProps, isBlockType, type Field } from "@platform/db/blocks";
@@ -51,8 +51,11 @@ export async function saveGlobalSettings(fd: FormData) {
 
     const [themeRow] = await db.select().from(themes).where(eq(themes.siteId, siteId));
     if (!themeRow) throw new Error("Set up branding before saving global links");
+    const disabledGlobalButtons = fd.has("globalButtonVisibility")
+      ? globalButtonKeys.filter((key) => !bool(fd, `globalButton:${key}:enabled`))
+      : themeRow.design?.disabledGlobalButtons;
     await db.update(themes).set({
-      design: { ...(themeRow.design ?? {}), scheduleCtaHref, diagnosticsCtaHref, tiresCtaHref, aboutCtaHref, servicesCtaHref, callCtaHref: callCtaHref || undefined, scheduleCtaLabel, diagnosticsCtaLabel, tiresCtaLabel, aboutCtaLabel, servicesCtaLabel, serviceCardCtaLabel, callCtaLabel },
+      design: { ...(themeRow.design ?? {}), disabledGlobalButtons, scheduleCtaHref, diagnosticsCtaHref, tiresCtaHref, aboutCtaHref, servicesCtaHref, callCtaHref: callCtaHref || undefined, scheduleCtaLabel, diagnosticsCtaLabel, tiresCtaLabel, aboutCtaLabel, servicesCtaLabel, serviceCardCtaLabel, callCtaLabel },
     }).where(eq(themes.siteId, siteId));
 
     for (const type of ["tire_finder", "ai_diagnostic"] as const) {

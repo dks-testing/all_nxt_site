@@ -2,9 +2,9 @@ import Link from "next/link";
 import type { SiteBundle, MenuItem } from "@platform/db";
 import { telHref } from "@/lib/format";
 import { PhoneIcon, MenuIcon, ChevronIcon } from "./Icons";
-import { getDesign } from "@platform/db/theme";
+import { getDesign, isGlobalButtonEnabled } from "@platform/db/theme";
 import { localSiteHref } from "@/lib/url";
-import { globalText } from "@/lib/global-content";
+import { globalText, isGlobalCtaEnabled } from "@/lib/global-content";
 import { ActiveNavLink } from "./ActiveNavLink";
 import { MicksMobileMenu } from "./MicksMobileMenu";
 
@@ -20,7 +20,7 @@ export function SiteHeader({ bundle, topBar }: { bundle: SiteBundle; topBar?: { 
       {topBar && (
         <div className="bg-[var(--color-secondary)] px-4 py-2 text-center text-sm text-white">
           {globalText(topBar.heading, bundle)}
-          {topBar.ctaUrl && (
+          {topBar.ctaUrl && isGlobalCtaEnabled(design, topBar.ctaUrl, topBar.ctaLabel) && (
             <Link href={localSiteHref(bundle.site.slug, topBar.ctaUrl)} className="ml-2 font-semibold underline">
               {topBar.ctaLabel ?? "Learn more"}
             </Link>
@@ -44,7 +44,7 @@ export function SiteHeader({ bundle, topBar }: { bundle: SiteBundle; topBar?: { 
         </nav>
 
         <div className="flex items-center gap-3">
-          {settings?.phone && (
+          {settings?.phone && isGlobalButtonEnabled(design, "call") && (
             <a href={telHref(settings.phone)} className="btn btn-primary nav-cta-button hidden whitespace-nowrap !px-4 !py-2.5 sm:inline-flex">
               <PhoneIcon className="h-4 w-4" /><span>{settings.phone}</span>
             </a>
@@ -91,6 +91,7 @@ function NavItem({ item, bundle }: { item: MenuItem; bundle: SiteBundle }) {
 function AngledHeader({ bundle }: { bundle: SiteBundle }) {
   const { settings, theme, headerMenu } = bundle;
   const name = settings?.businessName ?? bundle.site.name;
+  const design = getDesign(theme ?? {});
   const links = headerMenu.filter((item) => item.href !== "/" || !/^home$/i.test(item.label));
   const weekday = settings?.hours?.find((h) => h.day === "Mon" && !h.closed);
   const compactTime = (time: string) => {
@@ -111,7 +112,7 @@ function AngledHeader({ bundle }: { bundle: SiteBundle }) {
             {item.children?.length ? <div className="micks-dropdown">{item.children.map((child) => <ActiveNavLink key={child.href} href={localSiteHref(bundle.site.slug, child.href)} siteSlug={bundle.site.slug} className="micks-dropdown-link">{globalText(child.label, bundle)}</ActiveNavLink>)}</div> : null}
           </div>)}
         </nav>
-        {settings?.phone && <a href={telHref(settings.phone)} className="micks-phone-panel" aria-label={`Call ${settings.phone}`}>
+        {settings?.phone && isGlobalButtonEnabled(design, "call") && <a href={telHref(settings.phone)} className="micks-phone-panel" aria-label={`Call ${settings.phone}`}>
           <strong>{settings.phone}</strong><span>{hours}</span>
         </a>}
         <MicksMobileMenu

@@ -49,11 +49,11 @@ export function MicksContactBooking({ bundle, contactProps, bookingProps }: {
           {settings?.phone && <li><strong>Phone:</strong> <a href={telHref(settings.phone)}>{settings.phone}</a></li>}
           {settings?.hours && <li className="micks-contact-hours"><strong>Hours:</strong> <span>{groupHours(settings.hours).map((row) => <span key={row.days}>{row.days}: {row.time}</span>)}</span></li>}
         </ul>
-        <div className="micks-contact-actions">
-          {settings?.phone && <a href={callAction.href}><span>{callAction.label}</span></a>}
+        {((settings?.phone && callAction) || address || scheduleAction) && <div className="micks-contact-actions">
+          {settings?.phone && callAction && <a href={callAction.href}><span>{callAction.label}</span></a>}
           {address && <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`}><span>Get Directions</span></a>}
-          <Link href={localSiteHref(bundle.site.slug, scheduleAction.href)}><span>{scheduleAction.label}</span></Link>
-        </div>
+          {scheduleAction && <Link href={localSiteHref(bundle.site.slug, scheduleAction.href)}><span>{scheduleAction.label}</span></Link>}
+        </div>}
       </div>
       <div className="micks-booking-column" id="book">
         <h2>{booking?.appearance?.landingHeading || bookingProps.heading}</h2>

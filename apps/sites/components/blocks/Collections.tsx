@@ -5,8 +5,8 @@ import { richTextPlainText } from "@platform/db/rich-text-html";
 import { ArrowIcon, Stars, PhoneIcon, PinIcon, ClockIcon, WrenchIcon } from "../Icons";
 import type { BlockComponentProps } from "./types";
 import { localSiteHref } from "@/lib/url";
-import { globalCta, globalText, serviceCardLabel } from "@/lib/global-content";
-import { getDesign } from "@platform/db/theme";
+import { globalCta, globalText, isGlobalCtaEnabled, serviceCardLabel } from "@/lib/global-content";
+import { getDesign, isGlobalButtonEnabled } from "@platform/db/theme";
 
 export async function ServicesGrid({ ctx, bundle, props }: BlockComponentProps<"services_grid">) {
   const all = await getServices(ctx);
@@ -27,11 +27,11 @@ export async function ServicesGrid({ ctx, bundle, props }: BlockComponentProps<"
               <WrenchIcon className="mb-4 h-8 w-8 text-[var(--color-primary)]" />
               <h3 className="mb-2 text-lg font-bold leading-snug">{s.name}</h3>
               <p className="mb-4 flex-1 text-sm text-[var(--color-muted)]">{globalText(s.summary, bundle)}</p>
-              <span className="inline-flex items-center gap-1 text-sm font-bold uppercase text-[var(--color-primary)]">{serviceCardLabel(design)} <ArrowIcon className="h-4 w-4 transition group-hover:translate-x-1" /></span>
+              {isGlobalButtonEnabled(design, "serviceCard") && <span className="inline-flex items-center gap-1 text-sm font-bold uppercase text-[var(--color-primary)]">{serviceCardLabel(design)} <ArrowIcon className="h-4 w-4 transition group-hover:translate-x-1" /></span>}
             </Link>
           ))}
         </div>
-        {props.limit && all.length > props.limit && (
+        {servicesAction && props.limit && all.length > props.limit && (
           <div className="mt-10 text-center"><Link href={localSiteHref(bundle.site.slug, servicesAction.href)} className="btn btn-dark"><span>{servicesAction.label}</span></Link></div>
         )}
       </div>
@@ -42,6 +42,7 @@ export async function ServicesGrid({ ctx, bundle, props }: BlockComponentProps<"
 export async function Specials({ ctx, bundle, props }: BlockComponentProps<"specials">) {
   const items = await getSpecials(ctx);
   if (!items.length) return null;
+  const design = getDesign(bundle.theme ?? {});
   return (
     <section className="section bg-[var(--color-surface)]">
       <div className="container-site">
@@ -71,7 +72,7 @@ export async function Specials({ ctx, bundle, props }: BlockComponentProps<"spec
                     ? <a href={couponHref} className="btn btn-secondary mt-4"><span>{globalText(sp.couponButtonLabel, bundle).trim() || "Code"}: {sp.couponCode}</span></a>
                     : <p className="mt-4 text-sm">{globalText(sp.couponButtonLabel, bundle).trim() || "Code"}: <strong className="rounded bg-[var(--color-surface)] px-2 py-1 font-mono">{sp.couponCode}</strong></p>)}
                   {sp.validUntil && <p className="mt-2 text-xs text-[var(--color-muted)]">Valid until {sp.validUntil}</p>}
-                  <a href={actionHref} className="btn btn-primary mt-5"><span>{globalText(sp.ctaLabel, bundle).trim() || "Claim offer"}</span></a>
+                  {isGlobalCtaEnabled(design, actionHref, sp.ctaLabel) && <a href={actionHref} className="btn btn-primary mt-5"><span>{globalText(sp.ctaLabel, bundle).trim() || "Claim offer"}</span></a>}
                 </div>
               </div>
             );

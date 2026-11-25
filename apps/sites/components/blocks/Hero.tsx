@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getHeroBanner } from "@/lib/data";
 import { Stars, CheckIcon, PhoneIcon, PinIcon } from "../Icons";
-import { getDesign } from "@platform/db/theme";
+import { getDesign, isGlobalButtonEnabled } from "@platform/db/theme";
 import type { BlockProps } from "@platform/db/blocks";
 import type { BlockComponentProps } from "./types";
 import { localSiteHref } from "@/lib/url";
@@ -30,6 +30,7 @@ export async function Hero({ ctx, bundle, props, index, pageSlug, integratedTrus
 
   if (micksHome) {
     const s = bundle.settings;
+    const showPhone = s?.phone && isGlobalButtonEnabled(design, "call");
     const city = s?.address?.city;
     const region = s?.address?.region;
     const street = s?.address?.street;
@@ -45,14 +46,14 @@ export async function Hero({ ctx, bundle, props, index, pageSlug, integratedTrus
               {props.eyebrow && <p className="micks-home-eyebrow">{props.eyebrow}</p>}
               <h1 className="micks-home-title"><TextWithBreaks text={heading} /></h1>
               {sub && <RichText text={sub} className="micks-home-subtitle" bundle={bundle} />}
-              <div className="micks-home-actions">
+              {(primary || secondary || third) && <div className="micks-home-actions">
                 {primary && <Link className="micks-hero-button" href={localSiteHref(bundle.site.slug, primary.href)}><span>{primary.label}</span></Link>}
                 {secondary && <Link className="micks-hero-button" href={localSiteHref(bundle.site.slug, secondary.href)}><span>{secondary.label}</span></Link>}
                 {third && <Link className="micks-hero-button" href={localSiteHref(bundle.site.slug, third.href)}><span>{third.label}</span></Link>}
-              </div>
-              {(location || s?.phone) && <div className="micks-contact-strips">
+              </div>}
+              {(location || showPhone) && <div className="micks-contact-strips">
                 {location && <div className="micks-contact-strip"><PinIcon className="inline-block h-4 w-4" /><span>{location}</span></div>}
-                {s?.phone && <a href={telHref(s.phone)} className="micks-contact-strip"><PhoneIcon className="inline-block h-4 w-4" /><span>{s.phone}</span></a>}
+                {showPhone && <a href={telHref(s?.phone)} className="micks-contact-strip"><PhoneIcon className="inline-block h-4 w-4" /><span>{s?.phone}</span></a>}
               </div>}
             </div>
             {(props.showRating || props.reviewImageUrl || sharedCertifications.length > 0) && <aside className="micks-home-social-proof" aria-label="Ratings and certifications">
@@ -76,7 +77,7 @@ export async function Hero({ ctx, bundle, props, index, pageSlug, integratedTrus
   }
 
   if (pageSlug !== "" && design.headerStyle === "angled") {
-    return <MicksInnerHero bundle={bundle} heading={heading} primaryCta={primary} imageUrl={image} />;
+    return <MicksInnerHero bundle={bundle} heading={heading} primaryCta={primary ?? undefined} imageUrl={image} />;
   }
 
   const s = bundle.settings;

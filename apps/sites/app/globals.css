@@ -70,10 +70,6 @@ h4 {
     line-height: 1;
   }
 
-  .btn:hover {
-    /* transform: skewX(var(--button-skew, 0deg)) translateY(var(--button-hover-y, -2px)); */
-  }
-
   .btn:active {
     transform: skewX(var(--button-skew, 0deg)) translateY(1px);
   }
@@ -710,10 +706,6 @@ body.micks-menu-open {
   background-size: cover;
   background-position: center 55%;
   background-repeat: no-repeat;
-}
-
-.micks-home-hero-inner {
-  /* padding-top: 20px; */
 }
 
 .micks-home-top {
@@ -1409,9 +1401,6 @@ main > section {
   margin: 0;
   font: 800 52px/1 var(--font-heading), sans-serif;
   text-transform: uppercase;
-}
-
-.micks-about {
 }
 
 .micks-about-grid {
@@ -2165,10 +2154,6 @@ main > section {
     height: min(125vw, 600px);
   }
 
-  .micks-about-copy {
-    /* padding-inline: 8px; */
-  }
-
   .micks-ai-grid {
     gap: 30px;
   }
@@ -2395,6 +2380,7 @@ main > section {
 .micks-smart-tool-panel-copy>a:hover,
 .micks-smart-tool-panel-copy>button:hover {
   background: var(--button-hover-bg, #d1272c);
+  color:var(--button-hover-text, #fff);
 }
 
 .micks-smart-feature-copy-wrap>a>span,
@@ -2709,6 +2695,7 @@ main > section {
   font-size: 32px;
   font-weight: 600;
   line-height: 42px;
+  text-wrap: balance;
 }
 
 .micks-smart-feature-copy p {
@@ -2808,7 +2795,6 @@ main > section {
 
 .micks-smart-feature-intro .micks-smart-feature-callout b {
   display: block;
-  margin-bottom: 16px;
   font-size: 24px;
   font-weight: 600;
   line-height: 34px;
@@ -2907,11 +2893,6 @@ main > section {
   font-size: 12px;
   font-weight: 500;
   line-height: 23px;
-}
-
-.micks-smart-feature-experience.section,
-.micks-smart-feature-cta.section {
-  /* padding-block: 0 10px; */
 }
 
 /* .micks-smart-feature-experience+.micks-smart-feature-cta+.micks-smart-feature-trust.section {
@@ -5726,10 +5707,6 @@ body.micks-tool-popup-open {
   grid-template-columns: minmax(0, 53fr) minmax(0, 47fr);
 }
 
-.micks-service-live-trust .micks-service-live-grid>img {
-  /* height: 520px; */
-}
-
 .micks-step-icon {
   display: block;
   width: 57px;
@@ -6396,10 +6373,6 @@ body.micks-tool-popup-open {
     padding-block: 12px;
   }
 
-  .micks-footer-facebook {
-    /* justify-content: flex-start; */
-  }
-
   .micks-owner {
     padding-top: 32px;
   }
@@ -6904,10 +6877,6 @@ button:hover{
   .micks-shared-banner .micks-inner-hero-content h1{
     text-align: center;
   }
-  .micks-mission.section,
-  .micks-about-page-intro{
-    /* padding:30px 20px 0px; */
-  }
   .micks-mission-grid{
     width:100%;
   }
@@ -7011,12 +6980,6 @@ button:hover{
   .micks-home-actions {
     width: 100%;
   }
-
-  .micks-hero-button {
-    /* width: 100%; */
-  }
-
-   
 
   main > section .container-site {
     padding-inline: 0;

@@ -1,5 +1,5 @@
 import { eq, getDb, integrations, siteSettings, themes } from "@platform/db";
-import { getDesign } from "@platform/db/theme";
+import { getDesign, isGlobalButtonEnabled } from "@platform/db/theme";
 import { loadSite } from "@/lib/site";
 import { saveGlobalSettings } from "@/lib/actions/content";
 import { Card, Checkbox, Input, PageHeader } from "@/components/ui";
@@ -37,21 +37,22 @@ export default async function GlobalSettingsPage({ params }: { params: Promise<{
         </Card>
 
         <Card title="Global website buttons" description="Edit each shared action once. Matching buttons in heroes, page sections, service pages, contact areas and mobile actions update together.">
+          <input type="hidden" name="globalButtonVisibility" value="1" />
           <div className="space-y-4">
-            {[
-              ["Schedule service", "scheduleCtaLabel", design.scheduleCtaLabel ?? "Schedule Service", "scheduleCtaHref", design.scheduleCtaHref ?? "/make-an-appointment/"],
-              ["Diagnostics", "diagnosticsCtaLabel", design.diagnosticsCtaLabel ?? "Start Diagnostics", "diagnosticsCtaHref", design.diagnosticsCtaHref ?? "/diagnostics/"],
-              ["Tire finder", "tiresCtaLabel", design.tiresCtaLabel ?? "Find the Right Tires", "tiresCtaHref", design.tiresCtaHref ?? "/tires/"],
-              ["About us", "aboutCtaLabel", design.aboutCtaLabel ?? "About Us", "aboutCtaHref", design.aboutCtaHref ?? "/about-us/"],
-              ["Services", "servicesCtaLabel", design.servicesCtaLabel ?? "View Services", "servicesCtaHref", design.servicesCtaHref ?? "/services/"],
-              ["Call", "callCtaLabel", design.callCtaLabel ?? "Call Now", "callCtaHref", design.callCtaHref ?? (settings?.phone ? `tel:${settings.phone.replace(/[^+\d]/g, "")}` : "")],
-            ].map(([title, labelName, labelValue, hrefName, hrefValue]) => <div key={String(labelName)} className="grid gap-3 rounded-xl border border-slate-200 p-4 lg:grid-cols-[150px_1fr_1.3fr] lg:items-end">
-              <strong className="pb-2 text-sm">{title}</strong>
-              <Input label="Button label" name={String(labelName)} defaultValue={String(labelValue)} required />
-              <Input label="Button link" name={String(hrefName)} defaultValue={String(hrefValue)} required={title !== "Call"} help={title === "Call" ? "Leave blank to use the phone number from Business info." : undefined} />
+            {([
+              ["schedule", "Schedule service", design.scheduleCtaLabel ?? "Schedule Service", design.scheduleCtaHref ?? "/make-an-appointment/"],
+              ["diagnostics", "Diagnostics", design.diagnosticsCtaLabel ?? "Start Diagnostics", design.diagnosticsCtaHref ?? "/diagnostics/"],
+              ["tires", "Tire finder", design.tiresCtaLabel ?? "Find the Right Tires", design.tiresCtaHref ?? "/tires/"],
+              ["about", "About us", design.aboutCtaLabel ?? "About Us", design.aboutCtaHref ?? "/about-us/"],
+              ["services", "Services", design.servicesCtaLabel ?? "View Services", design.servicesCtaHref ?? "/services/"],
+              ["call", "Call", design.callCtaLabel ?? "Call Now", design.callCtaHref ?? (settings?.phone ? `tel:${settings.phone.replace(/[^+\d]/g, "")}` : "")],
+            ] as const).map(([key, title, label, href]) => <div key={key} className="grid gap-3 rounded-xl border border-slate-200 p-4 lg:grid-cols-[150px_1fr_1.3fr] lg:items-end">
+              <div className="space-y-2"><strong className="block text-sm">{title}</strong><Checkbox label="Enabled" name={`globalButton:${key}:enabled`} defaultChecked={isGlobalButtonEnabled(design, key)} /></div>
+              <Input label="Button label" name={`${key}CtaLabel`} defaultValue={label} required />
+              <Input label="Button link" name={`${key}CtaHref`} defaultValue={href} required={key !== "call"} help={key === "call" ? "Leave blank to use the phone number from Business info." : undefined} />
             </div>)}
             <div className="grid gap-3 rounded-xl border border-slate-200 p-4 lg:grid-cols-[150px_1fr_1.3fr] lg:items-end">
-              <strong className="pb-2 text-sm">Service cards</strong>
+              <div className="space-y-2"><strong className="block text-sm">Service cards</strong><Checkbox label="Enabled" name="globalButton:serviceCard:enabled" defaultChecked={isGlobalButtonEnabled(design, "serviceCard")} /></div>
               <Input label="Button label" name="serviceCardCtaLabel" defaultValue={design.serviceCardCtaLabel && !/^learn more$/i.test(design.serviceCardCtaLabel.trim()) ? design.serviceCardCtaLabel : "Read More"} required />
               <p className="pb-2 text-xs text-slate-500">Each card automatically links to its own service page, so only one shared label is needed.</p>
             </div>
