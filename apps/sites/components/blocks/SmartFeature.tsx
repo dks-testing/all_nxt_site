@@ -41,7 +41,7 @@ export function SmartFeature({ bundle, props, pageSlug }: BlockComponentProps<"s
             <RichText text={props.body} className="micks-smart-feature-copy" bundle={bundle} />
             {cta}
             {(props.calloutHeading || props.calloutBody) && <aside className="micks-smart-feature-callout">
-              {props.calloutHeading && <strong>{props.calloutHeading}</strong>}
+              {props.calloutHeading && <b>{props.calloutHeading}</b>}
               {props.calloutBody && <RichText text={props.calloutBody} bundle={bundle} />}
             </aside>}
             {props.supportText && <p className="micks-smart-support">{props.supportText}</p>}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { blockFields, splitLegacyOffer, type BlockType, type Field } from "@platform/db/blocks";
 import { MediaPicker, type MediaAsset } from "./MediaPicker";
 import { PairListEditor } from "./PairListEditor";
@@ -10,7 +10,7 @@ function get(obj: Record<string, unknown>, path: string): unknown {
   return path.split(".").reduce<unknown>((o, k) => (o && typeof o === "object" ? (o as Record<string, unknown>)[k] : undefined), obj);
 }
 
-type Group = "Content" | "Design" | "Images" | "Buttons" | "Advanced";
+type Group = "Content" | "Design" | "Images" | "Colors" | "Buttons" | "Advanced";
 export type TeamProfileOption = { id: string; name: string; position: string | null; imageUrl: string | null; isActive: boolean };
 
 function TeamProfilePicker({ value, profiles, publicOrigin, siteId, changed }: { value: unknown; profiles: TeamProfileOption[]; publicOrigin: string; siteId: string; changed: () => void }) {
@@ -60,6 +60,7 @@ function TeamProfilePicker({ value, profiles, publicOrigin, siteId, changed }: {
 function fieldGroup(field: Field): Group {
   if (field.path === "headingTag" || field.path === "animateVehicleImage") return "Content";
   if (field.kind === "image" || field.kind === "image-list") return "Images";
+  if (field.kind === "color") return "Colors";
   if (/cta|button|reviewUrl/i.test(field.path)) return "Buttons";
   if (/variant|layout|showRating|badges/i.test(field.path) || field.kind === "boolean" || field.kind === "select") return "Design";
   if (field.kind === "url" || /integration|height/i.test(field.path)) return "Advanced";
@@ -126,6 +127,22 @@ function RichTextItemsEditor({ name, label, value, siteId, publicOrigin, help, c
   </div>;
 }
 
+function SectionColorInput({ field, value }: { field: Extract<Field, { kind: "color" }>; value: unknown }) {
+  const id = useId();
+  const [color, setColor] = useState(typeof value === "string" ? value : "");
+  const fallback = field.defaultColor.replace(/^#([0-9a-f])([0-9a-f])([0-9a-f])$/i, "#$1$1$2$2$3$3");
+  const swatch = /^#[0-9a-f]{6}$/i.test(color) ? color : fallback;
+
+  return <div>
+    <label className="label" htmlFor={id}>{field.label}</label>
+    <div className="flex gap-2">
+      <input type="color" value={swatch} onChange={(event) => setColor(event.target.value)} className="h-10 w-12 shrink-0 cursor-pointer rounded-lg border border-slate-300 bg-white p-1" aria-label={`Choose ${field.label.toLowerCase()}`} />
+      <input id={id} name={`p:${field.path}`} value={color} onChange={(event) => setColor(event.target.value)} placeholder={fallback} pattern="#[0-9a-fA-F]{6}" className="input font-mono" aria-describedby={field.help ? `${id}-help` : undefined} />
+    </div>
+    {field.help && <p id={`${id}-help`} className="help">{field.help}</p>}
+  </div>;
+}
+
 function FieldInput({ f, value, siteId, media, publicOrigin, changed, imageCount, imageLabels, onCrewCountChange, teamProfiles }: { f: Field; value: unknown; siteId: string; media: MediaAsset[]; publicOrigin: string; changed: () => void; imageCount?: number; imageLabels?: string[]; onCrewCountChange?: (count: number) => void; teamProfiles: TeamProfileOption[] }) {
   const name = `p:${f.path}`;
   const wide = f.kind === "textarea" || f.kind === "rich-text" || f.kind === "list" || f.kind === "pairs" || f.kind === "rich-text-items";
@@ -133,6 +150,8 @@ function FieldInput({ f, value, siteId, media, publicOrigin, changed, imageCount
   switch (f.kind) {
     case "image":
       return <MediaPicker siteId={siteId} name={name} label={f.label} value={String(value ?? "")} assets={media} publicOrigin={publicOrigin} maxWidth={f.path.includes("Logo") ? 600 : 1920} className={cls} onChange={changed} />;
+    case "color":
+      return <SectionColorInput field={f} value={value} />;
     case "image-list":
       return <div className={`block ${cls}`}><span className="label">{f.label}</span><div className="mt-2 grid gap-4 sm:grid-cols-2">{Array.from({ length: imageCount ?? (Array.isArray(value) ? value.length : 0) }, (_, index) => <MediaPicker key={`${f.path}-${index}`} siteId={siteId} name={name} label={imageLabels?.[index] || `Crew photo ${index + 1}`} value={String(Array.isArray(value) ? value[index] ?? "" : "")} assets={media} publicOrigin={publicOrigin} maxWidth={900} onChange={changed} />)}</div>{f.help && <p className="help">{f.help}</p>}</div>;
     case "team":
@@ -160,7 +179,7 @@ function FieldInput({ f, value, siteId, media, publicOrigin, changed, imageCount
   }
 }
 
-export function SectionFields({ type, props, siteId, media, publicOrigin, teamProfiles = [], isHomePage = false, hideHeroDesign = false, onChange }: { type: BlockType; props: Record<string, unknown>; siteId: string; media: MediaAsset[]; publicOrigin: string; teamProfiles?: TeamProfileOption[]; isHomePage?: boolean; hideHeroDesign?: boolean; onChange?: () => void }) {
+export function SectionFields({ type, props, siteId, media, publicOrigin, teamProfiles = [], isHomePage = false, hideHeroDesign = false, colorDefaults = {}, onChange }: { type: BlockType; props: Record<string, unknown>; siteId: string; media: MediaAsset[]; publicOrigin: string; teamProfiles?: TeamProfileOption[]; isHomePage?: boolean; hideHeroDesign?: boolean; colorDefaults?: Record<string, string>; onChange?: () => void }) {
   // These legacy page-level fields are intentionally hidden: certification artwork
   // is now managed once per website in Branding, not independently per section.
   const fields = blockFields[type].filter((field) => !(
@@ -168,9 +187,11 @@ export function SectionFields({ type, props, siteId, media, publicOrigin, teamPr
     (type === "about" && field.path.startsWith("certificationLogoUrl")) ||
     (type === "hero" && !isHomePage && (field.path === "subheading" || /^(primary|secondary|tertiary)Cta\./.test(field.path))) ||
     (type === "hero" && hideHeroDesign && fieldGroup(field) === "Design")
-  ));
+  )).map((field) => field.kind === "color" && colorDefaults[field.path]
+    ? { ...field, defaultColor: colorDefaults[field.path] }
+    : field);
   const fieldProps = type === "embed" ? splitLegacyOffer(props) as Record<string, unknown> : props;
-  const groups = (["Content", "Design", "Images", "Buttons", "Advanced"] as Group[]).filter((group) => fields.some((field) => fieldGroup(field) === group));
+  const groups = (["Content", "Design", "Images", "Colors", "Buttons", "Advanced"] as Group[]).filter((group) => fields.some((field) => fieldGroup(field) === group));
   const [active, setActive] = useState<Group>(groups[0] ?? "Content");
   const [crewCount, setCrewCount] = useState(Array.isArray(props.crew) ? props.crew.length : 0);
   const crew = Array.isArray(props.crew) ? props.crew as { title?: string }[] : [];

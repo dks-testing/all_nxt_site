@@ -28,6 +28,10 @@ const safeFont = (f: string | undefined, fallback: string) =>
 
 /** Builds CSS variables from an allowlisted set of design options (never raw input). */
 export function getDesign(t?: { design?: DesignOptions | null }): DesignOptions { return t?.design ?? {}; }
+
+export function getButtonHoverBackground(theme: { colors?: Partial<ThemeColors> | null; design?: DesignOptions | null } = {}) {
+  return safeColor(theme.design?.buttonHoverBackground, theme.colors?.primary ?? defaultColors.primary);
+}
 const numberRange = (n: number | undefined, min: number, max: number, defaultValue = 0) =>
   Number.isFinite(n) ? Math.min(max, Math.max(min, n!)) : defaultValue;
 
@@ -58,7 +62,7 @@ export function themeToCss(t: { colors?: Partial<ThemeColors> | null; fonts?: Pa
     "--radius-button": btnRadius,
     "--button-bg": safeColor(design.buttonBackground, c.primary),
     "--button-text": safeColor(design.buttonText, c.primaryForeground),
-    "--button-hover-bg": safeColor(design.buttonHoverBackground, c.primary),
+    "--button-hover-bg": getButtonHoverBackground(t),
     "--button-hover-text": safeColor(design.buttonHoverText, c.primaryForeground),
     "--nav-button-bg": safeColor(design.navButtonBackground, safeColor(design.buttonBackground, c.primary)),
     "--nav-button-text": safeColor(design.navButtonText, safeColor(design.buttonText, c.primaryForeground)),

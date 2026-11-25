@@ -7,6 +7,7 @@ import { z } from "zod";
  */
 
 const link = z.object({ label: z.string().min(1), href: z.string().min(1) });
+const hexColor = z.string().regex(/^#[0-9a-f]{6}$/i, "Use a six-digit hex color");
 const richTextHeadingTags = ["h1", "h2", "h3", "h4", "h5", "h6", "strong", "b"] as const;
 
 export function splitLegacyOffer(props: unknown): unknown {
@@ -93,6 +94,9 @@ export const blockSchemas = {
     heading: z.string().min(1),
     imageUrl: z.string().optional(),
     items: z.array(z.object({ title: z.string(), body: z.string() })).default([]),
+    sectionBackgroundColor: hexColor.optional(),
+    cardBackgroundColor: hexColor.optional(),
+    cardHoverBackgroundColor: hexColor.optional(),
   }),
   about_owner: z.object({
     heading: z.string().min(1),
@@ -218,6 +222,7 @@ export const blockLabels: Record<BlockType, string> = {
 export type Field =
   | { path: string; label: string; kind: "text" | "textarea" | "url" | "image" | "number"; help?: string }
   | { path: string; label: string; kind: "boolean"; defaultChecked?: boolean; help?: string }
+  | { path: string; label: string; kind: "color"; defaultColor: string; help?: string }
   | { path: string; label: string; kind: "image-list"; help?: string }
   | { path: string; label: string; kind: "team"; help?: string }
   | { path: string; label: string; kind: "select"; options: string[] }
@@ -295,6 +300,9 @@ export const blockFields: Record<BlockType, Field[]> = {
     { path: "heading", label: "Section heading", kind: "text" },
     { path: "items", label: "How we work points", kind: "pairs", keys: ["title", "body"], help: "Add each point separately and reorder it with the arrow buttons." },
     { path: "imageUrl", label: "Team image", kind: "image" },
+    { path: "sectionBackgroundColor", label: "Section background color", kind: "color", defaultColor: "#f5f5f5", help: "Clear the hex value to use the default gray." },
+    { path: "cardBackgroundColor", label: "Card background color", kind: "color", defaultColor: "#c93232", help: "Applies to every card. Clear the hex value to use the default red." },
+    { path: "cardHoverBackgroundColor", label: "Card background color hover", kind: "color", defaultColor: "#1d4ed8", help: "Clear the hex value to use the site's button hover color." },
   ],
   about_owner: [
     { path: "heading", label: "Section heading", kind: "text" },

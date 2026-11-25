@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import type { SiteBundle } from "@platform/db";
 import { buildSlots } from "@platform/db/booking";
 import { getDesign } from "@platform/db/theme";
@@ -87,7 +88,24 @@ export async function MicksAboutSections({ bundle, ctx, sections }: { bundle: Si
     if (section.type === "about_work") {
       const props = parseBlock("about_work", section.props);
       if (!props) return null;
-      return <section key={index} className="micks-how-we-work section"><div className="container-site"><h2>{globalText(props.heading, bundle)}</h2>{props.imageUrl && <img src={props.imageUrl} alt={`The ${businessName} team`} />}<div className="micks-work-grid">{props.items.map(({ title, body }, itemIndex) => <div key={`${title}-${itemIndex}`}><StepListIcon design={design} label={title} /><b>{globalText(title, bundle)}</b><span>{globalText(body, bundle)}</span></div>)}</div></div></section>;
+      const sectionStyle = {
+        "--work-section-background": props.sectionBackgroundColor,
+        "--work-card-background": props.cardBackgroundColor,
+        "--work-card-hover-background": props.cardHoverBackgroundColor,
+      } as CSSProperties;
+      return <section key={index} className="micks-how-we-work section" style={sectionStyle}>
+        <div className="container-site">
+          <h2>{globalText(props.heading, bundle)}</h2>
+          {props.imageUrl && <img src={props.imageUrl} alt={`The ${businessName} team`} />}
+          <div className="micks-work-grid">
+            {props.items.map(({ title, body }, itemIndex) => <div key={`${title}-${itemIndex}`}>
+              <StepListIcon design={design} label={title} />
+              <b>{globalText(title, bundle)}</b>
+              <span>{globalText(body, bundle)}</span>
+            </div>)}
+          </div>
+        </div>
+      </section>;
     }
     if (section.type === "about_owner") {
       const props = parseBlock("about_owner", section.props);

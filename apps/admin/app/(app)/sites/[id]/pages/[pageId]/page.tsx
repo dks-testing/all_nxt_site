@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDb, pages, pageSections, media, themes, specials, teamProfiles, eq, and, asc, desc } from "@platform/db";
 import { blockLabels, blockTypes, isBlockType } from "@platform/db/blocks";
-import { getDesign } from "@platform/db/theme";
+import { getButtonHoverBackground, getDesign } from "@platform/db/theme";
 import { loadSite } from "@/lib/site";
 import { previewUrl } from "@/lib/site-url";
 import { savePageMeta, deletePage, addSection, saveSection, sectionOp, reorderSections } from "@/lib/actions/content";
@@ -31,8 +31,9 @@ export default async function PageEditor({ params, searchParams }: { params: Pro
   const db = getDb();
   const [page] = await db.select().from(pages).where(and(eq(pages.id, pageId), eq(pages.siteId, id)));
   if (!page) notFound();
-  const [theme] = await db.select({ design: themes.design }).from(themes).where(eq(themes.siteId, id)).limit(1);
+  const [theme] = await db.select({ design: themes.design, colors: themes.colors }).from(themes).where(eq(themes.siteId, id)).limit(1);
   const design = getDesign(theme ?? {});
+  const colorDefaults = { cardHoverBackgroundColor: getButtonHoverBackground(theme) };
   const angledInnerPage = page.slug !== "" && design.headerStyle === "angled";
   const sections = await db.select().from(pageSections).where(and(eq(pageSections.pageId, pageId), eq(pageSections.siteId, id))).orderBy(asc(pageSections.sortOrder));
   const specialOffers = sections.some((section) => section.type === "specials")
@@ -120,7 +121,7 @@ export default async function PageEditor({ params, searchParams }: { params: Pro
                   </span>
                 </summary>
                 <SectionEditor action={saveSection} type={sectionType} sectionId={s.id} previewBaseUrl={pagePreviewUrl} initialProps={editorProps} visible={s.isVisible} hidden={hidden(s.id)} hint={hint}>
-                  <SectionFields type={sectionType} props={editorProps} siteId={id} media={assets} publicOrigin={publicOrigin} teamProfiles={teamOptions} isHomePage={page.slug === ""} hideHeroDesign={angledInnerPage} />
+                  <SectionFields type={sectionType} props={editorProps} siteId={id} media={assets} publicOrigin={publicOrigin} teamProfiles={teamOptions} isHomePage={page.slug === ""} hideHeroDesign={angledInnerPage} colorDefaults={sectionType === "about_work" ? colorDefaults : undefined} />
                 </SectionEditor>
                 {sectionType === "specials" && <SpecialsSectionManager siteId={id} pageId={pageId} sectionId={s.id} offers={specialOffers} assets={assets} publicOrigin={publicOrigin} />}
               </details>

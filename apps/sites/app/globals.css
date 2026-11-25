@@ -2326,7 +2326,9 @@ main > section {
 .micks-work-grid>div {
   grid-template-columns: 57px minmax(115px, .9fr) minmax(0, 1.6fr);
 }
-.micks-work-grid>div:hover{background:var(--button-hover-bg);}
+.micks-work-grid>div:hover {
+  background: var(--work-card-hover-background, var(--button-hover-bg));
+}
 .micks-work-grid .micks-step-icon {
   width: 57px;
   height: 57px;
@@ -2414,7 +2416,7 @@ main > section {
   background: #6a8fb5;
 }
 
-.micks-smart-feature-callout strong {
+.micks-smart-feature-callout b {
   font-family: var(--font-heading);
   font-size: 28px;
   font-weight: 500;
@@ -2804,7 +2806,7 @@ main > section {
   background: #6a8fb5;
 }
 
-.micks-smart-feature-intro .micks-smart-feature-callout strong {
+.micks-smart-feature-intro .micks-smart-feature-callout b {
   display: block;
   margin-bottom: 16px;
   font-size: 24px;
@@ -3662,7 +3664,7 @@ main > section {
 .micks-smart-tool-card a,
 .micks-smart-cta a,
 .micks-specials-list a,
-.micks-know-cta a {
+.micks-know-cta>div>a {
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -3682,7 +3684,7 @@ main > section {
 .micks-smart-tool-card a>span,
 .micks-smart-cta a>span,
 .micks-specials-list a>span,
-.micks-know-cta a>span {
+.micks-know-cta>div>a>span {
   display: inline-block;
   transform: skewX(var(--button-text-skew, 9deg));
 }
@@ -3692,14 +3694,13 @@ main > section {
 .micks-smart-tool-card a:hover,
 .micks-smart-cta a:hover,
 .micks-specials-list a:hover,
-.micks-know-cta a:hover {
+.micks-know-cta>div>a:hover {
   color: var(--button-hover-text, #fff);
   background: var(--button-hover-bg, #a91919);
 }
 
 .micks-how-we-work {
-  
-  background: #f5f5f5;
+  background: var(--work-section-background, #f5f5f5);
 }
 
 .micks-how-we-work>div {
@@ -3736,7 +3737,7 @@ main > section {
   padding: 12px 16px;
   border-radius: 40px;
   color: #fff;
-  background: #c93232;
+  background: var(--work-card-background, #c93232);
 }
 
 .micks-work-grid b {
@@ -6889,7 +6890,7 @@ button:hover{
   }
   .micks-service-prose p,
   .micks-service-bullets li,
-  .micks-live-buttons a, .micks-smart-grid a, .micks-smart-tool-card a, .micks-smart-cta a, .micks-specials-list a, .micks-know-cta a,
+  .micks-live-buttons a, .micks-smart-grid a, .micks-smart-tool-card a, .micks-smart-cta a, .micks-specials-list a, .micks-know-cta>div>a,
   .micks-know-cta p, .micks-smart-cta p,
   .micks-service-step-list p{
     font-size: 14px;
