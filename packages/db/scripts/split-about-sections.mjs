@@ -37,7 +37,7 @@ try {
   const teamMemberIds = Array.isArray(legacy.teamMemberIds) && legacy.teamMemberIds.length ? legacy.teamMemberIds : profiles.map((profile) => profile.id);
   const sections = [
     ["about_intro", { eyebrow: legacy.eyebrow || "About Us", heading: legacy.heading || "About us", body: legacy.body || "", imageUrl: legacy.imageUrl || "" }],
-    ["about_mission", { heading: legacy.missionHeading || "One Shop, One Mission", body: legacy.missionBody || "", imageUrl: legacy.vehicleImageUrl || "", locationLabel: legacy.locationLabel || "Location", phoneLabel: legacy.phoneLabel || "Phone", hoursLabel: legacy.hoursLabel || "Hours" }],
+    ["about_mission", { heading: legacy.missionHeading || "One Shop, One Mission", body: legacy.missionBody || "", imageUrl: legacy.vehicleImageUrl || "", animateVehicleImage: legacy.animateVehicleImage, locationLabel: legacy.locationLabel || "Location", phoneLabel: legacy.phoneLabel || "Phone", hoursLabel: legacy.hoursLabel || "Hours" }],
     ["about_work", { heading: legacy.workHeading || "How We Work", imageUrl: legacy.teamImageUrl || "", items: legacy.workItems || [] }],
     ["about_owner", { heading: legacy.ownerHeading || "Meet the Owner", ownerName, body: [ownerIntro.join("\n"), ...ownerParagraphs].filter(Boolean).join("\n\n"), imageUrl: legacy.imageUrl || "" }],
     ["team_gallery", { heading: "Meet the Team", teamMemberIds }],

@@ -60,6 +60,7 @@ export const blockSchemas = {
     callCtaLabel: z.string().optional(),
     teamImageUrl: z.string().optional(),
     vehicleImageUrl: z.string().optional(),
+    animateVehicleImage: z.boolean().default(true),
     workHeading: z.string().optional(),
     workItems: z.array(z.object({ title: z.string(), body: z.string() })).optional(),
     ownerHeading: z.string().optional(),
@@ -82,6 +83,7 @@ export const blockSchemas = {
     heading: z.string().min(1),
     body: z.string().default(""),
     imageUrl: z.string().optional(),
+    animateVehicleImage: z.boolean().default(true),
     locationLabel: z.string().optional(),
     phoneLabel: z.string().optional(),
     hoursLabel: z.string().optional(),
@@ -213,7 +215,8 @@ export const blockLabels: Record<BlockType, string> = {
 
 /** Field descriptors that the admin turns into a form. `path` is dot-notation into props. */
 export type Field =
-  | { path: string; label: string; kind: "text" | "textarea" | "url" | "image" | "number" | "boolean"; help?: string }
+  | { path: string; label: string; kind: "text" | "textarea" | "url" | "image" | "number"; help?: string }
+  | { path: string; label: string; kind: "boolean"; defaultChecked?: boolean; help?: string }
   | { path: string; label: string; kind: "image-list"; help?: string }
   | { path: string; label: string; kind: "team"; help?: string }
   | { path: string; label: string; kind: "select"; options: string[] }
@@ -254,6 +257,7 @@ export const blockFields: Record<BlockType, Field[]> = {
     { path: "certificationLogoUrl", label: "Certification logo", kind: "image" },
     { path: "variant", label: "Layout", kind: "select", options: ["default", "micks-home"] },
     { path: "missionHeading", label: "Mission heading", kind: "text" },
+    { path: "animateVehicleImage", label: "Animate vehicle image on scroll", kind: "boolean", defaultChecked: true },
     { path: "missionBody", label: "Mission text", kind: "rich-text" },
     { path: "locationLabel", label: "Location column label", kind: "text" },
     { path: "phoneLabel", label: "Phone column label", kind: "text" },
@@ -278,6 +282,7 @@ export const blockFields: Record<BlockType, Field[]> = {
   ],
   about_mission: [
     { path: "heading", label: "Mission heading", kind: "text" },
+    { path: "animateVehicleImage", label: "Animate vehicle image on scroll", kind: "boolean", defaultChecked: true },
     { path: "body", label: "Mission text", kind: "rich-text" },
     { path: "imageUrl", label: "Vehicle image", kind: "image" },
     { path: "locationLabel", label: "Location column label", kind: "text" },

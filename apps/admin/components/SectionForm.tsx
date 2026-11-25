@@ -58,7 +58,7 @@ function TeamProfilePicker({ value, profiles, publicOrigin, siteId, changed }: {
 }
 
 function fieldGroup(field: Field): Group {
-  if (field.path === "headingTag") return "Content";
+  if (field.path === "headingTag" || field.path === "animateVehicleImage") return "Content";
   if (field.kind === "image" || field.kind === "image-list") return "Images";
   if (/cta|button|reviewUrl/i.test(field.path)) return "Buttons";
   if (/variant|layout|showRating|badges/i.test(field.path) || field.kind === "boolean" || field.kind === "select") return "Design";
@@ -137,8 +137,10 @@ function FieldInput({ f, value, siteId, media, publicOrigin, changed, imageCount
       return <div className={`block ${cls}`}><span className="label">{f.label}</span><div className="mt-2 grid gap-4 sm:grid-cols-2">{Array.from({ length: imageCount ?? (Array.isArray(value) ? value.length : 0) }, (_, index) => <MediaPicker key={`${f.path}-${index}`} siteId={siteId} name={name} label={imageLabels?.[index] || `Crew photo ${index + 1}`} value={String(Array.isArray(value) ? value[index] ?? "" : "")} assets={media} publicOrigin={publicOrigin} maxWidth={900} onChange={changed} />)}</div>{f.help && <p className="help">{f.help}</p>}</div>;
     case "team":
       return <TeamProfilePicker value={value} profiles={teamProfiles} publicOrigin={publicOrigin} siteId={siteId} changed={changed} />;
-    case "boolean":
-      return <label className={`flex items-center gap-2 rounded-lg border border-slate-200 p-3 text-sm ${cls}`}><input type="checkbox" name={name} defaultChecked={Boolean(value)} onChange={changed} /> <span>{f.label}</span></label>;
+    case "boolean": {
+      const spacing = f.path === "animateVehicleImage" ? "min-h-10 self-end px-3 py-2" : "p-3";
+      return <label className={`flex items-center gap-2 rounded-lg border border-slate-200 text-sm ${spacing} ${cls}`}><input type="checkbox" name={name} defaultChecked={Boolean(value ?? f.defaultChecked)} onChange={changed} /> <span>{f.label}</span></label>;
+    }
     case "select":
       return <label className={`block ${cls}`}><span className="label">{f.label}</span><select name={name} defaultValue={String(value ?? f.options[0])} className="input" onChange={changed}>{f.options.map((o) => <option key={o}>{o}</option>)}</select></label>;
     case "textarea":

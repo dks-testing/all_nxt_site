@@ -2,10 +2,12 @@
 
 import { useEffect, useRef } from "react";
 
-export function MicksMissionCar({ src }: { src: string }) {
+export function MicksMissionCar({ src, animate = true }: { src: string; animate?: boolean }) {
   const imageRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
+    if (!animate) return;
+
     const image = imageRef.current;
     const section = image?.closest("section");
     if (!image || !section) return;
@@ -41,7 +43,7 @@ export function MicksMissionCar({ src }: { src: string }) {
       reducedMotion.removeEventListener("change", scheduleUpdate);
       image.style.removeProperty("translate");
     };
-  }, []);
+  }, [animate]);
 
   return <img ref={imageRef} src={src} alt="Vehicle" />;
 }

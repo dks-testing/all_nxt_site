@@ -136,11 +136,10 @@ export default async function Page({ params, searchParams }: Props) {
     const processImage = design.serviceProcessImageUrl || "https://www.micksrepair.com/wp-content/uploads/2026/03/micks-repair-worthington-mn-sign.jpeg";
     const trustImage = design.serviceTrustImageUrl || "https://www.micksrepair.com/wp-content/uploads/2026/04/555799130_25292959790311872_8516031389215206101_n.jpg";
     const aboutPage = svc.showVehicleCallout ? await (ctx.preview ? getPageDraft : getPage)(ctx, "about-us") : null;
-    const mission = aboutPage?.sections.find((section) => section.type === "about_mission");
-    const legacyAbout = aboutPage?.sections.find((section) => section.type === "about");
-    const aboutVehicleImage = parseBlock("about_mission", mission?.props)?.imageUrl
-      || parseBlock("about", legacyAbout?.props)?.vehicleImageUrl;
-    const vehicleImage = aboutVehicleImage || design.aboutVehicleImageUrl || design.serviceVehicleImageUrl
+    const mission = parseBlock("about_mission", aboutPage?.sections.find((section) => section.type === "about_mission")?.props);
+    const legacyAbout = parseBlock("about", aboutPage?.sections.find((section) => section.type === "about")?.props);
+    const vehicleSettings = legacyAbout?.vehicleImageUrl && !mission?.imageUrl ? legacyAbout : (mission ?? legacyAbout);
+    const vehicleImage = mission?.imageUrl || legacyAbout?.vehicleImageUrl || design.aboutVehicleImageUrl || design.serviceVehicleImageUrl
       || "https://www.micksrepair.com/wp-content/uploads/2026/04/blue-car.webp";
     const pairs = (items?: string[] | null) => (items ?? []).map((item) => {
       const [title, ...body] = item.split("|");
@@ -185,7 +184,7 @@ export default async function Page({ params, searchParams }: Props) {
                   <Link href={localSiteHref(bundle.site.slug, scheduleAction.href)}><span>{scheduleAction.label}</span></Link>
                 </div>
               </div>
-              <MicksMissionCar src={vehicleImage} />
+              <MicksMissionCar src={vehicleImage} animate={vehicleSettings?.animateVehicleImage} />
             </div>
           </section>
         )}

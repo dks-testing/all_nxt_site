@@ -3577,7 +3577,9 @@ main > section {
   grid-template-columns: minmax(0, 628px) minmax(0, 1fr);
   align-items: center;
 }
-
+.micks-mission-grid p {
+    font-family: var(--font-heading);
+}
 .micks-mission-grid>div {
   min-width: 0;
 }
@@ -3620,6 +3622,7 @@ main > section {
   grid-template-columns: 1.55fr .8fr 1.05fr;
   border: 1px solid #aeb5bc;
   font-size: 14px;
+  overflow-x: scroll;
 }
 
 .micks-mission-table>* {
