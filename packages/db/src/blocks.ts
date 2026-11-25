@@ -87,6 +87,7 @@ export const blockSchemas = {
     locationLabel: z.string().optional(),
     phoneLabel: z.string().optional(),
     hoursLabel: z.string().optional(),
+    callCtaLabel: z.string().optional(),
   }),
   about_work: z.object({
     heading: z.string().min(1),
@@ -288,6 +289,7 @@ export const blockFields: Record<BlockType, Field[]> = {
     { path: "locationLabel", label: "Location column label", kind: "text" },
     { path: "phoneLabel", label: "Phone column label", kind: "text" },
     { path: "hoursLabel", label: "Hours column label", kind: "text" },
+    { path: "callCtaLabel", label: "Call button label", kind: "text" },
   ],
   about_work: [
     { path: "heading", label: "Section heading", kind: "text" },

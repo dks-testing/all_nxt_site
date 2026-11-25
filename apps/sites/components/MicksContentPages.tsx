@@ -79,7 +79,7 @@ export async function MicksAboutSections({ bundle, ctx, sections }: { bundle: Si
     if (section.type === "about_mission") {
       const props = parseBlock("about_mission", section.props);
       if (!props) return null;
-      const callAction = globalCta(design, design.callCtaHref || telHref(settings?.phone), "Call Now");
+      const callAction = globalCta(design, design.callCtaHref || telHref(settings?.phone), props.callCtaLabel || "Call Now");
       const scheduleAction = globalCta(design, "/make-an-appointment/", "Schedule Service");
       const hours = groupHours(settings?.hours)[0];
       return <section key={index} className="micks-mission section"><div className="container-site micks-mission-grid"><div><h2>{globalText(props.heading, bundle)}</h2><RichText text={globalText(props.body, bundle)} className="micks-mission-rich-text" bundle={bundle} /><div className="micks-mission-table"><b>{props.locationLabel || "Location"}</b><b>{props.phoneLabel || "Phone"}</b><b>{props.hoursLabel || "Hours"}</b><span>{address}</span><a href={telHref(settings?.phone)}>{settings?.phone}</a><span>{hours ? `${hours.days}: ${hours.time}` : ""}</span></div><div className="micks-live-buttons">{settings?.phone && <a href={callAction.href}><span>{callAction.label}</span></a>}<Link href={localSiteHref(bundle.site.slug, scheduleAction.href)}><span>{scheduleAction.label}</span></Link></div></div>{props.imageUrl && <MicksMissionCar src={props.imageUrl} animate={props.animateVehicleImage} />}</div></section>;

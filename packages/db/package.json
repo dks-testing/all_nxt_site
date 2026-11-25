@@ -24,7 +24,7 @@
     "db:seed": "tsx --env-file=../../.env scripts/seed.ts",
     "db:sync-micks": "tsx --env-file=../../.env scripts/sync-micks-replica.ts",
     "db:sync-about-team": "node --env-file=../../.env scripts/sync-about-team.mjs",
-    "db:split-about": "node --env-file=../../.env scripts/split-about-sections.mjs",
+    "db:split-about": "tsx --env-file=../../.env scripts/split-about-sections.mjs",
     "db:tokenize-sections": "node --env-file=../../.env scripts/tokenize-site-sections.mjs",
     "db:verify-dynamic": "tsx --env-file=../../.env scripts/verify-dynamic-content.ts",
     "db:upgrade": "tsx --env-file=../../.env scripts/upgrade-existing.ts",
