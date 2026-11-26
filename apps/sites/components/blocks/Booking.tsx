@@ -1,17 +1,53 @@
 import { buildSlots } from "@platform/db/booking";
 import { BookingFormClient } from "../BookingFormClient";
 import type { BlockComponentProps } from "./types";
-import { telHref, formatAddress, groupHours } from "@/lib/format";
+import { telHref, formatAddress, groupHours, RichText } from "@/lib/format";
 import Link from "next/link";
 import { localSiteHref } from "@/lib/url";
 import { getDesign } from "@platform/db/theme";
 import { globalCta } from "@/lib/global-content";
-import { RichText } from "@/lib/format";
 
-export function BookingForm({ bundle, props }: BlockComponentProps<"booking_form">) {
-  const b = bundle.booking;
-  if (b && !b.enabled) return null;
-  const rules = { slotMinutes: b?.slotMinutes ?? 30, openTime: b?.openTime ?? "08:00", closeTime: b?.closeTime ?? "16:30", closedDays: b?.closedDays ?? [0, 6] };
+function bookingFormSettings(bundle: BlockComponentProps<"booking_form">["bundle"]) {
+  const booking = bundle.booking;
+  const closedDays = booking?.closedDays ?? [0, 6];
+  return {
+    siteSlug: bundle.site.slug,
+    slots: buildSlots({
+      slotMinutes: booking?.slotMinutes ?? 30,
+      openTime: booking?.openTime ?? "08:00",
+      closeTime: booking?.closeTime ?? "16:30",
+      closedDays,
+    }),
+    closedDays,
+    disabledDates: booking?.disabledDates ?? [],
+    leadDays: booking?.leadDays ?? 0,
+    confirmation: booking?.confirmationMessage ?? "Thanks! We'll be in touch shortly to confirm.",
+    fields: booking?.formFields ?? [],
+    appearance: booking?.appearance,
+  };
+}
+
+const contactBookingPages = new Set(["contact", "contact-us", "make-an-appointment"]);
+
+export function BookingForm({ bundle, props, pageSlug }: Pick<BlockComponentProps<"booking_form">, "bundle" | "props" | "pageSlug">) {
+  if (bundle.booking?.enabled === false) return null;
+  const settings = bookingFormSettings(bundle);
+  if (contactBookingPages.has(pageSlug)) {
+    return (
+      <section className="micks-appointment-page micks-contact-page section" id="book">
+        <div className="container-site">
+          <BookingFormClient
+            {...settings}
+            variant="appointment"
+            heading={settings.appearance?.appointmentHeading || props.heading}
+            subheading={props.subheading}
+            plateState={bundle.settings?.address?.region}
+            initialSlotCount={4}
+          />
+        </div>
+      </section>
+    );
+  }
   return (
     <section className="section !pb-0" id="book">
       <div className="container-site">
@@ -19,7 +55,7 @@ export function BookingForm({ bundle, props }: BlockComponentProps<"booking_form
           <h2 className="text-3xl font-bold uppercase md:text-4xl">{props.heading}</h2>
           {props.subheading && <RichText text={props.subheading} className="mt-3 text-lg text-[var(--color-muted)]" bundle={bundle} />}
         </div>
-        <BookingFormClient siteSlug={bundle.site.slug} slots={buildSlots(rules)} closedDays={rules.closedDays} disabledDates={b?.disabledDates ?? []} leadDays={b?.leadDays ?? 0} confirmation={b?.confirmationMessage ?? "Thanks! We'll be in touch shortly to confirm."} fields={b?.formFields ?? []} appearance={b?.appearance} />
+        <BookingFormClient {...settings} />
       </div>
     </section>
   );
@@ -37,7 +73,6 @@ export function MicksContactBooking({ bundle, contactProps, bookingProps }: {
   const design = getDesign(bundle.theme ?? {});
   const callAction = globalCta(design, design.callCtaHref || telHref(settings?.phone), "Call Now");
   const scheduleAction = globalCta(design, "/make-an-appointment/", "Schedule Service");
-  const rules = { slotMinutes: booking?.slotMinutes ?? 30, openTime: booking?.openTime ?? "08:00", closeTime: booking?.closeTime ?? "16:30", closedDays: booking?.closedDays ?? [0, 6] };
   return <section className="micks-contact-booking section" id="contact">
     <div className="container-site micks-contact-booking-grid">
       <div className="micks-contact-column">
@@ -57,7 +92,7 @@ export function MicksContactBooking({ bundle, contactProps, bookingProps }: {
       </div>
       <div className="micks-booking-column" id="book">
         <h2>{booking?.appearance?.landingHeading || bookingProps.heading}</h2>
-        <BookingFormClient siteSlug={bundle.site.slug} slots={buildSlots(rules)} closedDays={rules.closedDays} disabledDates={booking?.disabledDates ?? []} leadDays={booking?.leadDays ?? 0} confirmation={booking?.confirmationMessage ?? "Thanks! We'll be in touch shortly to confirm."} fields={booking?.formFields ?? []} variant="landing" appearance={booking?.appearance} />
+        <BookingFormClient {...bookingFormSettings(bundle)} variant="landing" />
       </div>
     </div>
   </section>;

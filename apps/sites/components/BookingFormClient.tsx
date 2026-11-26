@@ -1,11 +1,11 @@
 "use client";
 
-import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { BookingAppearance, BookingField } from "@platform/db";
 
 const STATES = "AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY".split(" ");
 type Variant = "default" | "landing" | "appointment" | "micks";
-type Props = { siteSlug: string; slots: string[]; closedDays: number[]; disabledDates?: string[]; leadDays: number; confirmation: string; fields: BookingField[]; variant?: Variant; appearance?: BookingAppearance | null; heading?: string; subheading?: string; initialSlotCount?: number };
+type Props = { siteSlug: string; slots: string[]; closedDays: number[]; disabledDates?: string[]; leadDays: number; confirmation: string; fields: BookingField[]; variant?: Variant; appearance?: BookingAppearance | null; heading?: string; subheading?: string; initialSlotCount?: number; plateState?: string };
 
 function Icon({ name }: { name: "user" | "phone" | "mail" | "message" | "car" | "plate" | "pin" | "calendar" | "clock" | "shield" | "lock" | "issue" | "wait" | "dropoff" | "soonest" }) {
   if (name === "user") return <svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="16" cy="9" r="5.2" /><path d="M6.2 27c1.6-6.1 4.9-9.2 9.8-9.2s8.2 3.1 9.8 9.2" /></svg>;
@@ -41,7 +41,7 @@ function SelectionIndicator() {
 }
 
 const bookingColorStyle = {
-  "--book-accent": "var(--color-booking-accent)",
+  "--book-accent": "var(--color-accent)",
   "--book-accent-text": "var(--color-booking-accent-text)",
   "--book-bg": "var(--color-booking-surface)",
   "--book-text": "var(--color-booking-text)",
@@ -56,7 +56,9 @@ function dateKey(date: Date) {
   return `${year}-${month}-${day}`;
 }
 
-function CalendarPicker({ minDate, closedDays, disabledDates, value, onChange }: { minDate: string; closedDays: number[]; disabledDates: string[]; value: string; onChange: (value: string) => void }) {
+type DatePickerProps = { minDate: string; closedDays: number[]; disabledDates: string[]; value: string; onChange: (value: string) => void };
+
+function CalendarPicker({ minDate, closedDays, disabledDates, value, onChange }: DatePickerProps) {
   const earliest = new Date(`${minDate}T12:00:00`);
   const [month, setMonth] = useState(new Date(earliest.getFullYear(), earliest.getMonth(), 1));
   const today = dateKey(new Date());
@@ -73,6 +75,34 @@ function CalendarPicker({ minDate, closedDays, disabledDates, value, onChange }:
   })}</div><div className="book-calendar-legend"><span><i className="today" />Today</span><span><i className="available" />Available Dates</span><span><i className="selected" />Selected Date</span></div></div>;
 }
 
+function AppointmentDatePicker(props: DatePickerProps) {
+  const details = useRef<HTMLDetailsElement>(null);
+  const trigger = useRef<HTMLElement>(null);
+  const label = props.value
+    ? new Date(`${props.value}T12:00:00`).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })
+    : "Select a date";
+
+  function closeCalendar() {
+    if (details.current) details.current.open = false;
+    trigger.current?.focus();
+  }
+
+  return (
+    <details ref={details} className="book-date-picker" onKeyDown={(event) => {
+      if (event.key === "Escape" && details.current?.open) {
+        event.preventDefault();
+        closeCalendar();
+      }
+    }}>
+      <summary ref={trigger} className="book-date-trigger"><Icon name="calendar" /><span>{label}</span></summary>
+      <CalendarPicker {...props} onChange={(date) => {
+        props.onChange(date);
+        closeCalendar();
+      }} />
+    </details>
+  );
+}
+
 function BookingBenefits() {
   return <div className="book-benefits" aria-label="Booking benefits">
     <span><Icon name="shield" /><b>No payment<br />required</b></span><i />
@@ -86,7 +116,7 @@ function ExtraFields({ fields }: { fields: BookingField[] }) {
   return <div className="book-extra-fields">{fields.map((field) => <label key={field.key}>{field.label}{field.type === "textarea" ? <textarea name={`extra:${field.key}`} required={field.required} placeholder={field.placeholder} /> : field.type === "select" ? <select name={`extra:${field.key}`} required={field.required}><option value="">Select</option>{field.options?.map((option) => <option key={option}>{option}</option>)}</select> : field.type === "checkbox" ? <input type="checkbox" name={`extra:${field.key}`} required={field.required} /> : <input type={field.type} name={`extra:${field.key}`} required={field.required} placeholder={field.placeholder} />}</label>)}</div>;
 }
 
-export function BookingFormClient({ siteSlug, slots, closedDays, disabledDates = [], leadDays, confirmation, fields, variant = "default", appearance, heading, subheading, initialSlotCount = 6 }: Props) {
+export function BookingFormClient({ siteSlug, slots, closedDays, disabledDates = [], leadDays, confirmation, fields, variant = "default", appearance, heading, subheading, initialSlotCount = 6, plateState }: Props) {
   const normalizedVariant = variant === "micks" ? "landing" : variant;
   const [mode, setMode] = useState<"plate" | "manual">("plate");
   const [contact, setContact] = useState<"phone" | "text" | "email">("phone");
@@ -138,12 +168,84 @@ export function BookingFormClient({ siteSlug, slots, closedDays, disabledDates =
     {normalizedVariant === "landing" && <BookingBenefits />}
     <div className="book-contact-fields"><Field icon="user" label="Full Name"><input name="customerName" autoComplete="name" placeholder="Full Name" required /></Field><Field icon="phone" label="Phone Number"><input name="phone" type="tel" autoComplete="tel" placeholder="Phone Number" required /></Field><Field icon="mail" label="Email (optional)"><input name="email" type="email" autoComplete="email" placeholder="Email (optional)" /></Field>{normalizedVariant === "landing" ? <Field icon="message" label="Preferred contact"><select name="contactPref" defaultValue="phone" aria-label="Preferred contact"><option value="phone">Phone Call</option><option value="text">Text Message</option><option value="email">Email</option></select></Field> : null}</div>
     {normalizedVariant === "appointment" && <div className="book-contact-preferences">{(["phone", "text", "email"] as const).map((value) => <label key={value}><span>Prefer {value === "phone" ? "phone call" : value === "text" ? "text messages" : "email"}</span><input type="radio" name="contactPreferenceDisplay" checked={contact === value} onChange={() => setContact(value)} /><SelectionIndicator /></label>)}</div>}
-    <p className="book-step-label">1. How should we look up your vehicle?</p><VehicleFields mode={mode} setMode={setMode} isLanding={normalizedVariant === "landing"} />
-    {normalizedVariant === "appointment" ? <div className="book-appointment-grid"><section><h3><b>2.</b> When would you like to come in?</h3><CalendarPicker minDate={minDate} closedDays={closedDays} disabledDates={disabledDates} value={selectedDate} onChange={setSelectedDate} /></section><section><h3><b>3.</b> Preferred arrival time</h3><div className="book-time-grid">{visibleSlots.map((slot) => <button key={slot} type="button" className={selectedSlot === slot ? "selected" : ""} onClick={() => setSelectedSlot(slot)}>{slot}</button>)}</div>{slots.length > initialSlotCount && <button type="button" className="book-more-times" aria-expanded={showAllSlots} onClick={() => setShowAllSlots((value) => !value)}>{showAllSlots ? "Fewer times" : "More times"}<span aria-hidden="true" /></button>}<div className="book-time-or"><span>or</span></div><button type="button" className={selectedSlot === "Soonest available" ? "selected book-soonest" : "book-soonest"} onClick={() => setSelectedSlot("Soonest available")}><Icon name="soonest" /><span><strong>Soonest Available</strong><small>We&apos;ll contact you with the earliest opening.</small></span><i /></button></section><section><h3><b>4.</b> How will you leave your vehicle?</h3><button type="button" className={`book-drop-card ${dropOff === "drop_off" ? "selected" : ""}`} onClick={() => setDropOff("drop_off")}><Icon name="dropoff" /><span><strong>I&apos;ll Drop It Off</strong></span><i /></button><button type="button" className={`book-drop-card book-wait-card ${dropOff === "wait" ? "selected" : ""}`} onClick={() => setDropOff("wait")}><Icon name="wait" /><span><strong>I&apos;ll Wait</strong></span><small>If your appointment will be longer than 1–2 hours, we&apos;ll let you know in advance. All waiting appointments must start by noon.</small><i /></button></section></div> : <div className="book-landing-when"><Field icon="calendar" label="Date"><input type="date" name="preferredDate" min={minDate} required /></Field><Field icon="clock" label="Arrival Time"><select name="slot" defaultValue="Soonest available"><option>Soonest available</option>{slots.map((slot) => <option key={slot}>{slot}</option>)}</select></Field><Field icon="car" label="Drop Off or Wait?"><select name="dropOff"><option value="drop_off">I&apos;ll Drop It Off</option><option value="wait">I&apos;ll Wait</option></select></Field></div>}
-    <label className="book-issue"><strong>{normalizedVariant === "appointment" ? "5. " : ""}What can we help you with?</strong>{normalizedVariant === "appointment" && <Icon name="issue" />}<textarea name="issue" maxLength={normalizedVariant === "appointment" ? 1500 : 500} rows={normalizedVariant === "appointment" ? 5 : 4} onChange={(event) => setIssueLen(event.target.value.length)} placeholder="Ex. Brakes squeaking, check engine light, oil change, tire vibration..." /><small>{issueLen}/{normalizedVariant === "appointment" ? 1500 : 500}</small></label><ExtraFields fields={fields} /><input type="text" name="website" tabIndex={-1} autoComplete="off" className="book-honeypot" aria-hidden /><Submit status={status} error={error} />
+    <p className="book-step-label">1. How should we look up your vehicle?</p>
+    <VehicleFields mode={mode} setMode={setMode} isLanding={normalizedVariant === "landing"} plateState={normalizedVariant === "appointment" ? (plateState ?? "") : undefined} />
+    {normalizedVariant === "appointment" ? <>
+      <div className="book-appointment-grid">
+        <section>
+          <h3>When would you like to come in?</h3>
+          <AppointmentDatePicker minDate={minDate} closedDays={closedDays} disabledDates={disabledDates} value={selectedDate} onChange={setSelectedDate} />
+        </section>
+        <section>
+          <h3>Preferred arrival time</h3>
+          <div className="book-time-grid">
+            {visibleSlots.map((slot) => (
+              <button key={slot} type="button" aria-pressed={selectedSlot === slot} className={selectedSlot === slot ? "selected" : ""} onClick={() => setSelectedSlot(slot)}>{slot}</button>
+            ))}
+          </div>
+          {slots.length > initialSlotCount && (
+            <button type="button" className="book-more-times" aria-expanded={showAllSlots} onClick={() => setShowAllSlots((value) => !value)}>
+              {showAllSlots ? "Fewer times" : "More times"}<span aria-hidden="true" />
+            </button>
+          )}
+        </section>
+        <section>
+          <h3>Soonest available</h3>
+          <button type="button" aria-pressed={selectedSlot === "Soonest available"} className={`book-soonest ${selectedSlot === "Soonest available" ? "selected" : ""}`} onClick={() => setSelectedSlot("Soonest available")}>
+            <Icon name="soonest" /><span><strong>First available time</strong><small>We&apos;ll contact you with the earliest opening.</small></span><i aria-hidden="true" />
+          </button>
+        </section>
+      </div>
+      <fieldset className="book-appointment-dropoff">
+        <legend>How will you leave your vehicle?</legend>
+        <div>
+          <button type="button" aria-pressed={dropOff === "drop_off"} className={`book-drop-card ${dropOff === "drop_off" ? "selected" : ""}`} onClick={() => setDropOff("drop_off")}>
+            <Icon name="dropoff" /><span><strong>I&apos;ll Drop It Off</strong></span><i aria-hidden="true" />
+          </button>
+          <button type="button" aria-pressed={dropOff === "wait"} className={`book-drop-card book-wait-card ${dropOff === "wait" ? "selected" : ""}`} onClick={() => setDropOff("wait")}>
+            <Icon name="wait" /><span><strong>I&apos;ll Wait</strong></span><small>We&apos;ll confirm the estimated wait.</small><i aria-hidden="true" />
+          </button>
+        </div>
+      </fieldset>
+    </> : <div className="book-landing-when"><Field icon="calendar" label="Date"><input type="date" name="preferredDate" min={minDate} required /></Field><Field icon="clock" label="Arrival Time"><select name="slot" defaultValue="Soonest available"><option>Soonest available</option>{slots.map((slot) => <option key={slot}>{slot}</option>)}</select></Field><Field icon="car" label="Drop Off or Wait?"><select name="dropOff"><option value="drop_off">I&apos;ll Drop It Off</option><option value="wait">I&apos;ll Wait</option></select></Field></div>}
+    <label className="book-issue"><strong>What can we help you with?</strong>{normalizedVariant === "appointment" && <Icon name="issue" />}<textarea name="issue" maxLength={500} rows={normalizedVariant === "appointment" ? 5 : 4} onChange={(event) => setIssueLen(event.target.value.length)} placeholder="Ex. Brakes squeaking, check engine light, oil change, tire vibration..." /><small>{issueLen}/500</small></label><ExtraFields fields={fields} /><input type="text" name="website" tabIndex={-1} autoComplete="off" className="book-honeypot" aria-hidden /><Submit status={status} error={error} />
   </form>;
 }
 
 function Field({ icon, label, children }: { icon: Parameters<typeof Icon>[0]["name"]; label: string; children: ReactNode }) { return <label className={`book-field${icon === "plate" ? " book-field--plate" : ""}`}><Icon name={icon} /><span>{label}</span>{children}</label>; }
-function VehicleFields({ mode, setMode, isLanding = false }: { mode: "plate" | "manual"; setMode: (mode: "plate" | "manual") => void; isLanding?: boolean }) { return <><div className="book-vehicle-mode"><button type="button" className={mode === "plate" ? "selected" : ""} aria-pressed={mode === "plate"} onClick={() => setMode("plate")}><span className="book-vehicle-icon" aria-hidden="true"><Icon name="car" /></span><span><strong>Use License Plate</strong><small>Fast and accurate</small></span><SelectionIndicator /></button><button type="button" className={mode === "manual" ? "selected" : ""} aria-pressed={mode === "manual"} onClick={() => setMode("manual")}><span className="book-vehicle-icon" aria-hidden="true"><Icon name="car" /></span><span><strong>Enter Vehicle Manually</strong><small>Type year, make &amp; model</small></span><SelectionIndicator /></button></div>{mode === "plate" ? <div className="book-plate-fields"><Field icon="plate" label="License Plate"><input type="text" name="plate" autoComplete="off" aria-label="License Plate" placeholder={isLanding ? "License Plate Ex. ABC1234" : "Ex. ABC1234"} required /></Field><Field icon="pin" label="State"><select name="state" defaultValue="MN" aria-label="State">{STATES.map((state) => <option key={state}>{state}</option>)}</select></Field></div> : <div className="book-manual-fields"><label>Year<input name="year" inputMode="numeric" pattern="[0-9]{4}" required /></label><label>Make<input name="make" required /></label><label>Model<input name="model" required /></label></div>}</>; }
+function VehicleFields({ mode, setMode, isLanding = false, plateState = "MN" }: {
+  mode: "plate" | "manual";
+  setMode: (mode: "plate" | "manual") => void;
+  isLanding?: boolean;
+  plateState?: string;
+}) {
+  const state = plateState.trim().toUpperCase();
+  const defaultState = STATES.includes(state) ? state : "";
+  return <>
+    <div className="book-vehicle-mode">
+      <button type="button" className={mode === "plate" ? "selected" : ""} aria-pressed={mode === "plate"} onClick={() => setMode("plate")}>
+        <span className="book-vehicle-icon" aria-hidden="true"><Icon name="car" /></span>
+        <span><strong>Use License Plate</strong><small>Fast and accurate</small></span><SelectionIndicator />
+      </button>
+      <button type="button" className={mode === "manual" ? "selected" : ""} aria-pressed={mode === "manual"} onClick={() => setMode("manual")}>
+        <span className="book-vehicle-icon" aria-hidden="true"><Icon name="car" /></span>
+        <span><strong>Enter Vehicle Manually</strong><small>Type year, make &amp; model</small></span><SelectionIndicator />
+      </button>
+    </div>
+    {mode === "plate" ? <div className="book-plate-fields">
+      <Field icon="plate" label="License Plate"><input type="text" name="plate" autoComplete="off" aria-label="License Plate" placeholder={isLanding ? "License Plate Ex. ABC1234" : "Ex. ABC1234"} required /></Field>
+      <Field icon="pin" label="State">
+        <select name="state" defaultValue={defaultState} aria-label="State">
+          {!defaultState && <option value="" disabled>Select a state</option>}
+          {STATES.map((state) => <option key={state}>{state}</option>)}
+        </select>
+      </Field>
+    </div> : <div className="book-manual-fields">
+      <label>Year<input name="year" inputMode="numeric" pattern="[0-9]{4}" required /></label>
+      <label>Make<input name="make" required /></label>
+      <label>Model<input name="model" required /></label>
+    </div>}
+  </>;
+}
+
 function Submit({ status, error }: { status: "idle" | "sending" | "done" | "error"; error: string }) { return <>{error && <p className="book-error" role="alert">{error}</p>}<button type="submit" disabled={status === "sending"} className="book-submit"><Icon name="calendar" />{status === "sending" ? "Sending..." : "Book Appointment"}</button><p className="book-note"><Icon name="lock" />No payment required. A real advisor will confirm everything with you.</p></>; }

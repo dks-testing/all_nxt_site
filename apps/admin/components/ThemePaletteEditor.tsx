@@ -7,7 +7,7 @@ import { colorIndex, colorPattern, colorRoles, componentColors, contrastRatio, n
 const descriptions = {
   primary: ["Primary", "Brand links, highlights, focus outlines and default action backgrounds."],
   secondary: ["Secondary", "Navigation text, dark buttons and the standard footer background."],
-  accent: ["Accent", "Highlights and the default badge background."],
+  accent: ["Accent", "Highlights, the default badge background, and booking buttons, icons and selections."],
   background: ["Page background", "Main background across public pages."],
   surface: ["Section surface", "Light content panels, cards and dropdown hover backgrounds."],
   testimonialsBackground: ["Testimonials background", "Background of the testimonials section."],
@@ -34,8 +34,6 @@ const descriptions = {
   serviceProcessCardTextColor: ["Service card text", "Titles and descriptions on service process and trust cards."],
   serviceTrustCardBackground: ["Trust card background", "Background of trust cards on service detail pages."],
   serviceTrustCardHoverBackground: ["Trust card hover background", "Background on hover for service trust cards."],
-  accentColor: ["Booking accent", "Booking buttons, selection indicators and icons."],
-  accentTextColor: ["Booking accent text", "Text on booking accents."],
   formBackground: ["Booking form surface", "Background of the booking form."],
   inputBackground: ["Booking input surface", "Background of booking form fields."],
   formTextColor: ["Booking form text", "Text on the booking form."],
@@ -47,10 +45,10 @@ const descriptions = {
 } satisfies Record<ColorRole, [string, string]>;
 
 const globalGroups = [
-  { title: "Primary", roles: ["primary", "buttonBackground", "buttonHoverBackground", "navButtonBackground", "navButtonHoverBackground", "accentColor"] },
+  { title: "Primary", roles: ["primary", "buttonBackground", "buttonHoverBackground", "navButtonBackground", "navButtonHoverBackground"] },
   { title: "Secondary", roles: ["secondary", "accent", "badgeBackground", "featureHighlight", "quoteSvgColor", "quoteSvgHoverColor", "serviceStepIconColor", "serviceStepIconHoverColor"] },
   { title: "Section / Surface", roles: ["background", "surface", "testimonialsBackground", "footerLogoBandBackground", "featurePanel", "formBackground", "inputBackground", "trustCardHoverBackground", "serviceProcessCardBackground", "serviceProcessCardHoverBackground", "serviceTrustCardBackground", "serviceTrustCardHoverBackground"] },
-  { title: "Text", roles: ["text", "muted", "primaryForeground", "buttonText", "buttonHoverText", "navButtonText", "navButtonHoverText", "badgeText", "trustCardHeadingColor", "serviceProcessCardTextColor", "accentTextColor", "formTextColor", "inputTextColor"] },
+  { title: "Text", roles: ["text", "muted", "primaryForeground", "buttonText", "buttonHoverText", "navButtonText", "navButtonHoverText", "badgeText", "trustCardHeadingColor", "serviceProcessCardTextColor", "formTextColor", "inputTextColor"] },
 ] as const satisfies ReadonlyArray<{ title: string; roles: readonly ColorRole[] }>;
 
 const contrastPairs = [

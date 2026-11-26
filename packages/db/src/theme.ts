@@ -73,8 +73,6 @@ export const componentColors = {
 } as const;
 
 export const bookingColors = {
-  accentColor: { css: "--color-booking-accent", fallback: "#d1272c" },
-  accentTextColor: { css: "--color-booking-accent-text", fallback: "#ffffff" },
   formBackground: { css: "--color-booking-surface", fallback: "#ffffff" },
   inputBackground: { css: "--color-booking-input-surface", fallback: "#ffffff" },
   formTextColor: { css: "--color-booking-text", fallback: "#111111" },
@@ -185,6 +183,11 @@ const numberRange = (n: number | undefined, min: number, max: number, defaultVal
 /** Builds the :root CSS variable block injected into every page of a site. */
 export function themeToCss(t: ColorSource & { fonts?: Partial<ThemeFonts> | null; radius?: string | null; buttonStyle?: string | null }) {
   const palette = getThemePalette(t);
+  const accent = resolveColor(palette, "accent");
+  const bookingSurface = resolveColor(palette, "formBackground");
+  const bookingAccentText = contrastRatio("#000", accent, bookingSurface) >= contrastRatio("#fff", accent, bookingSurface)
+    ? "#000000"
+    : "#ffffff";
   const f = { ...defaultFonts, ...(t.fonts ?? {}) };
   const radius = /^[0-9.]+(rem|px)$/.test(t.radius ?? "") ? t.radius! : "0.75rem";
   const btnRadius = t.buttonStyle === "pill" ? "9999px" : t.buttonStyle === "square" ? "0px" : radius;
@@ -200,6 +203,8 @@ export function themeToCss(t: ColorSource & { fonts?: Partial<ThemeFonts> | null
     "--button-skew": `${skew}deg`,
     "--button-text-skew": `${textSkew}deg`,
     "--button-hover-y": `${translate}px`,
+    "--color-booking-accent": "var(--color-accent)",
+    "--color-booking-accent-text": bookingAccentText,
   };
   palette.swatches.forEach((value, index) => { vars[`--theme-swatch-${index}`] = value; });
   for (const role of colorRoles) {

@@ -212,7 +212,10 @@ export async function saveTheme(fd: FormData) {
     };
     await db.transaction(async (tx) => {
       await tx.insert(themes).values({ siteId, ...values }).onDuplicateKeyUpdate({ set: values });
-      await tx.update(bookingSettings).set({ appearance: sql`JSON_REMOVE(${bookingSettings.appearance}, ${sql.join(bookingColorRoles.map((role) => sql`${`$.${role}`}`), sql`, `)})` }).where(eq(bookingSettings.siteId, siteId));
+      await tx.update(bookingSettings).set({
+        appearance: sql`JSON_REMOVE(${bookingSettings.appearance}, '$.accentColor', '$.accentTextColor',
+          ${sql.join(bookingColorRoles.map((role) => sql`${`$.${role}`}`), sql`, `)})`,
+      }).where(eq(bookingSettings.siteId, siteId));
     });
     await afterChange(siteId, user.id, "theme.update");
     return "Branding saved";
