@@ -38,6 +38,14 @@ const componentColorFields = [
   ["badgeText", "Badge text", "Text displayed inside small badges."],
 ] as const;
 
+const serviceCardColorFields = [
+  ["serviceProcessCardBackground", "Process cards background", "Background for the process steps on service detail pages.", "buttonHoverBackground"],
+  ["serviceProcessCardHoverBackground", "Process cards hover", "Background when hovering a process step.", "buttonBackground"],
+  ["serviceProcessCardTextColor", "Process cards text color", "Text color for titles and descriptions on both Process and Trust cards.", undefined],
+  ["serviceTrustCardBackground", "Trust cards background", "Background for trust points such as ASE Certified Techs and Same Day Service.", "buttonHoverBackground"],
+  ["serviceTrustCardHoverBackground", "Trust cards hover", "Background when hovering a trust card.", "buttonBackground"],
+] as const;
+
 type Props = {
   siteId: string;
   initial: { colors: ThemeColors; fonts: { heading: string; body: string }; logoUrl: string; logoDarkUrl: string; faviconUrl: string; radius: string; buttonStyle: string; customCss: string; design: DesignOptions };
@@ -47,10 +55,11 @@ type Props = {
   publicOrigin: string;
 };
 
-function ColorControl({ name, label, help, value, onChange }: { name: string; label: string; help: string; value: string; onChange: (value: string) => void }) {
+function ColorControl({ name, label, help, value, fallback, onChange }: { name: string; label: string; help: string; value: string; fallback?: string; onChange: (value: string) => void }) {
+  const swatch = /^#[0-9a-f]{6}$/i.test(value) ? value : (fallback ?? "#000000");
   return <label className="block">
     <span className="label inline-flex items-center gap-1.5">{label}<span className="group relative inline-grid h-4 w-4 cursor-help place-items-center rounded-full bg-slate-200 text-[10px] font-bold text-slate-600" tabIndex={0} aria-label={`${label}: ${help}`}>i<span role="tooltip" className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 hidden w-64 -translate-x-1/2 rounded-lg bg-slate-950 px-3 py-2 text-left text-xs font-normal leading-5 text-white shadow-xl group-hover:block group-focus:block">{help}</span></span></span>
-    <div className="flex gap-2"><input type="color" value={value} onChange={(event) => onChange(event.target.value)} className="h-11 w-12 cursor-pointer rounded-lg border border-slate-300 bg-white p-1" aria-label={`Choose ${label.toLowerCase()}`} /><input name={name} value={value} onChange={(event) => onChange(event.target.value)} className="input font-mono" pattern="#[0-9a-fA-F]{6}" /></div>
+    <div className="flex gap-2"><input type="color" value={swatch} onChange={(event) => onChange(event.target.value)} className="h-11 w-12 cursor-pointer rounded-lg border border-slate-300 bg-white p-1" aria-label={`Choose ${label.toLowerCase()}`} /><input name={name} value={value} onChange={(event) => onChange(event.target.value)} placeholder={fallback} className="input font-mono" pattern="#[0-9a-fA-F]{6}" /></div>
   </label>;
 }
 
@@ -116,6 +125,16 @@ export function ThemeEditor({ siteId, initial, action, media, publicOrigin }: Pr
             <Contrast label="CTA contrast" ratio={buttonRatio} />
             <Contrast label="Navigation button contrast" ratio={navButtonRatio} />
           </div>
+          <div className="my-6 border-t border-slate-200" />
+          <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-slate-500">Service section cards</h3>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {serviceCardColorFields.map(([key, label, help, fallback]) => <ColorControl
+              key={key} name={key} label={label} help={help}
+              value={design[key] ?? ""} fallback={fallback ? designColor(fallback) : "#ffffff"}
+              onChange={(value) => setOption({ [key]: value })}
+            />)}
+          </div>
+          <p className="help mt-2">Clear a hex value to restore its default.</p>
           </div>
         </section>
 

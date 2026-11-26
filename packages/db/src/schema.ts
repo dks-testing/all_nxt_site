@@ -91,6 +91,11 @@ export type DesignOptions = {
   serviceBadgeThreeVisible?: boolean;
   serviceProcessImageUrl?: string;
   serviceTrustImageUrl?: string;
+  serviceProcessCardBackground?: string;
+  serviceProcessCardHoverBackground?: string;
+  serviceProcessCardTextColor?: string;
+  serviceTrustCardBackground?: string;
+  serviceTrustCardHoverBackground?: string;
   serviceVehicleImageUrl?: string;
   footerBackgroundImageUrl?: string;
   footerPoweredLogoUrl?: string;

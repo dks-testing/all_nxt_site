@@ -5692,6 +5692,16 @@ body.micks-tool-popup-open {
   gap: 20px;
 }
 
+.micks-service-process .micks-service-step-list {
+  --service-card-bg: var(--service-process-card-bg);
+  --service-card-hover-bg: var(--service-process-card-hover-bg);
+}
+
+.micks-service-trust-list {
+  --service-card-bg: var(--service-trust-card-bg);
+  --service-card-hover-bg: var(--service-trust-card-hover-bg);
+}
+
 .micks-service-step-list>div {
   min-height: 102px;
   display: grid;
@@ -5701,11 +5711,14 @@ body.micks-tool-popup-open {
   padding: 14px 16px;
   border-radius: 37px;
   color: #fff;
-  background: var(--button-hover-bg);
+  background: var(--service-card-bg, var(--button-hover-bg));
 }
-.micks-service-step-list>div:hover{background:var(--button-bg);}
+.micks-service-step-list>div:hover {
+  background: var(--service-card-hover-bg, var(--button-bg));
+}
 .micks-service-step-list p {
   margin: 0;
+  color: var(--service-process-card-text, inherit);
   font-size: 16px;
   line-height: 1.35;
 }

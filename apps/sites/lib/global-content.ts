@@ -92,7 +92,7 @@ function globalCtaKind(design: DesignOptions, href?: string | null, label?: stri
   const signal = `${href ?? ""} ${label ?? ""}`;
   if (includesAny(signal, ["tel:", "call now", "call us", "make a call"])) return "call";
   if (includesAny(signal, ["make-an-appointment", "schedule service", "book appointment", "book service"])) return "schedule";
-  if (includesAny(signal, ["diagnostic", "start diagnosis", "pre-diagnosis"])) return "diagnostics";
+  if (includesAny(signal, ["diagnostic", "diagnosis"])) return "diagnostics";
   if (includesAny(signal, ["/tires", "find my tires", "find the right tires", "tire finder"])) return "tires";
   if (/\/about-us\/?(?:[#?].*)?$/i.test(href || "") || includesAny(label || "", ["about us", "our story"])) return "about";
   if (/\/services\/?(?:[#?].*)?$/i.test(href || "") || includesAny(label || "", ["view services", "our services"])) return "services";
@@ -124,7 +124,7 @@ export type SmartToolKind = "diagnostics" | "tires";
 
 export function smartToolKind(href?: string | null, label?: string | null): SmartToolKind | undefined {
   const signal = `${href ?? ""} ${label ?? ""}`;
-  if (includesAny(signal, ["diagnostic", "start diagnosis", "pre-diagnosis"])) return "diagnostics";
+  if (includesAny(signal, ["diagnostic", "diagnosis"])) return "diagnostics";
   if (includesAny(signal, ["/tires", "find my tires", "find the right tires", "tire finder"])) return "tires";
   return undefined;
 }
