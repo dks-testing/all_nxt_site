@@ -119,10 +119,10 @@ export default async function Page({ params, searchParams }: Props) {
   const others = (await getServices(ctx)).filter((x) => x.id !== svc.id).slice(0, 6);
   const phone = bundle.settings?.phone;
   const design = getDesign(bundle.theme ?? {});
+  const detailImage = design.serviceDefaultImageUrl;
   const scheduleAction = globalCta(design, "/make-an-appointment/#book", "Schedule Service");
   const callAction = globalCta(design, design.callCtaHref || telHref(bundle.settings?.phone), "Call Now");
   if (design.headerStyle === "angled") {
-    const serviceImage = svc.imageUrl || design.serviceDefaultImageUrl;
     const blocks = globalText(svc.body, bundle).replace(/\r/g, "").split(/\n{2,}/).filter(Boolean);
     const markedHeading = blocks[0]?.match(/^#\s+(.+)/);
     const leadHeading = markedHeading?.[1] ?? svc.name;
@@ -154,7 +154,7 @@ export default async function Page({ params, searchParams }: Props) {
         <section className="micks-service-intro">
           <div className="container-site micks-service-intro-grid">
             <div className="micks-service-photo-wrap">
-              {serviceImage ? <img src={serviceImage} alt={`${svc.name} at ${bundle.settings?.businessName ?? bundle.site.name}`} className="micks-service-photo" /> : <div className="micks-service-photo-placeholder" />}
+              {detailImage ? <img src={detailImage} alt={`${svc.name} at ${bundle.settings?.businessName ?? bundle.site.name}`} className="micks-service-photo" /> : <div className="micks-service-photo-placeholder" />}
             </div>
             <div className="micks-service-copy">
               <div className="micks-service-heading"><QuoteMark design={design} className="micks-quote-mark" /><h2>{leadHeading}</h2></div>
@@ -194,6 +194,7 @@ export default async function Page({ params, searchParams }: Props) {
       </>
     );
   }
+  const serviceImage = detailImage || svc.imageUrl;
   return (
     <>
       <section className="bg-[var(--color-secondary)] py-16 text-white md:py-20">
@@ -210,9 +211,9 @@ export default async function Page({ params, searchParams }: Props) {
       <section className="section">
         <div className="container-site grid gap-12 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            {svc.imageUrl && (
+            {serviceImage && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={svc.imageUrl} alt={svc.name} className="mb-8 aspect-video w-full rounded-site object-cover" />
+              <img src={serviceImage} alt={svc.name} className="mb-8 aspect-video w-full rounded-site object-cover" />
             )}
             <RichText text={globalText(svc.body, bundle)} className="prose-site text-lg text-[var(--color-muted)]" />
             {!!svc.bullets?.length && (

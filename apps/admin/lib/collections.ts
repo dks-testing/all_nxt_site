@@ -55,7 +55,7 @@ export const collections: Record<string, CollectionDef> = {
       { name: "summary", label: "Summary", kind: "textarea", wide: true },
       { name: "body", label: "Page body", kind: "rich-text", wide: true },
       { name: "bullets", label: "Key points", kind: "list", wide: true, help: "One per line" },
-      { name: "imageUrl", label: "Image", kind: "image" },
+      { name: "imageUrl", label: "Service card background image", kind: "image" },
       { name: "priceFrom", label: "Starting price", kind: "text" },
       { name: "seoTitle", label: "SEO title", kind: "text", wide: true },
       { name: "seoDescription", label: "SEO description", kind: "textarea", wide: true },
