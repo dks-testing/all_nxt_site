@@ -66,6 +66,11 @@ export type BookingAppearance = {
   landingHeading?: string;
   appointmentHeading?: string;
 };
+export type BookingVehicleApiSettings = {
+  plateToVinToken?: string;
+  carApiToken?: string;
+  carApiSecret?: string;
+};
 export const globalButtonKeys = ["schedule", "diagnostics", "tires", "about", "services", "call", "serviceCard"] as const;
 export type GlobalButton = (typeof globalButtonKeys)[number];
 
@@ -455,6 +460,7 @@ export const bookingSettings = mysqlTable("booking_settings", {
   formFields: json("form_fields").$type<BookingField[]>(),
   disabledDates: json("disabled_dates").$type<string[]>(),
   appearance: json("appearance").$type<BookingAppearance>(),
+  vehicleApi: json("vehicle_api").$type<BookingVehicleApiSettings>(),
   adminEmailSubject: varchar("admin_email_subject", { length: 255 }),
   adminEmailTemplate: text("admin_email_template"),
   customerEmailSubject: varchar("customer_email_subject", { length: 255 }),

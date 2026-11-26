@@ -4319,9 +4319,16 @@ body.micks-tool-popup-open {
   gap: 12px;
 }
 
-.book-contact-fields,
-.book-plate-fields {
+.book-contact-fields {
   grid-template-columns: 1fr 1fr;
+}
+
+.book-plate-fields {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.book-tool--landing .book-plate-fields--compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .book-manual-fields,
@@ -4363,6 +4370,50 @@ body.micks-tool-popup-open {
   border-color: var(--book-accent);
   box-shadow: 0 0 0 1px var(--book-accent);
 }
+
+.book-vehicle-result {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 58px;
+  padding: 8px 14px;
+  border: 2px solid var(--swatch-booking-border);
+  border-radius: 6px;
+  color: var(--book-input-text);
+  background: var(--book-input-bg);
+  box-shadow: 0 0 0 1px var(--swatch-booking-border-shadow), 0 8px 20px var(--swatch-booking-shadow);
+}
+
+.book-vehicle-result > svg {
+  width: 27px;
+  height: 27px;
+  color: var(--swatch-booking-icon);
+}
+
+.book-vehicle-result > span {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.book-vehicle-result strong,
+.book-vehicle-result small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.book-vehicle-result strong { font-size: 14px; font-weight: 600; }
+.book-vehicle-result small { color: var(--swatch-615c70); font-size: 11px; }
+.book-vehicle-result.is-success,
+.book-vehicle-result.is-loading {
+  border-color: var(--book-accent);
+  background: color-mix(in srgb, var(--book-accent) 8%, var(--book-input-bg));
+}
+.book-vehicle-result.is-success > svg,
+.book-vehicle-result.is-loading > svg { color: var(--book-accent); }
 
 .book-field:not(.book-field--plate):has(input:not(:placeholder-shown))>span {
   opacity: 0;
@@ -4758,6 +4809,10 @@ body.micks-tool-popup-open {
   .book-landing-when,
   .book-appointment-grid,
   .book-default-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .book-tool--landing .book-plate-fields--compact {
     grid-template-columns: 1fr;
   }
 
@@ -6626,7 +6681,7 @@ body.micks-tool-popup-open {
   border-radius: 6px;
 }
 .micks-contact-page .book-step-label { font-weight: 500; }
-.book-tool--appointment .book-manual-fields > label {
+.book-tool:is(.book-tool--appointment, .book-tool--landing) .book-manual-fields > label {
   min-width: 0;
   min-height: 66px;
   align-content: center;
@@ -6639,11 +6694,11 @@ body.micks-tool-popup-open {
   font-size: 14px;
   line-height: 1.2;
 }
-.book-tool--appointment .book-manual-fields > label > span {
+.book-tool:is(.book-tool--appointment, .book-tool--landing) .book-manual-fields > label > span {
   color: var(--swatch-5e596e);
 }
-.book-tool--appointment .book-manual-fields input,
-.book-tool--appointment .book-manual-fields select {
+.book-tool:is(.book-tool--appointment, .book-tool--landing) .book-manual-fields input,
+.book-tool:is(.book-tool--appointment, .book-tool--landing) .book-manual-fields select {
   min-height: 0;
   min-width: 0;
   width: 100%;
@@ -6655,15 +6710,15 @@ body.micks-tool-popup-open {
   font: inherit;
   font-weight: 400;
 }
-.book-tool--appointment .book-manual-fields > label:has(> select) {
+.book-tool:is(.book-tool--appointment, .book-tool--landing) .book-manual-fields > label:has(> select) {
   position: relative;
 }
-.book-tool--appointment .book-manual-fields select {
+.book-tool:is(.book-tool--appointment, .book-tool--landing) .book-manual-fields select {
   appearance: none;
   padding-inline-end: 24px;
   cursor: pointer;
 }
-.book-tool--appointment .book-manual-fields > label:has(> select)::after {
+.book-tool:is(.book-tool--appointment, .book-tool--landing) .book-manual-fields > label:has(> select)::after {
   position: absolute;
   inset-inline-end: 20px;
   bottom: 17px;
@@ -6675,15 +6730,9 @@ body.micks-tool-popup-open {
   pointer-events: none;
   content: "";
 }
-.book-tool--appointment .book-manual-fields > label:focus-within {
+.book-tool:is(.book-tool--appointment, .book-tool--landing) .book-manual-fields > label:focus-within {
   border-color: var(--book-accent);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--book-accent) 14%, transparent);
-}
-.book-vehicle-catalog-link {
-  justify-self: start;
-  color: var(--book-text);
-  font-size: 13px;
-  text-decoration: underline;
 }
 .micks-contact-page .book-vehicle-mode { gap: 14px; }
 .micks-contact-page .book-vehicle-mode button {
@@ -6739,6 +6788,7 @@ button:hover{
 .book-tool .book-contact-preferences label:has(input:checked) .book-selection-indicator svg { display: block; }
 .book-tool .book-vehicle-mode button:focus-visible { outline: 2px solid var(--book-accent); outline-offset: 3px; }
 .micks-contact-page .book-plate-fields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.book-tool--appointment .book-vehicle-result { min-height: 66px; padding-inline: 18px; }
 .book-tool--appointment .book-field--plate,
 .book-tool--landing .book-field--plate {
   grid-template-columns: 42px minmax(0, 1fr);

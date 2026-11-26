@@ -33,6 +33,7 @@ const tables: Record<string, Record<string, string>> = {
     form_fields: "JSON NULL",
     disabled_dates: "JSON NULL",
     appearance: "JSON NULL",
+    vehicle_api: "JSON NULL",
     admin_email_subject: "VARCHAR(255) NULL",
     admin_email_template: "TEXT NULL",
     customer_email_subject: "VARCHAR(255) NULL",

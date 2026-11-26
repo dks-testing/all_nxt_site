@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { BookingAppearance, BookingField } from "@platform/db";
 import { BookingVehicleDropdowns } from "./BookingVehicleDropdowns";
 
@@ -164,7 +164,7 @@ export function BookingFormClient({ siteSlug, slots, closedDays, disabledDates =
     <div className="book-contact-fields"><Field icon="user" label="Full Name"><input name="customerName" autoComplete="name" placeholder="Full Name" required /></Field><Field icon="phone" label="Phone Number"><input name="phone" type="tel" autoComplete="tel" placeholder="Phone Number" required /></Field><Field icon="mail" label="Email (optional)"><input name="email" type="email" autoComplete="email" placeholder="Email (optional)" /></Field>{normalizedVariant === "landing" ? <Field icon="message" label="Preferred contact"><select name="contactPref" defaultValue="phone" aria-label="Preferred contact"><option value="phone">Phone Call</option><option value="text">Text Message</option><option value="email">Email</option></select></Field> : null}</div>
     {normalizedVariant === "appointment" && <div className="book-contact-preferences">{(["phone", "text", "email"] as const).map((value) => <label key={value}><span>Prefer {value === "phone" ? "phone call" : value === "text" ? "text messages" : "email"}</span><input type="radio" name="contactPreferenceDisplay" checked={contact === value} onChange={() => setContact(value)} /><SelectionIndicator /></label>)}</div>}
     <p className="book-step-label">1. How should we look up your vehicle?</p>
-    <VehicleFields mode={mode} setMode={setMode} isLanding={normalizedVariant === "landing"} useCatalog={normalizedVariant === "appointment"} plateState={normalizedVariant === "appointment" ? (plateState ?? "") : undefined} />
+    <VehicleFields mode={mode} setMode={setMode} siteSlug={siteSlug} isLanding={normalizedVariant === "landing"} useCatalog plateState={normalizedVariant === "appointment" ? (plateState ?? "") : undefined} />
     {normalizedVariant === "appointment" ?
       <div className="book-appointment-grid">
         <section>
@@ -211,9 +211,81 @@ export function BookingFormClient({ siteSlug, slots, closedDays, disabledDates =
 }
 
 function Field({ icon, label, children }: { icon: Parameters<typeof Icon>[0]["name"]; label: string; children: ReactNode }) { return <label className={`book-field${icon === "plate" ? " book-field--plate" : ""}`}><Icon name={icon} /><span>{label}</span>{children}</label>; }
-function VehicleFields({ mode, setMode, isLanding = false, useCatalog = false, plateState = "MN" }: {
+
+type PlateVehicle = { vin: string; year: string; make: string; model: string; trim?: string };
+
+function BookingPlateFields({ siteSlug, isLanding, defaultState, showResult }: { siteSlug: string; isLanding: boolean; defaultState: string; showResult: boolean }) {
+  const [plate, setPlate] = useState("");
+  const [state, setState] = useState(defaultState);
+  const [vehicle, setVehicle] = useState<PlateVehicle | null>(null);
+  const [lookupStatus, setLookupStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [lookupMessage, setLookupMessage] = useState("Enter a plate and select its state.");
+  const requestId = useRef(0);
+  const lastLookup = useRef("");
+
+  function clearLookup() {
+    requestId.current += 1;
+    lastLookup.current = "";
+    setVehicle(null);
+    setLookupStatus("idle");
+    setLookupMessage("Enter a plate and select its state.");
+  }
+
+  async function lookup(nextPlate = plate, nextState = state) {
+    const normalizedPlate = nextPlate.replace(/\s+/g, "").toUpperCase();
+    const normalizedState = nextState.trim().toUpperCase();
+    if (!normalizedPlate || !normalizedState) return;
+    const key = `${normalizedPlate}:${normalizedState}`;
+    if (lastLookup.current === key && (lookupStatus === "loading" || lookupStatus === "success")) return;
+    lastLookup.current = key;
+    const currentRequest = ++requestId.current;
+    setVehicle(null);
+    setLookupStatus("loading");
+    setLookupMessage("Looking up vehicle...");
+    try {
+      const response = await fetch("/api/booking-vehicle-lookup/", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ siteSlug, plate: normalizedPlate, state: normalizedState }),
+      });
+      const data = await response.json().catch(() => ({})) as { vehicle?: PlateVehicle; error?: string };
+      if (!response.ok || !data.vehicle) throw new Error(data.error || "Vehicle lookup failed.");
+      if (requestId.current !== currentRequest) return;
+      setVehicle(data.vehicle);
+      setLookupStatus("success");
+      setLookupMessage("Vehicle details found.");
+    } catch (error) {
+      if (requestId.current !== currentRequest) return;
+      lastLookup.current = "";
+      setLookupStatus("error");
+      setLookupMessage(error instanceof Error ? error.message : "Vehicle lookup failed.");
+    }
+  }
+
+  const vehicleName = vehicle ? [vehicle.year, vehicle.make, vehicle.model, vehicle.trim].filter(Boolean).join(" ") : "Vehicle details";
+  return <div className={`book-plate-fields${showResult ? "" : " book-plate-fields--compact"}`}>
+    <Field icon="plate" label="License Plate"><input type="text" name="plate" value={plate} onChange={(event) => { setPlate(event.target.value); clearLookup(); }} onBlur={() => void lookup()} autoComplete="off" aria-label="License Plate" placeholder={isLanding ? "License Plate Ex. ABC1234" : "Ex. ABC1234"} required /></Field>
+    <Field icon="pin" label="State">
+      <select name="state" value={state} aria-label="State" required onChange={(event) => { const nextState = event.target.value; setState(nextState); clearLookup(); void lookup(plate, nextState); }}>
+        {!defaultState && <option value="" disabled>Select your state</option>}
+        {STATES.map((stateOption) => <option key={stateOption}>{stateOption}</option>)}
+      </select>
+    </Field>
+    {showResult && <div className={`book-vehicle-result is-${lookupStatus}`} role="status" aria-live="polite">
+      <Icon name="car" />
+      <span><strong>{lookupStatus === "loading" ? "Looking up vehicle..." : vehicleName}</strong><small>{vehicle ? `VIN ${vehicle.vin}` : lookupMessage}</small></span>
+    </div>}
+    <input type="hidden" name="vin" value={vehicle?.vin ?? ""} />
+    <input type="hidden" name="year" value={vehicle?.year ?? ""} />
+    <input type="hidden" name="make" value={vehicle?.make ?? ""} />
+    <input type="hidden" name="model" value={vehicle?.model ?? ""} />
+  </div>;
+}
+
+function VehicleFields({ mode, setMode, siteSlug = "", isLanding = false, useCatalog = false, plateState = "MN" }: {
   mode: "plate" | "manual";
   setMode: (mode: "plate" | "manual") => void;
+  siteSlug?: string;
   isLanding?: boolean;
   useCatalog?: boolean;
   plateState?: string;
@@ -231,15 +303,7 @@ function VehicleFields({ mode, setMode, isLanding = false, useCatalog = false, p
         <span><strong>Enter Vehicle Manually</strong><small>{useCatalog ? "Choose year, make & model" : "Type year, make & model"}</small></span><SelectionIndicator />
       </button>
     </div>
-    {mode === "plate" ? <div className="book-plate-fields">
-      <Field icon="plate" label="License Plate"><input type="text" name="plate" autoComplete="off" aria-label="License Plate" placeholder={isLanding ? "License Plate Ex. ABC1234" : "Ex. ABC1234"} required /></Field>
-      <Field icon="pin" label="State">
-        <select name="state" defaultValue={defaultState} aria-label="State">
-          {!defaultState && <option value="" disabled>Select your state</option>}
-          {STATES.map((state) => <option key={state}>{state}</option>)}
-        </select>
-      </Field>
-    </div> : useCatalog ? <BookingVehicleDropdowns /> : <div className="book-manual-fields">
+    {mode === "plate" ? <BookingPlateFields siteSlug={siteSlug} isLanding={isLanding} defaultState={defaultState} showResult={!isLanding} /> : useCatalog ? <BookingVehicleDropdowns siteSlug={siteSlug} /> : <div className="book-manual-fields">
       <label><span>Year</span><input name="year" inputMode="numeric" pattern="[0-9]{4}" required /></label>
       <label><span>Make</span><input name="make" required /></label>
       <label><span>Model</span><input name="model" required /></label>

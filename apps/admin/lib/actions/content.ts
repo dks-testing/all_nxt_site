@@ -624,6 +624,15 @@ export async function saveBooking(fd: FormData) {
         landingHeading: str(fd, "landingHeading") || "Book Your Service",
         appointmentHeading: str(fd, "appointmentHeading") || "Schedule Your Service Online",
       };
+    } else if (section === "vehicle-api") {
+      const [current] = await getDb().select({ vehicleApi: bookingSettings.vehicleApi }).from(bookingSettings).where(eq(bookingSettings.siteId, siteId));
+      const existing = current?.vehicleApi ?? {};
+      const plateToVinToken = bool(fd, "clearPlateToVinToken") ? "" : str(fd, "plateToVinToken") || existing.plateToVinToken || "";
+      const clearCarApi = bool(fd, "clearCarApiCredentials");
+      const carApiToken = clearCarApi ? "" : str(fd, "carApiToken") || existing.carApiToken || "";
+      const carApiSecret = clearCarApi ? "" : str(fd, "carApiSecret") || existing.carApiSecret || "";
+      if (Boolean(carApiToken) !== Boolean(carApiSecret)) throw new Error("Enter both the CarAPI token and secret");
+      values.vehicleApi = { plateToVinToken, carApiToken, carApiSecret };
     } else if (section === "notifications") {
       values.notifyEmails = emails(str(fd, "notifyEmails"));
       values.notifySms = lines(str(fd, "notifySms"));

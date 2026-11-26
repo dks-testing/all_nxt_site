@@ -4,6 +4,7 @@ import { getDb, appointments, resolveHost, resolveSiteSlug, getSiteBundle } from
 import { sendEmail, sendSms } from "@/lib/notify";
 import { validateExtraFields } from "@platform/db/booking-fields";
 import { buildSlots } from "@platform/db/booking";
+import { lookupLicensePlate, VehicleApiError } from "@/lib/vehicle-api";
 
 export const dynamic = "force-dynamic";
 
@@ -70,13 +71,37 @@ export async function POST(req: Request) {
   const start = new Date(`${d.preferredDate}T12:00:00Z`);
   if (!Number.isFinite(start.valueOf()) || start.toISOString().slice(0, 10) !== d.preferredDate) return NextResponse.json({ error: "Invalid date" }, { status: 400 });
   const booking = bundle?.booking;
+  let vehicle = { plate: d.plate, state: d.state, vin: d.vin, year: d.year, make: d.make, model: d.model };
+  if (d.plate) {
+    const plate = d.plate.replace(/\s+/g, "").toUpperCase();
+    const state = d.state?.toUpperCase() ?? "";
+    if (!/^[A-Z0-9-]{2,16}$/.test(plate) || !/^[A-Z]{2}$/.test(state)) {
+      return NextResponse.json({ error: "Enter a valid license plate and state." }, { status: 400 });
+    }
+    const hiddenVehicleComplete = /^[A-HJ-NPR-Z0-9]{17}$/.test(d.vin?.toUpperCase() ?? "") && /^\d{4}$/.test(d.year ?? "") && Boolean(d.make && d.model);
+    if (hiddenVehicleComplete) {
+      vehicle = { plate, state, vin: d.vin?.toUpperCase(), year: d.year, make: d.make, model: d.model };
+    } else {
+      try {
+        const match = await lookupLicensePlate(plate, state, booking?.vehicleApi ?? {});
+        vehicle = { plate, state, vin: match.vin, year: match.year, make: match.make, model: match.model };
+      } catch (error) {
+        if (error instanceof VehicleApiError && error.code === "not_found") {
+          return NextResponse.json({ error: "We could not find that license plate. Check the plate and state, or use year, make and model." }, { status: 400 });
+        }
+        const message = error instanceof VehicleApiError && error.code === "not_configured"
+          ? "License plate lookup is not configured. Please use year, make and model."
+          : "License plate lookup is temporarily unavailable. Please use year, make and model.";
+        return NextResponse.json({ error: message }, { status: error instanceof VehicleApiError && error.code === "not_configured" ? 503 : 502 });
+      }
+    }
+  }
   const min = new Date(); min.setUTCHours(0, 0, 0, 0); min.setUTCDate(min.getUTCDate() + (booking?.leadDays ?? 0));
   if (start < min || (booking?.closedDays ?? [0, 6]).includes(start.getUTCDay()) || (booking?.disabledDates ?? []).includes(d.preferredDate)) return NextResponse.json({ error: "Choose an available date" }, { status: 400 });
   const validSlots = buildSlots({ slotMinutes: booking?.slotMinutes ?? 30, openTime: booking?.openTime ?? "08:00", closeTime: booking?.closeTime ?? "16:30", closedDays: booking?.closedDays ?? [0, 6] });
   if (d.slot && d.slot !== "Soonest available" && !validSlots.includes(d.slot)) return NextResponse.json({ error: "Choose an available time" }, { status: 400 });
 
   const id = crypto.randomUUID();
-  const vehicle = { plate: d.plate, state: d.state, vin: d.vin, year: d.year, make: d.make, model: d.model };
   await getDb().insert(appointments).values({
     id,
     siteId: site.siteId,
@@ -92,7 +117,7 @@ export async function POST(req: Request) {
     extraFields,
   });
 
-  const car = d.plate ? `${d.plate} (${d.state ?? ""})` : [d.year, d.make, d.model].filter(Boolean).join(" ");
+  const car = vehicle.plate ? `${vehicle.plate} (${vehicle.state ?? ""})` : [vehicle.year, vehicle.make, vehicle.model].filter(Boolean).join(" ");
   const answers = Object.entries(extraFields).map(([k, v]) => `${k}: ${String(v)}`).join("\n");
   const settings = bundle?.settings;
   const address = settings?.address ? [settings.address.street, settings.address.city, settings.address.region, settings.address.postalCode].filter(Boolean).join(", ") : "";
@@ -100,7 +125,7 @@ export async function POST(req: Request) {
   const tokens = {
     business_name: settings?.businessName ?? "your shop", business_phone: settings?.phone ?? "", business_email: settings?.email ?? "", business_address: address,
     business_hours: hours, logo_url: booking?.appearance?.logoUrl ?? bundle?.theme?.logoUrl ?? "", customer_name: d.customerName, customer_phone: d.phone,
-    customer_email: d.email ?? "", vehicle: `${car}${d.vin ? ` · VIN ${d.vin}` : ""}`, date: d.preferredDate || "any day", time: d.slot ?? "",
+    customer_email: d.email ?? "", vehicle: `${car}${vehicle.vin ? ` · VIN ${vehicle.vin}` : ""}`, date: d.preferredDate || "any day", time: d.slot ?? "",
     dropoff: d.dropOff === "wait" ? "will wait" : "drop off", message: `${d.issue || "-"}${answers ? `\nAdditional answers:\n${answers}` : ""}`,
   };
   const adminBody = replaceTokens(booking?.adminEmailTemplate ?? "New appointment request for {{business_name}}\n\nCustomer: {{customer_name}} · {{customer_phone}} · {{customer_email}}\nVehicle: {{vehicle}}\nWhen: {{date}} at {{time}} · {{dropoff}}\nIssue: {{message}}", tokens);
