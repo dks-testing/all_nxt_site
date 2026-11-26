@@ -137,6 +137,7 @@ export const blockSchemas = {
   faq: z.object({ heading: z.string().default("Frequently asked questions") }),
   contact_map: z.object({
     heading: z.string().default("Visit us"),
+    photoHeading: z.string().optional(),
     imageUrl: z.string().optional(),
     variant: z.enum(["default", "micks-home"]).default("default"),
   }),
@@ -347,6 +348,7 @@ export const blockFields: Record<BlockType, Field[]> = {
   ],
   faq: [{ path: "heading", label: "Heading", kind: "text" }],
   contact_map: [
+    { path: "photoHeading", label: "Contact photo heading", kind: "text", help: "Shown above the team photo on the contact page. Leave blank to restore the default for this section." },
     { path: "imageUrl", label: "Contact page photo", kind: "image" },
     { path: "heading", label: "Heading", kind: "text" },
     { path: "variant", label: "Layout", kind: "select", options: ["default", "micks-home"] },
@@ -405,6 +407,18 @@ export function parseBlock<T extends BlockType>(type: T, props: unknown): BlockP
   if (!schema) return null;
   const r = schema.safeParse(props ?? {});
   return r.success ? (r.data as BlockProps<T>) : null;
+}
+
+export function getContactPhotoHeading(props?: BlockProps<"contact_map"> | null): string {
+  const photoHeading = props?.photoHeading?.trim();
+  if (photoHeading) return photoHeading;
+
+  const sectionHeading = props?.heading.trim();
+  if (sectionHeading && !["contact & directions", "visit us"].includes(sectionHeading.toLowerCase())) {
+    return sectionHeading;
+  }
+
+  return "We Would Love to Help You";
 }
 
 export function isBlockType(t: string): t is BlockType {

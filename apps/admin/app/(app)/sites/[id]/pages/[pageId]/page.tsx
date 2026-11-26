@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDb, pages, pageSections, media, themes, specials, teamProfiles, eq, and, asc, desc } from "@platform/db";
-import { blockLabels, blockTypes, isBlockType } from "@platform/db/blocks";
+import { blockLabels, blockTypes, getContactPhotoHeading, isBlockType, parseBlock } from "@platform/db/blocks";
 import { getButtonHoverBackground, getDesign } from "@platform/db/theme";
 import { loadSite } from "@/lib/site";
 import { previewUrl } from "@/lib/site-url";
@@ -85,6 +85,9 @@ export default async function PageEditor({ params, searchParams }: { params: Pro
           {sections.map((s, i) => {
             if (!isBlockType(s.type)) return null;
             const sectionType = s.type;
+            const contactPhotoHeading = sectionType === "contact_map" && page.slug === "make-an-appointment" && angledInnerPage
+              ? getContactPhotoHeading(parseBlock("contact_map", s.props))
+              : undefined;
             const editorProps = sectionType === "about" ? {
               ...s.props,
               imageUrl: s.props.imageUrl ?? design.aboutOwnerImageUrl,
@@ -92,13 +95,15 @@ export default async function PageEditor({ params, searchParams }: { params: Pro
               vehicleImageUrl: s.props.vehicleImageUrl ?? design.aboutVehicleImageUrl,
               workItems: s.props.workItems ?? design.aboutWorkItems,
               crewImageUrls: s.props.crewImageUrls ?? [design.aboutCrewImageOneUrl, design.aboutCrewImageTwoUrl, design.aboutCrewImageThreeUrl],
-            } : s.props;
-            const hint = s.type === "specials" ? (
+            } : contactPhotoHeading ? { ...s.props, photoHeading: contactPhotoHeading } : s.props;
+            const hint = contactPhotoHeading ? (
+              <p className="mb-4 rounded-md bg-indigo-50 px-3 py-2 text-xs text-indigo-800">Edit <strong>Contact photo heading</strong> to change the text above the team photo. The address, phone number, and hours come from <Link className="font-semibold underline" href={`/sites/${id}/business`}>Business info</Link>.</p>
+            ) : s.type === "specials" ? (
               <p className="mb-4 rounded-md bg-indigo-50 px-3 py-2 text-xs text-indigo-800">Set the section heading and intro here. Edit the offer cards below.</p>
             ) : collectionHint[s.type] ? (
               <p className="mb-4 rounded-md bg-indigo-50 px-3 py-2 text-xs text-indigo-800">This section shows content from <Link className="font-semibold underline" href={`/sites/${id}/${collectionHint[s.type]![0]}`}>{collectionHint[s.type]![1]}</Link>.</p>
             ) : undefined;
-            const summary = (s.props as { heading?: string }).heading;
+            const summary = contactPhotoHeading ?? (s.props as { heading?: string }).heading;
             return (
               <details key={s.id} id={`s-${s.id}`} data-section-id={s.id} open={openSection === s.id} className={`card group ${s.isVisible ? "" : "opacity-60"}`}>
                 <summary className="flex items-center gap-3 p-4">

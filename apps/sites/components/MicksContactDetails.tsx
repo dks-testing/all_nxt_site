@@ -1,5 +1,5 @@
 import type { SiteBundle } from "@platform/db";
-import type { BlockProps } from "@platform/db/blocks";
+import { getContactPhotoHeading, type BlockProps } from "@platform/db/blocks";
 import { getDesign } from "@platform/db/theme";
 import { formatAddress, groupHours, telHref } from "@/lib/format";
 import { globalText } from "@/lib/global-content";
@@ -11,8 +11,7 @@ export function MicksContactDetails({ bundle, props }: { bundle: SiteBundle; pro
   const address = formatAddress(settings?.address);
   const businessName = settings?.businessName || bundle.site.name;
   const image = props?.imageUrl || design.aboutOwnerImageUrl || "https://www.micksrepair.com/wp-content/uploads/2026/04/micks-repair-worthington-mn-mick-eggers.jpeg";
-  const sourceHeading = props?.heading?.trim();
-  const heading = !sourceHeading || ["contact & directions", "visit us"].includes(sourceHeading.toLowerCase()) ? "We Would Love to Help You" : globalText(sourceHeading, bundle);
+  const heading = globalText(getContactPhotoHeading(props), bundle);
   return <section className="micks-contact-details" id="contact">
     <div className="container-site micks-contact-details-grid">
       <article className="micks-contact-profile">
