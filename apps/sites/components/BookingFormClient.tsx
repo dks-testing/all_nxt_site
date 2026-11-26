@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import type { BookingAppearance, BookingField } from "@platform/db";
 
 const STATES = "AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY".split(" ");
@@ -63,44 +63,38 @@ function CalendarPicker({ minDate, closedDays, disabledDates, value, onChange }:
   const [month, setMonth] = useState(new Date(earliest.getFullYear(), earliest.getMonth(), 1));
   const today = dateKey(new Date());
   const cells = useMemo(() => {
-    const start = new Date(month.getFullYear(), month.getMonth(), 1 - month.getDay());
-    return Array.from({ length: 42 }, (_, index) => new Date(start.getFullYear(), start.getMonth(), start.getDate() + index));
+    const year = month.getFullYear();
+    const monthIndex = month.getMonth();
+    const offset = month.getDay();
+    const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+    const weeks = Math.max(5, Math.ceil((offset + daysInMonth) / 7));
+    return Array.from({ length: weeks * 7 }, (_, index) => new Date(year, monthIndex, index + 1 - offset));
   }, [month]);
   const label = month.toLocaleDateString(undefined, { month: "long", year: "numeric" });
-  return <div className="book-calendar"><div className="book-calendar-head"><button type="button" onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))} aria-label="Previous month">‹</button><strong>{label}</strong><button type="button" onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))} aria-label="Next month">›</button></div><div className="book-calendar-grid">{"SMTWTFS".split("").map((day, index) => <small key={`${day}${index}`}>{day}</small>)}{cells.map((date) => {
-    const key = dateKey(date);
-    const unavailable = key < minDate || closedDays.includes(date.getDay()) || disabledDates.includes(key);
-    const outside = date.getMonth() !== month.getMonth();
-    return <button key={key} type="button" disabled={unavailable} className={`${outside ? "outside" : ""} ${!unavailable && !outside ? "available" : ""} ${key === today ? "today" : ""} ${value === key ? "selected" : ""}`} onClick={() => onChange(key)}>{date.getDate()}</button>;
-  })}</div><div className="book-calendar-legend"><span><i className="today" />Today</span><span><i className="available" />Available Dates</span><span><i className="selected" />Selected Date</span></div></div>;
-}
-
-function AppointmentDatePicker(props: DatePickerProps) {
-  const details = useRef<HTMLDetailsElement>(null);
-  const trigger = useRef<HTMLElement>(null);
-  const label = props.value
-    ? new Date(`${props.value}T12:00:00`).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })
-    : "Select a date";
-
-  function closeCalendar() {
-    if (details.current) details.current.open = false;
-    trigger.current?.focus();
-  }
-
-  return (
-    <details ref={details} className="book-date-picker" onKeyDown={(event) => {
-      if (event.key === "Escape" && details.current?.open) {
-        event.preventDefault();
-        closeCalendar();
-      }
-    }}>
-      <summary ref={trigger} className="book-date-trigger"><Icon name="calendar" /><span>{label}</span></summary>
-      <CalendarPicker {...props} onChange={(date) => {
-        props.onChange(date);
-        closeCalendar();
-      }} />
-    </details>
-  );
+  return <>
+    <div className="book-calendar">
+      <div className="book-calendar-head">
+        <button type="button" onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))} aria-label="Previous month">‹</button>
+        <strong aria-live="polite">{label}</strong>
+        <button type="button" onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))} aria-label="Next month">›</button>
+      </div>
+      <div className="book-calendar-grid">
+        {["SU", "MO", "TU", "WE", "TH", "FR", "SA"].map((day) => <small key={day}>{day}</small>)}
+        {cells.map((date) => {
+          const key = dateKey(date);
+          const outside = date.getMonth() !== month.getMonth();
+          const unavailable = outside || key < minDate || closedDays.includes(date.getDay()) || disabledDates.includes(key);
+          const classes = [outside && "outside", !unavailable && "available", key === today && !outside && "today", value === key && !outside && "selected"];
+          return <button key={key} type="button" disabled={unavailable}
+            className={classes.filter(Boolean).join(" ")} aria-pressed={value === key && !outside}
+            aria-label={date.toLocaleDateString(undefined, { dateStyle: "full" })} onClick={() => onChange(key)}>
+            {date.getDate()}
+          </button>;
+        })}
+      </div>
+    </div>
+    <div className="book-calendar-legend"><span><i className="today" />Today</span><span><i className="available" />Available Dates</span><span><i className="selected" />Selected Date</span></div>
+  </>;
 }
 
 function BookingBenefits() {
@@ -170,14 +164,14 @@ export function BookingFormClient({ siteSlug, slots, closedDays, disabledDates =
     {normalizedVariant === "appointment" && <div className="book-contact-preferences">{(["phone", "text", "email"] as const).map((value) => <label key={value}><span>Prefer {value === "phone" ? "phone call" : value === "text" ? "text messages" : "email"}</span><input type="radio" name="contactPreferenceDisplay" checked={contact === value} onChange={() => setContact(value)} /><SelectionIndicator /></label>)}</div>}
     <p className="book-step-label">1. How should we look up your vehicle?</p>
     <VehicleFields mode={mode} setMode={setMode} isLanding={normalizedVariant === "landing"} plateState={normalizedVariant === "appointment" ? (plateState ?? "") : undefined} />
-    {normalizedVariant === "appointment" ? <>
+    {normalizedVariant === "appointment" ?
       <div className="book-appointment-grid">
         <section>
-          <h3>When would you like to come in?</h3>
-          <AppointmentDatePicker minDate={minDate} closedDays={closedDays} disabledDates={disabledDates} value={selectedDate} onChange={setSelectedDate} />
+          <h3>2. When would you like to come in?</h3>
+          <CalendarPicker minDate={minDate} closedDays={closedDays} disabledDates={disabledDates} value={selectedDate} onChange={setSelectedDate} />
         </section>
         <section>
-          <h3>Preferred arrival time</h3>
+          <h3>3. Preferred arrival time</h3>
           <div className="book-time-grid">
             {visibleSlots.map((slot) => (
               <button key={slot} type="button" aria-pressed={selectedSlot === slot} className={selectedSlot === slot ? "selected" : ""} onClick={() => setSelectedSlot(slot)}>{slot}</button>
@@ -188,27 +182,30 @@ export function BookingFormClient({ siteSlug, slots, closedDays, disabledDates =
               {showAllSlots ? "Fewer times" : "More times"}<span aria-hidden="true" />
             </button>
           )}
-        </section>
-        <section>
-          <h3>Soonest available</h3>
+          {slots.length > 0 && <div className="book-time-or">or</div>}
           <button type="button" aria-pressed={selectedSlot === "Soonest available"} className={`book-soonest ${selectedSlot === "Soonest available" ? "selected" : ""}`} onClick={() => setSelectedSlot("Soonest available")}>
-            <Icon name="soonest" /><span><strong>First available time</strong><small>We&apos;ll contact you with the earliest opening.</small></span><i aria-hidden="true" />
+            <Icon name="soonest" /><span><strong>Soonest Available</strong><small>We&apos;ll contact you with the earliest opening.</small></span><i aria-hidden="true" />
           </button>
         </section>
-      </div>
-      <fieldset className="book-appointment-dropoff">
-        <legend>How will you leave your vehicle?</legend>
-        <div>
+        <section>
+          <h3>4. How will you leave your vehicle?</h3>
           <button type="button" aria-pressed={dropOff === "drop_off"} className={`book-drop-card ${dropOff === "drop_off" ? "selected" : ""}`} onClick={() => setDropOff("drop_off")}>
             <Icon name="dropoff" /><span><strong>I&apos;ll Drop It Off</strong></span><i aria-hidden="true" />
           </button>
           <button type="button" aria-pressed={dropOff === "wait"} className={`book-drop-card book-wait-card ${dropOff === "wait" ? "selected" : ""}`} onClick={() => setDropOff("wait")}>
             <Icon name="wait" /><span><strong>I&apos;ll Wait</strong></span><small>We&apos;ll confirm the estimated wait.</small><i aria-hidden="true" />
           </button>
-        </div>
-      </fieldset>
-    </> : <div className="book-landing-when"><Field icon="calendar" label="Date"><input type="date" name="preferredDate" min={minDate} required /></Field><Field icon="clock" label="Arrival Time"><select name="slot" defaultValue="Soonest available"><option>Soonest available</option>{slots.map((slot) => <option key={slot}>{slot}</option>)}</select></Field><Field icon="car" label="Drop Off or Wait?"><select name="dropOff"><option value="drop_off">I&apos;ll Drop It Off</option><option value="wait">I&apos;ll Wait</option></select></Field></div>}
-    <label className="book-issue"><strong>What can we help you with?</strong>{normalizedVariant === "appointment" && <Icon name="issue" />}<textarea name="issue" maxLength={500} rows={normalizedVariant === "appointment" ? 5 : 4} onChange={(event) => setIssueLen(event.target.value.length)} placeholder="Ex. Brakes squeaking, check engine light, oil change, tire vibration..." /><small>{issueLen}/500</small></label><ExtraFields fields={fields} /><input type="text" name="website" tabIndex={-1} autoComplete="off" className="book-honeypot" aria-hidden /><Submit status={status} error={error} />
+        </section>
+      </div> : <div className="book-landing-when"><Field icon="calendar" label="Date"><input type="date" name="preferredDate" min={minDate} required /></Field><Field icon="clock" label="Arrival Time"><select name="slot" defaultValue="Soonest available"><option>Soonest available</option>{slots.map((slot) => <option key={slot}>{slot}</option>)}</select></Field><Field icon="car" label="Drop Off or Wait?"><select name="dropOff"><option value="drop_off">I&apos;ll Drop It Off</option><option value="wait">I&apos;ll Wait</option></select></Field></div>}
+    <label className="book-issue">
+      <strong>{normalizedVariant === "appointment" ? "5. " : ""}What can we help you with?</strong>
+      {normalizedVariant === "appointment" && <Icon name="issue" />}
+      <textarea name="issue" maxLength={500} rows={normalizedVariant === "appointment" ? 5 : 4} onChange={(event) => setIssueLen(event.target.value.length)} placeholder="Ex. Brakes squeaking, check engine light, oil change, tire vibration..." />
+      <small>{issueLen}{normalizedVariant === "appointment" ? " / " : "/"}500</small>
+    </label>
+    <ExtraFields fields={fields} />
+    <input type="text" name="website" tabIndex={-1} autoComplete="off" className="book-honeypot" aria-hidden />
+    <Submit status={status} error={error} />
   </form>;
 }
 
@@ -236,7 +233,7 @@ function VehicleFields({ mode, setMode, isLanding = false, plateState = "MN" }: 
       <Field icon="plate" label="License Plate"><input type="text" name="plate" autoComplete="off" aria-label="License Plate" placeholder={isLanding ? "License Plate Ex. ABC1234" : "Ex. ABC1234"} required /></Field>
       <Field icon="pin" label="State">
         <select name="state" defaultValue={defaultState} aria-label="State">
-          {!defaultState && <option value="" disabled>Select a state</option>}
+          {!defaultState && <option value="" disabled>Select your state</option>}
           {STATES.map((state) => <option key={state}>{state}</option>)}
         </select>
       </Field>
