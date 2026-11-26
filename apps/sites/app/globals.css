@@ -6771,17 +6771,17 @@ button:hover{
   min-width: 0;
   padding: 28px 34px 40px;
   border-radius: 40px;
-  background: #6d92b7;
+  background: var(--testimonials-bg, #6d92b7);
   box-shadow: 0 0 9px #0005;
 }
 .micks-contact-profile h2,
 .micks-contact-profile h3 { color: #fff; font-size: 26px; font-weight: 800; line-height: 1.2; text-transform: uppercase; }
 .micks-contact-profile h2 { margin: 0 0 14px; }
-.micks-contact-profile > img { display: block; width: 100%; aspect-ratio: 490 / 560; object-fit: cover; border-radius: 36px; }
+.micks-contact-profile > img { display: block; width: 100%; aspect-ratio: 490 / 434; object-fit: cover; border-radius: 36px; }
 .micks-contact-profile h3 { margin: 10px 0 24px; text-align: center; }
 .micks-contact-profile-info { font-size: 16px; line-height: 1.5; text-align: center; }
 .micks-contact-profile-info p { margin: 0; }
-.micks-contact-profile-info > a { display: inline-flex; align-items: center; justify-content: center; gap: 8px; color: #ff3345; }
+.micks-contact-profile-info > a { display: inline-flex; align-items: center; justify-content: center; gap: 8px; color: #fff; }
 .micks-contact-profile-info > a svg { width: 16px; height: 16px; }
 .micks-contact-profile-info > a:hover { text-decoration: underline; }
 .micks-contact-profile-info ul { margin: 0; padding: 0; list-style: none; }

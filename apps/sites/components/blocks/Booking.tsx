@@ -13,8 +13,8 @@ export function BookingForm({ bundle, props }: BlockComponentProps<"booking_form
   if (b && !b.enabled) return null;
   const rules = { slotMinutes: b?.slotMinutes ?? 30, openTime: b?.openTime ?? "08:00", closeTime: b?.closeTime ?? "16:30", closedDays: b?.closedDays ?? [0, 6] };
   return (
-    <section className="section" id="book">
-      <div className="container-site max-w-4xl">
+    <section className="section !pb-0" id="book">
+      <div className="container-site">
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-bold uppercase md:text-4xl">{props.heading}</h2>
           {props.subheading && <RichText text={props.subheading} className="mt-3 text-lg text-[var(--color-muted)]" bundle={bundle} />}
