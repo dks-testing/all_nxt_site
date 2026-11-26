@@ -6626,6 +6626,65 @@ body.micks-tool-popup-open {
   border-radius: 6px;
 }
 .micks-contact-page .book-step-label { font-weight: 500; }
+.book-tool--appointment .book-manual-fields > label {
+  min-width: 0;
+  min-height: 66px;
+  align-content: center;
+  gap: 4px;
+  padding: 10px 19px;
+  border: 2px solid var(--swatch-booking-border);
+  border-radius: 6px;
+  background: var(--book-input-bg);
+  box-shadow: 0 0 0 1px var(--swatch-booking-border-shadow), 0 8px 20px var(--swatch-booking-shadow);
+  font-size: 14px;
+  line-height: 1.2;
+}
+.book-tool--appointment .book-manual-fields > label > span {
+  color: var(--swatch-5e596e);
+}
+.book-tool--appointment .book-manual-fields input,
+.book-tool--appointment .book-manual-fields select {
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  color: var(--book-input-text);
+  background: transparent;
+  font: inherit;
+  font-weight: 400;
+}
+.book-tool--appointment .book-manual-fields > label:has(> select) {
+  position: relative;
+}
+.book-tool--appointment .book-manual-fields select {
+  appearance: none;
+  padding-inline-end: 24px;
+  cursor: pointer;
+}
+.book-tool--appointment .book-manual-fields > label:has(> select)::after {
+  position: absolute;
+  inset-inline-end: 20px;
+  bottom: 17px;
+  width: 11px;
+  height: 11px;
+  border-right: 2px solid var(--book-input-text);
+  border-bottom: 2px solid var(--book-input-text);
+  transform: translateY(-2px) rotate(45deg);
+  pointer-events: none;
+  content: "";
+}
+.book-tool--appointment .book-manual-fields > label:focus-within {
+  border-color: var(--book-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--book-accent) 14%, transparent);
+}
+.book-vehicle-catalog-link {
+  justify-self: start;
+  color: var(--book-text);
+  font-size: 13px;
+  text-decoration: underline;
+}
 .micks-contact-page .book-vehicle-mode { gap: 14px; }
 .micks-contact-page .book-vehicle-mode button {
   grid-template-columns: 54px minmax(0, 1fr) 35px;

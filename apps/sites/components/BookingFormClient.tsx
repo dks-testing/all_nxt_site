@@ -2,6 +2,7 @@
 
 import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import type { BookingAppearance, BookingField } from "@platform/db";
+import { BookingVehicleDropdowns } from "./BookingVehicleDropdowns";
 
 const STATES = "AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY".split(" ");
 type Variant = "default" | "landing" | "appointment" | "micks";
@@ -163,7 +164,7 @@ export function BookingFormClient({ siteSlug, slots, closedDays, disabledDates =
     <div className="book-contact-fields"><Field icon="user" label="Full Name"><input name="customerName" autoComplete="name" placeholder="Full Name" required /></Field><Field icon="phone" label="Phone Number"><input name="phone" type="tel" autoComplete="tel" placeholder="Phone Number" required /></Field><Field icon="mail" label="Email (optional)"><input name="email" type="email" autoComplete="email" placeholder="Email (optional)" /></Field>{normalizedVariant === "landing" ? <Field icon="message" label="Preferred contact"><select name="contactPref" defaultValue="phone" aria-label="Preferred contact"><option value="phone">Phone Call</option><option value="text">Text Message</option><option value="email">Email</option></select></Field> : null}</div>
     {normalizedVariant === "appointment" && <div className="book-contact-preferences">{(["phone", "text", "email"] as const).map((value) => <label key={value}><span>Prefer {value === "phone" ? "phone call" : value === "text" ? "text messages" : "email"}</span><input type="radio" name="contactPreferenceDisplay" checked={contact === value} onChange={() => setContact(value)} /><SelectionIndicator /></label>)}</div>}
     <p className="book-step-label">1. How should we look up your vehicle?</p>
-    <VehicleFields mode={mode} setMode={setMode} isLanding={normalizedVariant === "landing"} plateState={normalizedVariant === "appointment" ? (plateState ?? "") : undefined} />
+    <VehicleFields mode={mode} setMode={setMode} isLanding={normalizedVariant === "landing"} useCatalog={normalizedVariant === "appointment"} plateState={normalizedVariant === "appointment" ? (plateState ?? "") : undefined} />
     {normalizedVariant === "appointment" ?
       <div className="book-appointment-grid">
         <section>
@@ -210,10 +211,11 @@ export function BookingFormClient({ siteSlug, slots, closedDays, disabledDates =
 }
 
 function Field({ icon, label, children }: { icon: Parameters<typeof Icon>[0]["name"]; label: string; children: ReactNode }) { return <label className={`book-field${icon === "plate" ? " book-field--plate" : ""}`}><Icon name={icon} /><span>{label}</span>{children}</label>; }
-function VehicleFields({ mode, setMode, isLanding = false, plateState = "MN" }: {
+function VehicleFields({ mode, setMode, isLanding = false, useCatalog = false, plateState = "MN" }: {
   mode: "plate" | "manual";
   setMode: (mode: "plate" | "manual") => void;
   isLanding?: boolean;
+  useCatalog?: boolean;
   plateState?: string;
 }) {
   const state = plateState.trim().toUpperCase();
@@ -226,7 +228,7 @@ function VehicleFields({ mode, setMode, isLanding = false, plateState = "MN" }: 
       </button>
       <button type="button" className={mode === "manual" ? "selected" : ""} aria-pressed={mode === "manual"} onClick={() => setMode("manual")}>
         <span className="book-vehicle-icon" aria-hidden="true"><Icon name="car" /></span>
-        <span><strong>Enter Vehicle Manually</strong><small>Type year, make &amp; model</small></span><SelectionIndicator />
+        <span><strong>Enter Vehicle Manually</strong><small>{useCatalog ? "Choose year, make & model" : "Type year, make & model"}</small></span><SelectionIndicator />
       </button>
     </div>
     {mode === "plate" ? <div className="book-plate-fields">
@@ -237,10 +239,10 @@ function VehicleFields({ mode, setMode, isLanding = false, plateState = "MN" }: 
           {STATES.map((state) => <option key={state}>{state}</option>)}
         </select>
       </Field>
-    </div> : <div className="book-manual-fields">
-      <label>Year<input name="year" inputMode="numeric" pattern="[0-9]{4}" required /></label>
-      <label>Make<input name="make" required /></label>
-      <label>Model<input name="model" required /></label>
+    </div> : useCatalog ? <BookingVehicleDropdowns /> : <div className="book-manual-fields">
+      <label><span>Year</span><input name="year" inputMode="numeric" pattern="[0-9]{4}" required /></label>
+      <label><span>Make</span><input name="make" required /></label>
+      <label><span>Model</span><input name="model" required /></label>
     </div>}
   </>;
 }
