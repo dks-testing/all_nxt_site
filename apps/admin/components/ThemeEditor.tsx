@@ -1,8 +1,9 @@
 "use client";
 import { useState, type CSSProperties } from "react";
-import type { ThemeColors, DesignOptions } from "@platform/db";
-import { contrastRatio, fontOptions } from "@platform/db/theme";
+import type { ThemePalette, DesignOptions } from "@platform/db";
+import { fontOptions, resolveColor } from "@platform/db/theme";
 import { MediaPicker, type MediaAsset } from "./MediaPicker";
+import { ThemePaletteEditor } from "./ThemePaletteEditor";
 
 const sharedBadgeControls = [
   { slot: 1, url: "serviceBadgeOneUrl", link: "serviceBadgeOneLink", alt: "serviceBadgeOneAlt", visible: "serviceBadgeOneVisible", title: "Certification badge 1", fallbackAlt: "Certified auto repair" },
@@ -10,61 +11,17 @@ const sharedBadgeControls = [
   { slot: 3, url: "serviceBadgeThreeUrl", link: "serviceBadgeThreeLink", alt: "serviceBadgeThreeAlt", visible: "serviceBadgeThreeVisible", title: "Certification badge 3 (optional)", fallbackAlt: "Automotive certification" },
 ] as const;
 
-const colorFields: [keyof ThemeColors, string, string][] = [
-  ["primary", "Primary", "Default brand accent and fallback color for buttons and links."],
-  ["primaryForeground", "Text on primary", "Text and icons placed on the primary brand color."],
-  ["secondary", "Secondary", "Dark sections, standard footer backgrounds, and secondary emphasis."],
-  ["accent", "Accent", "Highlights, small emphasis elements, and fallback badge color."],
-  ["background", "Page background", "Main background used across public pages."],
-  ["surface", "Panel background", "Cards, dropdown hover states, and light content panels."],
-  ["text", "Body text", "Default headings and paragraph text."],
-  ["muted", "Muted text", "Supporting copy, captions, and secondary information."],
-  ["testimonialsBackground", "Testimonials section bg", "Background color for the testimonials section."],
-  ["footerLogoBandBackground", "Footer logo band", "Background color for the footer logo and certification badge band."],
-];
-
-const componentColorFields = [
-  ["buttonBackground", "CTA button", "Background for Schedule Service and other main action buttons."],
-  ["buttonText", "CTA button text", "Text and icons inside main action buttons."],
-  ["buttonHoverBackground", "CTA hover", "Main action-button background while a visitor hovers."],
-  ["buttonHoverText", "CTA hover text", "Main action-button text while a visitor hovers."],
-  ["navButtonBackground", "Navigation button", "Background for the phone/call button in the website header."],
-  ["navButtonText", "Navigation button text", "Phone number and hours inside the header button."],
-  ["navButtonHoverBackground", "Navigation button hover", "Header phone/call button background on hover."],
-  ["navButtonHoverText", "Navigation hover text", "Header phone/call button text on hover."],
-  ["trustCardHoverBackground", "Trust / value card hover", "Background color when hovering the Trust / Value cards."],
-  ["trustCardHeadingColor", "Trust / value card headings", "Heading text color for the Trust / Value cards."],
-  ["badgeBackground", "Badge background", "Background for small promotional or navigation badges."],
-  ["badgeText", "Badge text", "Text displayed inside small badges."],
-] as const;
-
-const serviceCardColorFields = [
-  ["serviceProcessCardBackground", "Process cards background", "Background for the process steps on service detail pages.", "buttonHoverBackground"],
-  ["serviceProcessCardHoverBackground", "Process cards hover", "Background when hovering a process step.", "buttonBackground"],
-  ["serviceProcessCardTextColor", "Process cards text color", "Text color for titles and descriptions on both Process and Trust cards.", undefined],
-  ["serviceTrustCardBackground", "Trust cards background", "Background for trust points such as ASE Certified Techs and Same Day Service.", "buttonHoverBackground"],
-  ["serviceTrustCardHoverBackground", "Trust cards hover", "Background when hovering a trust card.", "buttonBackground"],
-] as const;
-
 type Props = {
   siteId: string;
-  initial: { colors: ThemeColors; fonts: { heading: string; body: string }; logoUrl: string; logoDarkUrl: string; faviconUrl: string; radius: string; buttonStyle: string; customCss: string; design: DesignOptions };
+  initial: { palette: ThemePalette; fonts: { heading: string; body: string }; logoUrl: string; logoDarkUrl: string; faviconUrl: string; radius: string; buttonStyle: string; customCss: string; design: DesignOptions };
   businessName: string;
   action: (fd: FormData) => Promise<void>;
   media: MediaAsset[];
   publicOrigin: string;
 };
 
-function ColorControl({ name, label, help, value, fallback, onChange }: { name: string; label: string; help: string; value: string; fallback?: string; onChange: (value: string) => void }) {
-  const swatch = /^#[0-9a-f]{6}$/i.test(value) ? value : (fallback ?? "#000000");
-  return <label className="block">
-    <span className="label inline-flex items-center gap-1.5">{label}<span className="group relative inline-grid h-4 w-4 cursor-help place-items-center rounded-full bg-slate-200 text-[10px] font-bold text-slate-600" tabIndex={0} aria-label={`${label}: ${help}`}>i<span role="tooltip" className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 hidden w-64 -translate-x-1/2 rounded-lg bg-slate-950 px-3 py-2 text-left text-xs font-normal leading-5 text-white shadow-xl group-hover:block group-focus:block">{help}</span></span></span>
-    <div className="flex gap-2"><input type="color" value={swatch} onChange={(event) => onChange(event.target.value)} className="h-11 w-12 cursor-pointer rounded-lg border border-slate-300 bg-white p-1" aria-label={`Choose ${label.toLowerCase()}`} /><input name={name} value={value} onChange={(event) => onChange(event.target.value)} placeholder={fallback} className="input font-mono" pattern="#[0-9a-fA-F]{6}" /></div>
-  </label>;
-}
-
 export function ThemeEditor({ siteId, initial, action, media, publicOrigin }: Props) {
-  const [c, setC] = useState(initial.colors);
+  const [palette, setPalette] = useState(initial.palette);
   const [fonts, setFonts] = useState(initial.fonts);
   const [logo, setLogo] = useState(initial.logoUrl);
   const [radius, setRadius] = useState(initial.radius);
@@ -72,27 +29,11 @@ export function ThemeEditor({ siteId, initial, action, media, publicOrigin }: Pr
   const [design, setDesign] = useState<DesignOptions>(initial.design);
   const setOption = (patch: Partial<DesignOptions>) => setDesign((old) => ({ ...old, ...patch }));
   const isHex = (value?: string) => typeof value === "string" && /^#[0-9a-fA-F]{6}$/.test(value);
-  const quoteColor = design.quoteSvgColor ?? "";
-  const quoteHoverColor = design.quoteSvgHoverColor ?? "";
+  const quoteColor = resolveColor(palette, "quoteSvgColor");
   const canTintQuote = isHex(quoteColor);
   const previewQuoteUrl = typeof design.quoteSvgUrl === "string" && /^\/images_nextjs\/[a-f0-9-]{36}\/[a-f0-9-]{36}\.svg$/i.test(design.quoteSvgUrl) ? `${publicOrigin}${design.quoteSvgUrl}` : "";
   const stepIconUrl = design.serviceStepIconUrl ?? design.serviceTrustIconUrls?.[0] ?? "";
-  const stepIconColor = design.serviceStepIconColor ?? design.serviceTrustIconColor ?? "";
-  const stepIconHoverColor = design.serviceStepIconHoverColor ?? design.serviceTrustIconHoverColor ?? "";
-  const ratio = contrastRatio(c.primary, c.primaryForeground);
-  const textRatio = contrastRatio(c.text, c.background);
-  const componentFallbacks: Record<(typeof componentColorFields)[number][0], string> = {
-    buttonBackground: c.primary, buttonText: c.primaryForeground, buttonHoverBackground: c.primary, buttonHoverText: c.primaryForeground,
-    navButtonBackground: design.buttonBackground ?? c.primary, navButtonText: design.buttonText ?? c.primaryForeground,
-    navButtonHoverBackground: design.buttonHoverBackground ?? c.primary, navButtonHoverText: design.buttonHoverText ?? c.primaryForeground,
-    trustCardHoverBackground: design.trustCardHoverBackground ?? design.buttonHoverBackground ?? c.primary,
-    trustCardHeadingColor: design.trustCardHeadingColor ?? c.primaryForeground,
-    badgeBackground: c.accent, badgeText: c.primaryForeground,
-  };
-  const designColor = (key: (typeof componentColorFields)[number][0]) => typeof design[key] === "string" ? design[key] as string : componentFallbacks[key];
-  const buttonRatio = contrastRatio(designColor("buttonBackground"), designColor("buttonText"));
-  const navButtonRatio = contrastRatio(designColor("navButtonBackground"), designColor("navButtonText"));
-
+  const stepIconColor = resolveColor(palette, "serviceStepIconColor");
   return (
     <form action={action} className="space-y-6">
       <input type="hidden" name="siteId" value={siteId} />
@@ -107,36 +48,7 @@ export function ThemeEditor({ siteId, initial, action, media, publicOrigin }: Pr
           <p className="help mt-2">Choose an image from this site’s media library or upload a new optimized image.</p>
         </section>
 
-        <section className="card overflow-hidden">
-          <div className="border-b border-slate-200 bg-slate-50/70 px-5 py-4"><h2 className="font-semibold">Complete colour scheme</h2><p className="mt-1 text-sm text-slate-500">All website colors are managed here. Hover or focus the information icon beside any color to see exactly where it is used.</p></div>
-          <div className="p-5">
-          <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-slate-500">Foundation colors</h3>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {colorFields.map(([key, label, help]) => <ColorControl key={key} name={key} label={label} help={help} value={c[key]} onChange={(value) => setC({ ...c, [key]: value })} />)}
-          </div>
-          <div className="my-6 border-t border-slate-200" />
-          <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-slate-500">Buttons, navigation &amp; badges</h3>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {componentColorFields.map(([key, label, help]) => <ColorControl key={key} name={key} label={label} help={help} value={designColor(key)} onChange={(value) => setOption({ [key]: value })} />)}
-          </div>
-          <div className="mt-4 flex flex-wrap gap-3 text-xs">
-            <Contrast label="Primary contrast" ratio={ratio} />
-            <Contrast label="Body text contrast" ratio={textRatio} />
-            <Contrast label="CTA contrast" ratio={buttonRatio} />
-            <Contrast label="Navigation button contrast" ratio={navButtonRatio} />
-          </div>
-          <div className="my-6 border-t border-slate-200" />
-          <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-slate-500">Service section cards</h3>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {serviceCardColorFields.map(([key, label, help, fallback]) => <ColorControl
-              key={key} name={key} label={label} help={help}
-              value={design[key] ?? ""} fallback={fallback ? designColor(fallback) : "#ffffff"}
-              onChange={(value) => setOption({ [key]: value })}
-            />)}
-          </div>
-          <p className="help mt-2">Clear a hex value to restore its default.</p>
-          </div>
-        </section>
+        <ThemePaletteEditor palette={palette} onChange={setPalette} />
 
         <section className="card p-5">
           <h2 className="mb-4 font-semibold">Typography & shape</h2>
@@ -155,25 +67,8 @@ export function ThemeEditor({ siteId, initial, action, media, publicOrigin }: Pr
                 <h4 className="mb-1 font-semibold">Quote decoration SVG</h4>
                 <p className="help mb-3">Upload the quote artwork used by this website in the About section and service-page quotations. The change applies to every matching quote decoration on this site only. Leave empty to keep the default // decoration.</p>
                 <MediaPicker siteId={siteId} name="quoteSvgUrl" label="Quote SVG (per website)" value={design.quoteSvgUrl ?? ""} onChange={(url) => setOption({ quoteSvgUrl: url })} assets={media} publicOrigin={publicOrigin} svgOnly help="Upload a static SVG (up to 512 KB). It remains an SVG and is saved to this website's media library." />
-                <div className="mt-4 grid gap-4 sm:grid-cols-[1fr_1fr]">
-                  <div className="space-y-3">
-                    <label className="block">
-                      <span className="label">SVG Color</span>
-                      <div className="flex gap-2">
-                        <input type="color" aria-label="Select quote SVG color" className="h-9 w-12 cursor-pointer rounded border border-slate-300" value={canTintQuote ? quoteColor : "#7198bd"} onChange={(event) => setOption({ quoteSvgColor: event.target.value })} />
-                        <input className="input font-mono" name="quoteSvgColor" value={quoteColor} onChange={(event) => setOption({ quoteSvgColor: event.target.value })} pattern="#[0-9a-fA-F]{6}" placeholder="Original SVG colors" aria-label="Quote SVG hex color" />
-                      </div>
-                    </label>
-                    <label className="block">
-                      <span className="label">SVG Hover Color</span>
-                      <div className="flex gap-2">
-                        <input type="color" aria-label="Select quote SVG hover color" className="h-9 w-12 cursor-pointer rounded border border-slate-300 disabled:cursor-not-allowed disabled:opacity-40" disabled={!canTintQuote} value={isHex(quoteHoverColor) ? quoteHoverColor : canTintQuote ? quoteColor : "#7198bd"} onChange={(event) => setOption({ quoteSvgHoverColor: event.target.value })} />
-                        <input className="input font-mono" name="quoteSvgHoverColor" value={quoteHoverColor} disabled={!canTintQuote} onChange={(event) => setOption({ quoteSvgHoverColor: event.target.value })} pattern="#[0-9a-fA-F]{6}" placeholder="Same as SVG color" aria-label="Quote SVG hover hex color" />
-                      </div>
-                    </label>
-                    <button type="button" className="btn btn-secondary btn-sm" onClick={() => setOption({ quoteSvgColor: undefined, quoteSvgHoverColor: undefined })}>Reset Color (original SVG)</button>
-                    <p className="help">Choosing a color applies one solid color to the entire SVG, including its strokes. Reset restores the file's original colors. Hover applies when the quote icon is hovered.</p>
-                  </div>
+                <div className="mt-4 grid items-start gap-4 sm:grid-cols-2">
+                  <p className="help">Manage the quote tint and its hover colour in the global palette.</p>
                   <div className="rounded-lg border border-slate-200 bg-white p-3">
                     <p className="label">Live preview</p>
                     <div className="flex min-h-28 items-center justify-center bg-slate-50 rounded">
@@ -189,11 +84,7 @@ export function ThemeEditor({ siteId, initial, action, media, publicOrigin }: Pr
                   <p className="help">Upload one static SVG. It is automatically used for every item in every service step list, including the trust list, at 57 × 57 px on desktop.</p>
                 </div>
                 <MediaPicker siteId={siteId} name="serviceStepIconUrl" label="Shared step-list SVG" value={stepIconUrl} onChange={(url) => setOption({ serviceStepIconUrl: url })} assets={media} publicOrigin={publicOrigin} svgOnly help="Choose an existing site SVG or upload a safe static SVG once for all service step-list items." />
-                <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_1fr_220px]">
-                  <label><span className="label">SVG Color</span><div className="flex gap-2"><input type="color" className="h-10 w-12 rounded border" value={isHex(stepIconColor) ? stepIconColor : "#0c1b2a"} onChange={(event) => setOption({ serviceStepIconColor: event.target.value })} /><input name="serviceStepIconColor" className="input font-mono" value={stepIconColor} onChange={(event) => setOption({ serviceStepIconColor: event.target.value })} placeholder="Original colors" pattern="#[0-9a-fA-F]{6}" /></div></label>
-                  <label><span className="label">Hover Color</span><div className="flex gap-2"><input type="color" className="h-10 w-12 rounded border disabled:opacity-40" disabled={!isHex(stepIconColor)} value={isHex(stepIconHoverColor) ? stepIconHoverColor : isHex(stepIconColor) ? stepIconColor : "#0c1b2a"} onChange={(event) => setOption({ serviceStepIconHoverColor: event.target.value })} /><input name="serviceStepIconHoverColor" className="input font-mono" disabled={!isHex(stepIconColor)} value={stepIconHoverColor} onChange={(event) => setOption({ serviceStepIconHoverColor: event.target.value })} placeholder="Same as SVG color" pattern="#[0-9a-fA-F]{6}" /></div></label>
-                  <div><span className="label">Actions</span><button type="button" className="btn btn-secondary w-full" onClick={() => setOption({ serviceStepIconColor: "", serviceStepIconHoverColor: "" })}>Reset to original colors</button></div>
-                </div>
+                <p className="help mt-3">Manage the step icon tint and its hover colour in the global palette.</p>
                 <div className="mt-4 rounded-lg border bg-white p-3"><p className="label">Live preview</p><div className="flex items-center gap-4"><div className="grid h-[72px] w-[72px] shrink-0 place-items-center rounded-lg bg-slate-100">{stepIconUrl ? (isHex(stepIconColor) ? <span className="h-[57px] w-[57px]" style={{ backgroundColor: stepIconColor, mask: `url(${publicOrigin}${stepIconUrl}) center/contain no-repeat`, WebkitMask: `url(${publicOrigin}${stepIconUrl}) center/contain no-repeat` }} /> : <img src={`${publicOrigin}${stepIconUrl}`} alt="Shared service step-list icon" className="h-[57px] w-[57px] object-contain" />) : <span className="text-xs text-slate-400">Fallback</span>}</div><p className="help">This previewed icon is applied to every row inside <code>.micks-service-step-list</code> across the selected website.</p></div></div>
               </div>
               <MediaPicker siteId={siteId} name="innerHeroImageUrl" label="Inner-page banner" value={design.innerHeroImageUrl ?? ""} assets={media} publicOrigin={publicOrigin} maxWidth={1920} className="sm:col-span-2" />
@@ -251,9 +142,4 @@ export function ThemeEditor({ siteId, initial, action, media, publicOrigin }: Pr
 
     </form>
   );
-}
-
-function Contrast({ label, ratio }: { label: string; ratio: number }) {
-  const ok = ratio >= 4.5;
-  return <span className={`rounded-full px-2.5 py-1 font-semibold ${ok ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-800"}`}>{label}: {ratio.toFixed(1)}:1 {ok ? "✓ readable" : "⚠ below 4.5:1"}</span>;
 }

@@ -124,7 +124,7 @@ function MicksFooter({ bundle }: { bundle: SiteBundle }) {
         {theme?.logoUrl ? <img src={theme.logoUrl} alt={name} className="micks-footer-main-logo" /> : <strong>{name}</strong>}
         <div className="micks-footer-badge-side">{footerBadges.slice(1).map((badge) => <CertificationBadge key={badge.slot} design={design} slot={badge.slot} />)}</div>
       </div></div>}
-      <div className="micks-footer-main" style={{ backgroundImage: `linear-gradient(#000c,#000c),url(${JSON.stringify(footerBackground)})` }}>
+      <div className="micks-footer-main" style={{ backgroundImage: `linear-gradient(var(--swatch-000000cc),var(--swatch-000000cc)),url(${JSON.stringify(footerBackground)})` }}>
         <div className="container-site micks-footer-main-grid">
           <div>
             <h2>Contact</h2>

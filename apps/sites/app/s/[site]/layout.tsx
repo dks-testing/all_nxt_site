@@ -38,7 +38,7 @@ export default async function SiteLayout({ children, params }: Params & { childr
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
       {googleFonts && <link rel="stylesheet" href={googleFonts} precedence="default" />}
       <style href={`theme-${bundle.site.id}`} precedence="high">
-        {customFontCss(bundle.theme?.fonts) + "\n" + themeToCss(bundle.theme ?? {}) + (bundle.theme?.customCss ? `\n${bundle.theme.customCss.replace(/<\/?style/gi, "")}` : "")}
+        {customFontCss(bundle.theme?.fonts) + "\n" + themeToCss({ ...bundle.theme, bookingAppearance: bundle.booking?.appearance }) + (bundle.theme?.customCss ? `\n${bundle.theme.customCss.replace(/<\/?style/gi, "")}` : "")}
       </style>
       {ctx.preview && (
         <div className="sticky top-0 z-50 bg-amber-400 px-4 py-1.5 text-center text-sm font-semibold text-black">

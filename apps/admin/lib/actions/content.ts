@@ -3,13 +3,13 @@ import bcrypt from "bcryptjs";
 import { resolve4, resolveCname } from "node:dns/promises";
 import { revalidatePath } from "next/cache";
 import {
-  getDb, and, eq, asc, siteSettings, themes, media, pages, pageSections, menus, domains, redirects, bookingSettings, appointments, services,
+  getDb, and, eq, asc, sql, siteSettings, themes, media, pages, pageSections, menus, domains, redirects, bookingSettings, appointments, services,
   integrations, users, siteMembers, integrationTypes, appointmentStatus, siteRoles, audit, globalButtonKeys,
-  type DayHours, type MenuItem, type ThemeColors,
+  type DayHours, type MenuItem, type DesignOptions,
 } from "@platform/db";
 import { blockSchemas, blockFields, defaultBlockProps, isBlockType, type Field } from "@platform/db/blocks";
 import { cleanRichText } from "@platform/db/rich-text-html";
-import { fontOptions } from "@platform/db/theme";
+import { bookingColorRoles, buildPalette, colorRoles, componentColorRoles, componentColors, fontOptions, getThemePalette, normalizeColor, paletteColor } from "@platform/db/theme";
 import { fieldsSchema } from "@platform/db/booking-fields";
 import { requireSiteAccess, requireSuperAdmin } from "../auth";
 import { afterChange } from "../mutate";
@@ -110,17 +110,6 @@ export async function saveTheme(fd: FormData) {
   const siteId = str(fd, "siteId");
   const { user } = await requireSiteAccess(siteId);
   return run(`/sites/${siteId}/branding`, async () => {
-    const hex = (k: string) => {
-      const v = str(fd, k);
-      if (!/^#[0-9a-fA-F]{6}$/.test(v)) throw new Error(`${k} must be a hex colour like #1d4ed8`);
-      return v;
-    };
-    const colors: ThemeColors = {
-      primary: hex("primary"), primaryForeground: hex("primaryForeground"), secondary: hex("secondary"), accent: hex("accent"),
-      background: hex("background"), surface: hex("surface"), text: hex("text"), muted: hex("muted"),
-      testimonialsBackground: hex("testimonialsBackground"),
-      footerLogoBandBackground: hex("footerLogoBandBackground"),
-    };
     const font = (k: string) => {
       const v = str(fd, k);
       if (!(fontOptions as readonly string[]).includes(v)) throw new Error("Unsupported font");
@@ -138,21 +127,31 @@ export async function saveTheme(fd: FormData) {
     // Uploaded SVG URLs must belong to the selected site's media library.
     // Clones may retain their original quote until the owner uploads a replacement.
     const quoteSvgUrl = opt(fd, "quoteSvgUrl") ?? undefined;
-    const optionalHex = (field: string): string | undefined => {
-      const value = str(fd, field).trim();
-      if (!value) return undefined;
-      if (!/^#[0-9a-fA-F]{6}$/.test(value)) throw new Error(`${field} must be a 6-digit hex color like #7198BD`);
-      return value;
-    };
-    const quoteSvgColor = optionalHex("quoteSvgColor");
-    const quoteSvgHoverColor = optionalHex("quoteSvgHoverColor");
     const serviceStepIconUrl = opt(fd, "serviceStepIconUrl") ?? undefined;
-    const serviceStepIconColor = optionalHex("serviceStepIconColor");
-    const serviceStepIconHoverColor = optionalHex("serviceStepIconHoverColor");
-    if (quoteSvgHoverColor && !quoteSvgColor) throw new Error("Set an SVG Color before choosing an SVG Hover Color");
-    if (serviceStepIconHoverColor && !serviceStepIconColor) throw new Error("Set a step-list SVG Color before choosing a Hover Color");
     const svgUrls = [quoteSvgUrl, serviceStepIconUrl].filter((url): url is string => Boolean(url));
-    const [previousTheme] = await getDb().select({ design: themes.design }).from(themes).where(eq(themes.siteId, siteId));
+    const db = getDb();
+    const [previousTheme] = await db.select({ colors: themes.colors, design: themes.design }).from(themes).where(eq(themes.siteId, siteId));
+    const [booking] = await db.select({ appearance: bookingSettings.appearance }).from(bookingSettings).where(eq(bookingSettings.siteId, siteId));
+    const previousPalette = getThemePalette({ ...previousTheme, bookingAppearance: booking?.appearance });
+    const submission: { roles?: Record<string, number>; swatches?: string[] } | undefined =
+      fd.has("palette") ? JSON.parse(str(fd, "palette")) : undefined;
+    if (fd.has("palette") && (!Array.isArray(submission?.swatches) || !submission.roles || typeof submission.roles !== "object")) {
+      throw new Error("Invalid colour palette");
+    }
+    const colors = buildPalette(Object.fromEntries(colorRoles.map((role) => {
+      const index = submission?.roles?.[role];
+      if (submission && index !== undefined && (!Number.isSafeInteger(index) || index < 0 || index >= submission.swatches!.length)) {
+        throw new Error(`Invalid palette assignment for ${role}`);
+      }
+      if (!submission && !fd.has(role)) return [role, paletteColor(previousPalette, role)];
+      const input = submission ? (index === undefined ? undefined : submission.swatches![index]) : str(fd, role);
+      const color = normalizeColor(input);
+      if (!color && (index !== undefined || input || !(role in componentColors))) throw new Error(`${role} must be a hex colour like #1d4ed8`);
+      if (color && (role.startsWith("quoteSvg") || role.startsWith("serviceStepIcon")) && color.length !== 7) {
+        throw new Error(`${role} must be a six-digit hex colour`);
+      }
+      return [role, color];
+    })));
     const inheritedUrls = [previousTheme?.design?.quoteSvgUrl, previousTheme?.design?.serviceStepIconUrl, ...(previousTheme?.design?.serviceTrustIconUrls ?? [])];
     for (const svgUrl of new Set(svgUrls)) {
       const validPath = /^\/images_nextjs\/[a-f0-9-]{36}\/[a-f0-9-]{36}\.svg$/i.test(svgUrl);
@@ -161,18 +160,14 @@ export async function saveTheme(fd: FormData) {
         .where(and(eq(media.siteId, siteId), eq(media.url, svgUrl)));
       if (!siteAsset && !inheritedUrls.includes(svgUrl)) throw new Error("Each SVG must be uploaded to this website");
     }
-    const design = {
+    const design: DesignOptions = {
       // Preserve older per-site design settings which this editor does not expose.
       // Otherwise saving colors can silently erase icons and custom layout options.
       ...(previousTheme?.design ?? {}),
       headerStyle: headerStyle as "standard" | "angled",
       heroStyle: heroStyle as "classic" | "micks-overlay",
       quoteSvgUrl,
-      quoteSvgColor,
-      quoteSvgHoverColor,
       serviceStepIconUrl,
-      serviceStepIconColor,
-      serviceStepIconHoverColor,
       innerHeroImageUrl: opt(fd, "innerHeroImageUrl") ?? undefined,
       serviceDefaultImageUrl: opt(fd, "serviceDefaultImageUrl") ?? undefined,
       serviceBadgeOneUrl: opt(fd, "serviceBadgeOneUrl") ?? undefined,
@@ -189,11 +184,6 @@ export async function saveTheme(fd: FormData) {
       serviceBadgeThreeVisible: bool(fd, "serviceBadgeThreeVisible"),
       serviceProcessImageUrl: opt(fd, "serviceProcessImageUrl") ?? undefined,
       serviceTrustImageUrl: opt(fd, "serviceTrustImageUrl") ?? undefined,
-      serviceProcessCardBackground: fd.has("serviceProcessCardBackground") ? optionalHex("serviceProcessCardBackground") : previousTheme?.design?.serviceProcessCardBackground,
-      serviceProcessCardHoverBackground: fd.has("serviceProcessCardHoverBackground") ? optionalHex("serviceProcessCardHoverBackground") : previousTheme?.design?.serviceProcessCardHoverBackground,
-      serviceProcessCardTextColor: fd.has("serviceProcessCardTextColor") ? optionalHex("serviceProcessCardTextColor") : previousTheme?.design?.serviceProcessCardTextColor,
-      serviceTrustCardBackground: fd.has("serviceTrustCardBackground") ? optionalHex("serviceTrustCardBackground") : previousTheme?.design?.serviceTrustCardBackground,
-      serviceTrustCardHoverBackground: fd.has("serviceTrustCardHoverBackground") ? optionalHex("serviceTrustCardHoverBackground") : previousTheme?.design?.serviceTrustCardHoverBackground,
       serviceVehicleImageUrl: opt(fd, "serviceVehicleImageUrl") ?? undefined,
       footerBackgroundImageUrl: opt(fd, "footerBackgroundImageUrl") ?? undefined,
       footerPoweredLogoUrl: opt(fd, "footerPoweredLogoUrl") ?? undefined,
@@ -205,17 +195,13 @@ export async function saveTheme(fd: FormData) {
       scheduleCtaHref: opt(fd, "scheduleCtaHref") ?? undefined,
       diagnosticsCtaHref: opt(fd, "diagnosticsCtaHref") ?? undefined,
       tiresCtaHref: opt(fd, "tiresCtaHref") ?? undefined,
-      buttonBackground: hex("buttonBackground"), buttonText: hex("buttonText"),
-      buttonHoverBackground: hex("buttonHoverBackground"), buttonHoverText: hex("buttonHoverText"),
-      navButtonBackground: hex("navButtonBackground"), navButtonText: hex("navButtonText"),
-      navButtonHoverBackground: hex("navButtonHoverBackground"), navButtonHoverText: hex("navButtonHoverText"),
-      trustCardHoverBackground: hex("trustCardHoverBackground"),
-      trustCardHeadingColor: hex("trustCardHeadingColor"),
-      badgeBackground: hex("badgeBackground"), badgeText: hex("badgeText"),
       buttonSkew: skew, buttonTextSkew: textSkew, buttonHoverTranslateY: translate,
       footerRedlineHiddenPages: previousTheme?.design?.footerRedlineHiddenPages ?? [],
       footerLogosHiddenPages: previousTheme?.design?.footerLogosHiddenPages ?? [],
     };
+    for (const role of componentColorRoles) delete design[role];
+    delete design.serviceTrustIconColor;
+    delete design.serviceTrustIconHoverColor;
     const values = {
       logoUrl: opt(fd, "logoUrl"), logoDarkUrl: opt(fd, "logoDarkUrl"), faviconUrl: opt(fd, "faviconUrl"),
       colors, fonts: { heading: font("fontHeading"), body: font("fontBody") },
@@ -224,10 +210,10 @@ export async function saveTheme(fd: FormData) {
       customCss: opt(fd, "customCss"),
       design,
     };
-    const db = getDb();
-    const [exists] = await db.select({ id: themes.siteId }).from(themes).where(eq(themes.siteId, siteId));
-    if (exists) await db.update(themes).set(values).where(eq(themes.siteId, siteId));
-    else await db.insert(themes).values({ siteId, ...values });
+    await db.transaction(async (tx) => {
+      await tx.insert(themes).values({ siteId, ...values }).onDuplicateKeyUpdate({ set: values });
+      await tx.update(bookingSettings).set({ appearance: sql`JSON_REMOVE(${bookingSettings.appearance}, ${sql.join(bookingColorRoles.map((role) => sql`${`$.${role}`}`), sql`, `)})` }).where(eq(bookingSettings.siteId, siteId));
+    });
     await afterChange(siteId, user.id, "theme.update");
     return "Branding saved";
   });
@@ -630,18 +616,7 @@ export async function saveBooking(fd: FormData) {
       values.leadDays = Math.max(0, int(fd, "leadDays", 0));
       values.disabledDates = lines(str(fd, "disabledDates")).filter((v) => /^\d{4}-\d{2}-\d{2}$/.test(v));
     } else if (section === "appearance") {
-      const color = (key: string, fallback: string) => {
-        const value = str(fd, key);
-        if (value && !/^#[0-9a-f]{6}$/i.test(value)) throw new Error(`${key} must be a six-digit hex color`);
-        return value || fallback;
-      };
       values.appearance = {
-        accentColor: color("accentColor", "#d1272c"),
-        accentTextColor: color("accentTextColor", "#ffffff"),
-        formBackground: color("formBackground", "#ffffff"),
-        formTextColor: color("formTextColor", "#111111"),
-        inputBackground: color("inputBackground", "#ffffff"),
-        inputTextColor: color("inputTextColor", "#111111"),
         logoUrl: str(fd, "logoUrl"),
         landingHeading: str(fd, "landingHeading") || "Book Your Service",
         appointmentHeading: str(fd, "appointmentHeading") || "Schedule Your Service Online",
@@ -666,7 +641,14 @@ export async function saveBooking(fd: FormData) {
     } else throw new Error("Unknown booking settings section");
     const db = getDb();
     const [b] = await db.select().from(bookingSettings).where(eq(bookingSettings.siteId, siteId));
-    if (b) await db.update(bookingSettings).set(values).where(eq(bookingSettings.siteId, siteId));
+    if (b) {
+      const appearance = values.appearance;
+      await db.update(bookingSettings).set(appearance ? {
+        appearance: sql`JSON_SET(COALESCE(${bookingSettings.appearance}, JSON_OBJECT()),
+          '$.logoUrl', ${appearance.logoUrl}, '$.landingHeading', ${appearance.landingHeading},
+          '$.appointmentHeading', ${appearance.appointmentHeading})`,
+      } : values).where(eq(bookingSettings.siteId, siteId));
+    }
     else await db.insert(bookingSettings).values({ siteId, closedDays: [0, 6], notifyEmails: [], notifySms: [], ...values });
     await afterChange(siteId, user.id, "booking.update");
     return "Booking settings saved";

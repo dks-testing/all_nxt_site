@@ -36,7 +36,15 @@ export type ThemeColors = {
   muted: string;
   testimonialsBackground: string;
   footerLogoBandBackground: string;
+  featurePanel: string;
+  featureHighlight: string;
 };
+export type ThemePalette = {
+  version?: 2;
+  swatches: string[];
+  roles: Partial<Record<string, number>>;
+};
+export type StoredThemeColors = Partial<ThemeColors> | ThemePalette;
 export type ThemeFonts = { heading: string; body: string };
 export type MenuItem = { label: string; href: string; badge?: string; children?: MenuItem[] };
 export type BookingField = {
@@ -206,7 +214,7 @@ export const themes = mysqlTable("themes", {
   logoUrl: varchar("logo_url", { length: 1024 }),
   logoDarkUrl: varchar("logo_dark_url", { length: 1024 }),
   faviconUrl: varchar("favicon_url", { length: 1024 }),
-  colors: json("colors").$type<ThemeColors>().notNull(),
+  colors: json("colors").$type<StoredThemeColors>().notNull(),
   fonts: json("fonts").$type<ThemeFonts>().notNull(),
   radius: varchar("radius", { length: 16 }).notNull().default("0.75rem"),
   buttonStyle: mysqlEnum("button_style", ["rounded", "pill", "square"]).notNull().default("rounded"),

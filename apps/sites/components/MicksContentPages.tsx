@@ -138,7 +138,7 @@ export async function MicksServices({ bundle, ctx, props }: { bundle: SiteBundle
     {props.subheading && <RichText text={globalText(props.subheading, bundle)} className="micks-services-intro" bundle={bundle} />}
     <div className="micks-services-grid">{visibleServices.map((service) => {
       const image = service.imageUrl;
-      return <article key={service.id} style={{ backgroundImage: `linear-gradient(180deg,#0002 10%,#000e 100%),url(${JSON.stringify(image)})` }}>
+      return <article key={service.id} style={{ backgroundImage: `linear-gradient(180deg,var(--swatch-00000022) 10%,var(--swatch-000000ee) 100%),url(${JSON.stringify(image)})` }}>
         <h3>{service.name}</h3>
         {service.summary && <p>{globalText(service.summary, bundle)}</p>}
         {isGlobalButtonEnabled(design, "serviceCard") && <Link href={localSiteHref(bundle.site.slug, `/${service.slug}/`)} style={{ transform: "skewX(var(--button-skew))" }}>

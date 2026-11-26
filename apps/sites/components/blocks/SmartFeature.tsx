@@ -14,7 +14,7 @@ export function SmartFeature({ bundle, props, pageSlug }: BlockComponentProps<"s
   const toolKind = props.integration === "ai_diagnostic" ? "diagnostics" : props.integration === "tire_finder" ? "tires" : undefined;
   const gradientBackground = (props.variant === "experience" || props.variant === "final")
     && (props.gradientStartColor || props.gradientEndColor)
-    ? `linear-gradient(180deg, ${props.gradientStartColor ?? "#ffffff"} 0%, color-mix(in srgb, ${props.gradientEndColor ?? "#6a8fb5"} 30%, transparent) 100%)`
+    ? `linear-gradient(180deg, ${props.gradientStartColor ?? "var(--swatch-white)"} 0%, color-mix(in srgb, ${props.gradientEndColor ?? "var(--color-feature-panel)"} 30%, transparent) 100%)`
     : undefined;
   const cta = props.cta && ctaHref && (
     <FeatureLink

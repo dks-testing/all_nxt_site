@@ -24,7 +24,7 @@ export function MicksInnerHero({ bundle, heading, primaryCta, imageUrl, variant 
       { key: "tires", action: globalCta(design, undefined, undefined, "tires") },
     ] as const;
     const visibleActions = actions.flatMap(({ key, action }) => action ? [{ key, ...action }] : []);
-    return <section className="micks-inner-hero micks-shared-banner" style={background ? { backgroundImage: `linear-gradient(rgba(0,0,0,.68),rgba(0,0,0,.68)),url(${JSON.stringify(background)})` } : undefined}>
+    return <section className="micks-inner-hero micks-shared-banner" style={background ? { backgroundImage: `linear-gradient(var(--swatch-shared-hero-overlay),var(--swatch-shared-hero-overlay)),url(${JSON.stringify(background)})` } : undefined}>
       <div className="container-site micks-inner-hero-content">
         <h1><TextWithBreaks text={heading} /></h1>
         {visibleActions.length > 0 && <div className="micks-shared-banner-actions">{visibleActions.map((action) => action.key !== "schedule"
@@ -40,7 +40,7 @@ export function MicksInnerHero({ bundle, heading, primaryCta, imageUrl, variant 
   const diagnostics = globalCta(design, undefined, undefined, "diagnostics");
   const showCall = settings?.phone && isGlobalButtonEnabled(design, "call");
   return (
-    <section className="micks-inner-hero" style={background ? { backgroundImage: `linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.7)),url(${JSON.stringify(background)})` } : undefined}>
+    <section className="micks-inner-hero" style={background ? { backgroundImage: `linear-gradient(var(--swatch-inner-hero-overlay),var(--swatch-inner-hero-overlay)),url(${JSON.stringify(background)})` } : undefined}>
       <div className="container-site micks-inner-hero-content">
         <h1><TextWithBreaks text={heading} /></h1>
         {(schedule || innerAddress || showCall || diagnostics) && <div className="micks-inner-actions">

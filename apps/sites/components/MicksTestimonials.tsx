@@ -9,7 +9,7 @@ function reviewUrl(value?: string | null) {
 }
 
 function GoogleMark() {
-  return <svg className="micks-testimonial-google" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285f4" d="M43.61 24.46c0-1.36-.12-2.66-.35-3.92H24v7.43h11a9.4 9.4 0 0 1-4.08 6.18v5.14h6.61c3.87-3.56 6.08-8.81 6.08-14.83Z"/><path fill="#34a853" d="M24 44c5.51 0 10.13-1.83 13.51-4.96l-6.61-5.14c-1.83 1.23-4.17 1.97-6.9 1.97-5.32 0-9.84-3.59-11.46-8.43H5.7v5.3A20.4 20.4 0 0 0 24 44Z"/><path fill="#fbbc05" d="M12.54 27.44a12.3 12.3 0 0 1 0-7.88v-5.3H5.7a20 20 0 0 0 0 18.48l6.84-5.3Z"/><path fill="#ea4335" d="M24 11.13c3.01 0 5.69 1.03 7.82 3.05l5.86-5.86A19.64 19.64 0 0 0 24 3a20.4 20.4 0 0 0-18.3 11.26l6.84 5.3c1.62-4.84 6.14-8.43 11.46-8.43Z"/></svg>;
+  return <svg className="micks-testimonial-google" viewBox="0 0 48 48" aria-hidden="true"><path fill="var(--swatch-google-blue)" d="M43.61 24.46c0-1.36-.12-2.66-.35-3.92H24v7.43h11a9.4 9.4 0 0 1-4.08 6.18v5.14h6.61c3.87-3.56 6.08-8.81 6.08-14.83Z"/><path fill="var(--swatch-google-green)" d="M24 44c5.51 0 10.13-1.83 13.51-4.96l-6.61-5.14c-1.83 1.23-4.17 1.97-6.9 1.97-5.32 0-9.84-3.59-11.46-8.43H5.7v5.3A20.4 20.4 0 0 0 24 44Z"/><path fill="var(--swatch-google-yellow)" d="M12.54 27.44a12.3 12.3 0 0 1 0-7.88v-5.3H5.7a20 20 0 0 0 0 18.48l6.84-5.3Z"/><path fill="var(--swatch-google-red)" d="M24 11.13c3.01 0 5.69 1.03 7.82 3.05l5.86-5.86A19.64 19.64 0 0 0 24 3a20.4 20.4 0 0 0-18.3 11.26l6.84 5.3c1.62-4.84 6.14-8.43 11.46-8.43Z"/></svg>;
 }
 
 function ReviewBadge({ platform, href }: { platform: "facebook" | "google"; href?: string }) {

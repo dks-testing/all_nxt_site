@@ -9,6 +9,7 @@ import { eq } from "drizzle-orm";
 import { getDb, closeDb } from "../src/client";
 import * as s from "../src/schema";
 import type { BlockType } from "../src/blocks";
+import { buildPalette } from "../src/theme";
 
 const db = getDb();
 const SLUG = "micks-repair";
@@ -81,9 +82,8 @@ async function main() {
     siteId,
     logoUrl: `${WP}/2025/10/logo-micks-repairs-1.webp`,
     faviconUrl: `${WP}/2025/10/logo-2.png`,
-    colors: {
+    colors: buildPalette({
       primary: "#b91c1c",
-      primaryForeground: "#ffffff",
       secondary: "#111827",
       accent: "#f59e0b",
       background: "#ffffff",
@@ -92,15 +92,16 @@ async function main() {
       muted: "#4b5563",
       testimonialsBackground: "#6d92b7",
       footerLogoBandBackground: "#f5f5f5",
-    },
+      buttonBackground: "#c62828",
+      buttonHoverBackground: "#ad2222",
+      badgeBackground: "#6c94ba",
+    }),
     fonts: { heading: "Nike Futura ND", body: "Poppins" },
     radius: "0.5rem",
     buttonStyle: "rounded",
     design: {
-      headerStyle: "angled", heroStyle: "micks-overlay", buttonBackground: "#c62828", buttonText: "#ffffff",
-      buttonHoverBackground: "#ad2222", buttonHoverText: "#ffffff",
+      headerStyle: "angled", heroStyle: "micks-overlay",
       buttonSkew: -14, buttonHoverTranslateY: -2,
-      badgeBackground: "#6c94ba", badgeText: "#ffffff",
       innerHeroImageUrl: `${WP}/2026/03/Micks-Repair-Worthington-MN-4-of-4.jpeg`,
       serviceDefaultImageUrl: `${WP}/2026/04/micks-repair-worthington-mn-terry-eggers.jpeg`,
       serviceBadgeOneUrl: `${WP}/2026/04/Group.svg`,

@@ -4,7 +4,7 @@ import {
   getDb, sites, siteSettings, themes, pages, pageSections, menus, bookingSettings, siteMembers, eq,
   cloneSite, syncCloneSections, slugify, setSiteStatus, deleteSite as dbDeleteSite, restoreVersion, audit,
 } from "@platform/db";
-import { defaultColors, defaultFonts } from "@platform/db/theme";
+import { defaultFonts, getThemePalette } from "@platform/db/theme";
 import { requireUser, requireSiteAccess } from "../auth";
 import { revalidateSite } from "../revalidate";
 import { str } from "../forms";
@@ -40,7 +40,7 @@ async function createBlankSite(name: string, slug: string, userId: string) {
   await db.transaction(async (tx) => {
     await tx.insert(sites).values({ id: siteId, name, slug, status: "DRAFT", createdBy: userId });
     await tx.insert(siteSettings).values({ siteId, businessName: name, hours: [] });
-    await tx.insert(themes).values({ siteId, colors: defaultColors, fonts: defaultFonts });
+    await tx.insert(themes).values({ siteId, colors: getThemePalette(), fonts: defaultFonts });
     await tx.insert(bookingSettings).values({ siteId, closedDays: [0, 6], notifyEmails: [], notifySms: [] });
     await tx.insert(menus).values([
       { siteId, location: "header", items: [{ label: "Home", href: "/" }, { label: "Services", href: "/services/" }, { label: "Contact", href: "/contact/" }] },

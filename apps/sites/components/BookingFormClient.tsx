@@ -40,16 +40,14 @@ function SelectionIndicator() {
   return <i className="book-selection-indicator" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12.4 4.1 4.1L19.4 6.8" /></svg></i>;
 }
 
-function styleFor(appearance?: BookingAppearance | null) {
-  return {
-    "--book-accent": appearance?.accentColor ?? "#d1272c",
-    "--book-accent-text": appearance?.accentTextColor ?? "#ffffff",
-    "--book-bg": appearance?.formBackground ?? "#ffffff",
-    "--book-text": appearance?.formTextColor ?? "#111111",
-    "--book-input-bg": appearance?.inputBackground ?? "#ffffff",
-    "--book-input-text": appearance?.inputTextColor ?? "#111111",
-  } as CSSProperties;
-}
+const bookingColorStyle = {
+  "--book-accent": "var(--color-booking-accent)",
+  "--book-accent-text": "var(--color-booking-accent-text)",
+  "--book-bg": "var(--color-booking-surface)",
+  "--book-text": "var(--color-booking-text)",
+  "--book-input-bg": "var(--color-booking-input-surface)",
+  "--book-input-text": "var(--color-booking-input-text)",
+} as CSSProperties;
 
 function dateKey(date: Date) {
   const year = date.getFullYear();
@@ -131,11 +129,11 @@ export function BookingFormClient({ siteSlug, slots, closedDays, disabledDates =
     } catch (caught) { setStatus("error"); setError(caught instanceof Error ? caught.message : "Something went wrong"); }
   }
 
-  if (status === "done") return <div className="book-confirmation" style={styleFor(appearance)} role="status">{confirmation}</div>;
-  if (normalizedVariant === "default") return <form onSubmit={onSubmit} className="book-tool book-tool--default" style={styleFor(appearance)}><VehicleFields mode={mode} setMode={setMode} /><div className="book-default-grid"><label>Preferred date<input type="date" name="preferredDate" min={minDate} required /></label><label>Time<select name="slot" defaultValue="Soonest available"><option>Soonest available</option>{slots.map((slot) => <option key={slot}>{slot}</option>)}</select></label><label>Drop-off<select name="dropOff"><option value="drop_off">I’ll drop it off</option><option value="wait">I’ll wait</option></select></label><label>Full name<input name="customerName" required /></label><label>Phone<input name="phone" type="tel" required /></label><label>Email<input name="email" type="email" /></label></div><input type="hidden" name="contactPref" value="phone" /><label>What can we help with?<textarea name="issue" maxLength={500} /></label><ExtraFields fields={fields} /><Submit status={status} error={error} /></form>;
+  if (status === "done") return <div className="book-confirmation" style={bookingColorStyle} role="status">{confirmation}</div>;
+  if (normalizedVariant === "default") return <form onSubmit={onSubmit} className="book-tool book-tool--default" style={bookingColorStyle}><VehicleFields mode={mode} setMode={setMode} /><div className="book-default-grid"><label>Preferred date<input type="date" name="preferredDate" min={minDate} required /></label><label>Time<select name="slot" defaultValue="Soonest available"><option>Soonest available</option>{slots.map((slot) => <option key={slot}>{slot}</option>)}</select></label><label>Drop-off<select name="dropOff"><option value="drop_off">I’ll drop it off</option><option value="wait">I’ll wait</option></select></label><label>Full name<input name="customerName" required /></label><label>Phone<input name="phone" type="tel" required /></label><label>Email<input name="email" type="email" /></label></div><input type="hidden" name="contactPref" value="phone" /><label>What can we help with?<textarea name="issue" maxLength={500} /></label><ExtraFields fields={fields} /><Submit status={status} error={error} /></form>;
 
   const visibleSlots = showAllSlots ? slots : slots.slice(0, initialSlotCount);
-  return <form onSubmit={onSubmit} className={`book-tool book-tool--${normalizedVariant}`} style={styleFor(appearance)}>
+  return <form onSubmit={onSubmit} className={`book-tool book-tool--${normalizedVariant}`} style={bookingColorStyle}>
     {normalizedVariant === "appointment" && <header className="book-appointment-header"><div><h2>{heading || appearance?.appointmentHeading || "Schedule Your Service Online"}</h2><p>{subheading ? <><strong>{appointmentLead}</strong>{appointmentDetail && <span>{appointmentDetail}</span>}</> : <><strong>Fast, easy, and always free.</strong><span>A real advisor will confirm everything with you.</span></>}</p></div><BookingBenefits /></header>}
     {normalizedVariant === "landing" && <BookingBenefits />}
     <div className="book-contact-fields"><Field icon="user" label="Full Name"><input name="customerName" autoComplete="name" placeholder="Full Name" required /></Field><Field icon="phone" label="Phone Number"><input name="phone" type="tel" autoComplete="tel" placeholder="Phone Number" required /></Field><Field icon="mail" label="Email (optional)"><input name="email" type="email" autoComplete="email" placeholder="Email (optional)" /></Field>{normalizedVariant === "landing" ? <Field icon="message" label="Preferred contact"><select name="contactPref" defaultValue="phone" aria-label="Preferred contact"><option value="phone">Phone Call</option><option value="text">Text Message</option><option value="email">Email</option></select></Field> : null}</div>
