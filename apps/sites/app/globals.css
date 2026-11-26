@@ -157,17 +157,18 @@ h4 {
 a, a:hover{
   transition:all .3s ease-in-out;
 }
-.rich-text-content :is(h1, h2, h3, h4, h5, h6) {
+.rich-text-content :is(h1, h2, h3, h4, h5, h6),
+.prose-site :is(h1, h2, h3, h4, h5, h6) {
   margin-block: 1em .5em;
   font-weight: 700;
   line-height: 1.25;
 }
-.rich-text-content h1 { font-size: 2em; }
-.rich-text-content h2 { font-size: 1.65em; }
-.rich-text-content h3 { font-size: 1.4em; }
-.rich-text-content h4 { font-size: 1.2em; }
-.rich-text-content h5 { font-size: 1.1em; }
-.rich-text-content h6 { font-size: 1em; }
+.rich-text-content h1, .prose-site h1 { font-size: 2em; }
+.rich-text-content h2, .prose-site h2 { font-size: 1.65em; }
+.rich-text-content h3, .prose-site h3 { font-size: 1.4em; }
+.rich-text-content h4, .prose-site h4 { font-size: 1.2em; }
+.rich-text-content h5, .prose-site h5 { font-size: 1.1em; }
+.rich-text-content h6, .prose-site h6 { font-size: 1em; }
 .rich-text-content :is(ul, ol) { padding-inline-start: 1.25em; margin-block-end: 1em; }
 .rich-text-content ul { list-style: disc; }
 .rich-text-content ol { list-style: decimal; }
@@ -1183,6 +1184,23 @@ body.micks-menu-open {
   font-weight: 400;
   line-height: 1.55;
 }
+
+.micks-service-copy .micks-service-prose :is(h1, h2, h3, h4, h5, h6) {
+  display: block;
+  min-height: 0;
+  margin-block: 1em .5em;
+  font-weight: 700;
+  line-height: 1.25;
+  text-transform: none;
+  text-wrap: initial;
+}
+
+.micks-service-copy .micks-service-prose h1 { font-size: 2em; }
+.micks-service-copy .micks-service-prose h2 { font-size: 1.65em; }
+.micks-service-copy .micks-service-prose h3 { font-size: 1.4em; }
+.micks-service-copy .micks-service-prose h4 { font-size: 1.2em; }
+.micks-service-copy .micks-service-prose h5 { font-size: 1.1em; }
+.micks-service-copy .micks-service-prose h6 { font-size: 1em; }
 
 .micks-service-copy h3 {
   margin: 24px 0 12px;

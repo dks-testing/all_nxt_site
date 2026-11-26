@@ -14,6 +14,7 @@ export function MicksInnerHero({ bundle, heading, primaryCta, imageUrl, variant 
   const settings = bundle.settings;
   const background = imageUrl || design.innerHeroImageUrl;
   const address = formatAddress(settings?.address);
+  const innerAddress = [settings?.address?.street, settings?.address?.city].filter(Boolean).join(", ");
   const scheduleSource = primaryCta ?? { label: "Schedule Service", href: "/make-an-appointment/#book" };
   const schedule = globalCta(design, scheduleSource.href, scheduleSource.label);
   if (variant === "page") {
@@ -30,7 +31,7 @@ export function MicksInnerHero({ bundle, heading, primaryCta, imageUrl, variant 
           ? <ToolPopupLink key={action.key} href={localSiteHref(bundle.site.slug, action.href)} label={action.label} src={smartToolUrl(bundle, action.key)} className="micks-hero-button" />
           : <Link key={action.key} href={localSiteHref(bundle.site.slug, action.href)} className="micks-hero-button"><span>{action.label}</span></Link>)}</div>}
         <div className="micks-contact-strips">
-          {address && <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`} className="micks-contact-strip"><PinIcon className="h-4 w-4" /><span>{address}</span></a>}
+          {innerAddress && <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`} className="micks-contact-strip"><PinIcon className="h-4 w-4" /><span>{innerAddress}</span></a>}
           {settings?.phone && isGlobalButtonEnabled(design, "call") && <a href={telHref(settings.phone)} className="micks-contact-strip"><PhoneIcon className="h-4 w-4" /><span>{settings.phone}</span></a>}
         </div>
       </div>
@@ -42,9 +43,9 @@ export function MicksInnerHero({ bundle, heading, primaryCta, imageUrl, variant 
     <section className="micks-inner-hero" style={background ? { backgroundImage: `linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.7)),url(${JSON.stringify(background)})` } : undefined}>
       <div className="container-site micks-inner-hero-content">
         <h1><TextWithBreaks text={heading} /></h1>
-        {(schedule || address || showCall || diagnostics) && <div className="micks-inner-actions">
+        {(schedule || innerAddress || showCall || diagnostics) && <div className="micks-inner-actions">
           {schedule && <Link href={localSiteHref(bundle.site.slug, schedule.href)} className="micks-inner-action micks-inner-action-primary"><span>{schedule.label}</span></Link>}
-          {address && <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`} className="micks-inner-action"><span><PinIcon className="h-4 w-4" />{address}</span></a>}
+          {innerAddress && <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`} className="micks-inner-action"><span><PinIcon className="h-4 w-4" />{innerAddress}</span></a>}
           {showCall && <a href={telHref(settings.phone)} className="micks-inner-action"><span><PhoneIcon className="h-4 w-4" />{settings.phone}</span></a>}
           {diagnostics && <ToolPopupLink
             href={localSiteHref(bundle.site.slug, diagnostics.href)}

@@ -12,6 +12,10 @@ export function SmartFeature({ bundle, props, pageSlug }: BlockComponentProps<"s
   const imageAlt = `${props.heading} at ${bundle.settings?.businessName ?? bundle.site.name}`;
   const ctaHref = props.variant === "tool" && toolUrl ? toolUrl : props.cta?.href;
   const toolKind = props.integration === "ai_diagnostic" ? "diagnostics" : props.integration === "tire_finder" ? "tires" : undefined;
+  const gradientBackground = (props.variant === "experience" || props.variant === "final")
+    && (props.gradientStartColor || props.gradientEndColor)
+    ? `linear-gradient(180deg, ${props.gradientStartColor ?? "#ffffff"} 0%, color-mix(in srgb, ${props.gradientEndColor ?? "#6a8fb5"} 30%, transparent) 100%)`
+    : undefined;
   const cta = props.cta && ctaHref && (
     <FeatureLink
       bundle={bundle}
@@ -78,7 +82,7 @@ export function SmartFeature({ bundle, props, pageSlug }: BlockComponentProps<"s
 
   return <section className={`micks-smart-feature micks-smart-feature-${props.variant}${pageClass} section${bottomPaddingClass}`}>
     <div className="container-site">
-      <div className="micks-smart-feature-grid">
+      <div className="micks-smart-feature-grid" style={gradientBackground ? { background: gradientBackground } : undefined}>
         <div className="micks-smart-feature-copy-wrap">
           {props.eyebrow && <p className="micks-smart-kicker">{props.eyebrow}</p>}
           <h2>{props.heading}</h2>

@@ -188,6 +188,8 @@ export const blockSchemas = {
     variant: z.enum(["intro", "tool", "experience", "cta", "trust", "testimonial", "final"]).default("intro"),
     integration: z.enum(["tire_finder", "ai_diagnostic", "custom"]).default("ai_diagnostic"),
     showCertifications: z.boolean().default(false),
+    gradientStartColor: hexColor.optional(),
+    gradientEndColor: hexColor.optional(),
   }),
 } as const;
 
@@ -393,6 +395,8 @@ export const blockFields: Record<BlockType, Field[]> = {
     { path: "variant", label: "Layout", kind: "select", options: ["intro", "tool", "experience", "cta", "trust", "testimonial", "final"] },
     { path: "integration", label: "Tool source", kind: "select", options: ["tire_finder", "ai_diagnostic", "custom"] },
     { path: "showCertifications", label: "Show shared certification badges", kind: "boolean" },
+    { path: "gradientStartColor", label: "Gradient start color", kind: "color", defaultColor: "#ffffff", help: "Top color of the background gradient. Applies to Experience and Final layouts." },
+    { path: "gradientEndColor", label: "Gradient end color", kind: "color", defaultColor: "#6a8fb5", help: "Bottom color of the background gradient, with the existing 30% fade. Applies to Experience and Final layouts." },
   ],
 };
 

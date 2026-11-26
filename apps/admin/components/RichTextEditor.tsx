@@ -60,6 +60,17 @@ export function RichTextEditor({ name, label, value, siteId, publicOrigin, class
           link_target_list: false,
           valid_elements: validElements,
           content_style: `
+            .mce-content-body :is(h1, h2, h3, h4, h5, h6) {
+              margin-block: 1em .5em;
+              font-weight: 700;
+              line-height: 1.25;
+            }
+            .mce-content-body h1 { font-size: 2em; }
+            .mce-content-body h2 { font-size: 1.65em; }
+            .mce-content-body h3 { font-size: 1.4em; }
+            .mce-content-body h4 { font-size: 1.2em; }
+            .mce-content-body h5 { font-size: 1.1em; }
+            .mce-content-body h6 { font-size: 1em; }
             .mce-content-body > p:has(+ p) { margin-block-end: 1rem; }
             .mce-content-body > p + p { margin-block-start: 0; }
           `,
