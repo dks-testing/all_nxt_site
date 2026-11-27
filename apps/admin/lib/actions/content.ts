@@ -11,6 +11,7 @@ import { blockSchemas, blockFields, defaultBlockProps, isBlockType, type Field }
 import { cleanRichText } from "@platform/db/rich-text-html";
 import { bookingColorRoles, buildPalette, colorRoles, componentColorRoles, componentColors, fontOptions, getThemePalette, normalizeColor, paletteColor } from "@platform/db/theme";
 import { fieldsSchema } from "@platform/db/booking-fields";
+import { isWidgetButtonIdBase } from "@platform/db/widget-buttons";
 import { requireSiteAccess, requireSuperAdmin } from "../auth";
 import { afterChange } from "../mutate";
 import { collections, parseCollectionForm } from "../collections";
@@ -28,14 +29,22 @@ export async function saveGlobalSettings(fd: FormData) {
     const db = getDb();
     const businessName = str(fd, "businessName").trim() || "Untitled";
     const ownerName = str(fd, "ownerName").trim() || (/^Mick(?:'|’)?s Repair$/i.test(businessName) ? "Mick’s" : businessName);
-    const scheduleCtaHref = str(fd, "scheduleCtaHref").trim() || "/make-an-appointment/";
-    const diagnosticsCtaHref = str(fd, "diagnosticsCtaHref").trim() || "/diagnostics/";
-    const tiresCtaHref = str(fd, "tiresCtaHref").trim() || "/tires/";
+    const globalButtonIds: NonNullable<DesignOptions["globalButtonIds"]> = {};
+    for (const key of globalButtonKeys) {
+      const value = str(fd, `${key}CtaId`).trim();
+      if (!value) continue;
+      if (!isWidgetButtonIdBase(value)) throw new Error("Choose a valid button widget ID");
+      globalButtonIds[key] = value;
+    }
+    const buttonHref = (key: keyof typeof globalButtonIds, field: string, fallback: string) => str(fd, field).trim() || (globalButtonIds[key] ? "" : fallback);
+    const scheduleCtaHref = buttonHref("schedule", "scheduleCtaHref", "/make-an-appointment/");
+    const diagnosticsCtaHref = buttonHref("diagnostics", "diagnosticsCtaHref", "/diagnostics/");
+    const tiresCtaHref = buttonHref("tires", "tiresCtaHref", "/tires/");
     const scheduleCtaLabel = str(fd, "scheduleCtaLabel").trim() || "Schedule Service";
     const diagnosticsCtaLabel = str(fd, "diagnosticsCtaLabel").trim() || "Start Diagnostics";
     const tiresCtaLabel = str(fd, "tiresCtaLabel").trim() || "Find the Right Tires";
-    const aboutCtaHref = str(fd, "aboutCtaHref").trim() || "/about-us/";
-    const servicesCtaHref = str(fd, "servicesCtaHref").trim() || "/services/";
+    const aboutCtaHref = buttonHref("about", "aboutCtaHref", "/about-us/");
+    const servicesCtaHref = buttonHref("services", "servicesCtaHref", "/services/");
     const callCtaHref = str(fd, "callCtaHref").trim();
     const aboutCtaLabel = str(fd, "aboutCtaLabel").trim() || "About Us";
     const servicesCtaLabel = str(fd, "servicesCtaLabel").trim() || "View Services";
@@ -43,6 +52,10 @@ export async function saveGlobalSettings(fd: FormData) {
     const serviceCardCtaLabel = !submittedServiceCardCtaLabel || /^learn more$/i.test(submittedServiceCardCtaLabel) ? "Read More" : submittedServiceCardCtaLabel;
     const callCtaLabel = str(fd, "callCtaLabel").trim() || "Call Now";
     const toolUrl = str(fd, "toolEmbedUrl").trim();
+    let inferredToolWidgetKey = "";
+    try { inferredToolWidgetKey = new URL(toolUrl).searchParams.get("id")?.trim() ?? ""; } catch { /* URL input validation handles malformed values. */ }
+    const toolWidgetKey = str(fd, "toolWidgetKey").trim() || inferredToolWidgetKey;
+    if (toolWidgetKey && !/^[A-Za-z0-9_-]+$/.test(toolWidgetKey)) throw new Error("The shared widget key contains invalid characters");
     const toolEnabled = bool(fd, "toolEnabled");
 
     const [settingsRow] = await db.select({ siteId: siteSettings.siteId }).from(siteSettings).where(eq(siteSettings.siteId, siteId));
@@ -55,11 +68,11 @@ export async function saveGlobalSettings(fd: FormData) {
       ? globalButtonKeys.filter((key) => !bool(fd, `globalButton:${key}:enabled`))
       : themeRow.design?.disabledGlobalButtons;
     await db.update(themes).set({
-      design: { ...(themeRow.design ?? {}), disabledGlobalButtons, scheduleCtaHref, diagnosticsCtaHref, tiresCtaHref, aboutCtaHref, servicesCtaHref, callCtaHref: callCtaHref || undefined, scheduleCtaLabel, diagnosticsCtaLabel, tiresCtaLabel, aboutCtaLabel, servicesCtaLabel, serviceCardCtaLabel, callCtaLabel },
+      design: { ...(themeRow.design ?? {}), disabledGlobalButtons, globalButtonIds, scheduleCtaHref, diagnosticsCtaHref, tiresCtaHref, aboutCtaHref, servicesCtaHref, callCtaHref: callCtaHref || (globalButtonIds.call ? "" : undefined), scheduleCtaLabel, diagnosticsCtaLabel, tiresCtaLabel, aboutCtaLabel, servicesCtaLabel, serviceCardCtaLabel, callCtaLabel },
     }).where(eq(themes.siteId, siteId));
 
     for (const type of ["tire_finder", "ai_diagnostic"] as const) {
-      const config = { url: toolUrl, label: "Vehicle tool" };
+      const config = { url: toolUrl, key: toolWidgetKey, label: "Vehicle tool" };
       const [row] = await db.select().from(integrations).where(and(eq(integrations.siteId, siteId), eq(integrations.type, type)));
       if (row) await db.update(integrations).set({ config, enabled: toolEnabled }).where(eq(integrations.id, row.id));
       else if (toolUrl || toolEnabled) await db.insert(integrations).values({ siteId, type, config, enabled: toolEnabled });

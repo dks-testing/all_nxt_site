@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { widgetButtonBaseFromHref } from "@platform/db/widget-buttons";
 
 export function ToolPopupLink({
   href,
@@ -32,9 +33,12 @@ export function ToolPopupLink({
   }, [open]);
 
   const external = /^https?:\/\//i.test(href);
+  const widgetButton = Boolean(widgetButtonBaseFromHref(href));
   const content = children ?? <span>{label}</span>;
   return <>
-    {src
+    {widgetButton
+      ? <Link href={href} className={className}>{content}</Link>
+      : src
       ? <button type="button" className={className} aria-haspopup="dialog" aria-expanded={open} onClick={() => setOpen(true)}>{content}</button>
       : external
         ? <a href={href} className={className} target="_blank" rel="noopener noreferrer">{content}</a>

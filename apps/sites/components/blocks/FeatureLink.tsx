@@ -12,10 +12,11 @@ export function FeatureLink({ bundle, href, className, toolKind, children }: {
   toolKind?: "diagnostics" | "tires";
 }) {
   const design = getDesign(bundle.theme ?? {});
-  const action = globalCta(design, href, String(children));
   const kind = toolKind ?? smartToolKind(href, String(children));
+  const action = globalCta(design, href, String(children), kind);
   if (!action || (kind && !isGlobalButtonEnabled(design, kind))) return null;
-  const resolved = /^https?:\/\//i.test(href) ? href : action.href;
+  const useWidgetId = Boolean(kind && design.globalButtonIds?.[kind] && !design[`${kind}CtaHref`]);
+  const resolved = useWidgetId ? action.href : /^https?:\/\//i.test(href) ? href : action.href;
   return <ToolPopupLink
     href={/^https?:\/\//i.test(resolved) ? resolved : localSiteHref(bundle.site.slug, resolved)}
     label={action.label}

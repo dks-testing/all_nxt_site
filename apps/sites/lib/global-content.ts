@@ -1,6 +1,7 @@
 import type { DesignOptions, SiteBundle } from "@platform/db";
 import { escapeHtmlText, richTextHtmlPrefix } from "@platform/db/rich-text";
 import { isGlobalButtonEnabled } from "@platform/db/theme";
+import { widgetButtonHref } from "@platform/db/widget-buttons";
 
 // Name substitutions belong to visible copy only. Rewriting URLs or layout keys such
 // as "micks-home" breaks images and can hide entire sections during Zod parsing.
@@ -109,8 +110,10 @@ export function isGlobalCtaEnabled(design: DesignOptions, href?: string | null, 
 export function globalCta(design: DesignOptions, href?: string | null, label?: string | null, kind = globalCtaKind(design, href, label)) {
   if (!kind) return { href: href || "#", label: label || "Learn More" };
   if (!isGlobalButtonEnabled(design, kind)) return null;
+  const configuredHref = design[`${kind}CtaHref`];
+  const widgetId = design.globalButtonIds?.[kind];
   return {
-    href: design[`${kind}CtaHref`] || (kind === "call" && href) || sharedCtas[kind].href,
+    href: configuredHref || (widgetId ? widgetButtonHref(widgetId) : undefined) || (kind === "call" && href) || sharedCtas[kind].href,
     label: design[`${kind}CtaLabel`] || sharedCtas[kind].label,
   };
 }
@@ -134,10 +137,29 @@ export function sharedToolConfig(bundle: SiteBundle) {
   return bundle.integrations.tire_finder || bundle.integrations.ai_diagnostic;
 }
 
+/** Only the known Raise a Hood loader is allowed to execute as an admin-configured script. */
+export function sharedToolLoader(bundle: SiteBundle): { src: string; key: string } | undefined {
+  const config = sharedToolConfig(bundle);
+  const value = config?.url?.trim();
+  if (!value) return undefined;
+  try {
+    const url = new URL(value);
+    const allowedHost = url.hostname === "embed.raiseahood.com" || url.hostname === "staging-embed.raiseahood.com";
+    const key = config?.key?.trim() || url.searchParams.get("id")?.trim();
+    if (url.protocol !== "https:" || !allowedHost || url.pathname !== "/js/widget-loader.js" || !key || !/^[A-Za-z0-9_-]+$/.test(key)) return undefined;
+    return { src: url.toString(), key };
+  } catch {
+    return undefined;
+  }
+}
+
 export function smartToolUrl(bundle: SiteBundle, kind: SmartToolKind): string | undefined {
   const integration = kind === "diagnostics" ? "ai_diagnostic" : "tire_finder";
   const url = bundle.integrations[integration]?.url || sharedToolConfig(bundle)?.url;
   if (!url) return undefined;
+  // The widget loader opens its own modal and must be loaded as a script by the
+  // site layout. It is not an iframe URL.
+  if (sharedToolLoader(bundle)) return undefined;
 
   if (/^https?:\/\/embed\.raiseahood\.com\/api\/gus-page(?:\?|$)/i.test(url)) {
     const [path, query = ""] = url.split("?", 2);

@@ -10,7 +10,7 @@ import { MicksInnerHero } from "./MicksInnerHero";
 import { BookingForm } from "./blocks/Booking";
 import { CertificationBadges } from "./CertificationBadge";
 import { QuoteMark } from "./QuoteMark";
-import { globalCta, globalText, serviceCardLabel, sharedToolConfig } from "@/lib/global-content";
+import { globalCta, globalText, serviceCardLabel, smartToolUrl } from "@/lib/global-content";
 import { StepListIcon } from "./TrustListIcon";
 import { MicksSpecials } from "./MicksSpecials";
 import { MicksTestimonials } from "./MicksTestimonials";
@@ -194,11 +194,13 @@ function MicksSmartTool({ bundle, kind }: { bundle: SiteBundle; kind: "diagnosti
   const design = getDesign(bundle.theme ?? {});
   const diagnostics = kind === "diagnostics";
   const image = diagnostics ? (design.diagnosticsImageUrl || `${WP}/2026/06/Pre-Diagnostic-Tool-2.png`) : (design.tiresImageUrl || `${WP}/2026/04/tire-ai-2048x1365.jpg`);
-  const integration = sharedToolConfig(bundle);
-  const toolUrl = integration?.url;
-  const cta = diagnostics ? (design.diagnosticsCtaLabel || "Start Diagnostics") : (design.tiresCtaLabel || "Find the Right Tires");
-  const showAction = isGlobalButtonEnabled(design, kind);
-  const href = toolUrl || (diagnostics ? design.diagnosticsCtaHref : design.tiresCtaHref) || (diagnostics ? "/diagnostics/#tool" : "/tires/#tool");
+  const toolUrl = smartToolUrl(bundle, kind);
+  const action = globalCta(design, undefined, undefined, kind);
+  const cta = action?.label ?? (diagnostics ? "Start Diagnostics" : "Find the Right Tires");
+  const configuredHref = diagnostics ? design.diagnosticsCtaHref : design.tiresCtaHref;
+  const configuredWidgetId = design.globalButtonIds?.[kind];
+  const showAction = Boolean(action);
+  const href = (configuredHref || configuredWidgetId ? action?.href : toolUrl || action?.href) ?? (diagnostics ? "/diagnostics/#tool" : "/tires/#tool");
   return <>
     <section className="micks-smart-intro section"><div className="container-site"><p className="micks-smart-kicker">{globalText(diagnostics ? "Smart free pre-diagnosis from {{businessName}}" : "Smart Tire Finder at {{businessName}}", bundle)}</p><div className="micks-smart-grid"><div><h2>Smarter Car Care for Worthington Drivers</h2><p>{globalText(diagnostics ? "{{businessName}} combines trusted local service with advanced technology to give you a smarter, more reliable automotive experience. Our skilled technicians bring years of hands-on expertise, while our modern diagnostic tools help identify issues before they turn into costly problems." : "{{businessName}} combines trusted local service with advanced technology to help you find the perfect tires and keep your vehicle performing at its best—anytime, anywhere.", bundle)}</p>{showAction && <a href={href}><span>{cta}</span></a>}</div><img src={image} alt="" /></div><div className="micks-smart-offer"><strong>Special Offer</strong><span>Our digital tools save you time and save us time. Bring in your online results and take $25 off your associated service.</span></div></div></section>
     <section className="micks-smart-tool section" id="tool"><div className="container-site"><h2>{diagnostics ? "Know the Problem Before You Visit." : "Smarter Tire Selection. Starts Here"}</h2><p>{diagnostics ? "Whether your dashboard light is on or your tires are wearing unevenly, our smart tools make it easy to get answers before you arrive." : "Built on real-world data and vehicle insights, the recommendations help you choose tires that match your needs before you arrive."}</p>{toolUrl ? <iframe src={toolUrl} title={diagnostics ? "Pre-diagnosis tool" : "Tire finder"} /> : <div className="micks-smart-tool-card"><h3>{diagnostics ? "Pre-Diagnosis Tool" : "Perfect Tire Tool"}</h3><p>{diagnostics ? "Tell us what’s going on with your vehicle. Our system analyzes your symptoms, provides possible causes and connects you with our certified staff." : "Enter your vehicle and priorities to instantly see tire options matched to your needs."}</p>{showAction && <a href={href}><span>{cta}</span></a>}</div>}</div></section>

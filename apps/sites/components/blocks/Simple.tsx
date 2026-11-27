@@ -6,7 +6,7 @@ import { localSiteHref } from "@/lib/url";
 import { getDesign } from "@platform/db/theme";
 import { CertificationBadges } from "../CertificationBadge";
 import { QuoteMark } from "../QuoteMark";
-import { globalCta, sharedToolConfig } from "@/lib/global-content";
+import { globalCta, sharedToolConfig, smartToolUrl } from "@/lib/global-content";
 
 export function TrustCards({ bundle, props }: BlockComponentProps<"trust_cards">) {
   if (!props.items.length) return null;
@@ -123,11 +123,12 @@ export function RichTextBlock({ bundle, props, pageSlug }: BlockComponentProps<"
 
 export function Embed({ bundle, props, id }: BlockComponentProps<"embed">) {
   const design = getDesign(bundle.theme ?? {});
-  const action = props.cta && globalCta(design, props.cta.href, props.cta.label);
+  const toolKind = props.integration === "tire_finder" ? "tires" : props.integration === "ai_diagnostic" ? "diagnostics" : undefined;
+  const action = props.cta && globalCta(design, props.cta.href, props.cta.label, toolKind);
   const cfg = props.integration === "tire_finder" || props.integration === "ai_diagnostic"
     ? sharedToolConfig(bundle)
     : props.integration !== "custom" ? bundle.integrations[props.integration] : undefined;
-  const url = props.url || cfg?.url;
+  const url = props.url || (toolKind ? smartToolUrl(bundle, toolKind) : cfg?.url);
   const anchor = props.integration === "tire_finder" ? "tire-finder" : props.integration === "ai_diagnostic" ? "ai-diagnostic" : `embed-${id}`;
   if (props.variant === "micks-ai") {
     return (

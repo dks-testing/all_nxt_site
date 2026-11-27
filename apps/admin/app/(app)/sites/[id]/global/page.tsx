@@ -4,6 +4,7 @@ import { loadSite } from "@/lib/site";
 import { saveGlobalSettings } from "@/lib/actions/content";
 import { Card, Checkbox, Input, PageHeader } from "@/components/ui";
 import { SubmitButton } from "@/components/ConfirmButton";
+import { widgetButtonIdBases } from "@platform/db/widget-buttons";
 
 export default async function GlobalSettingsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -20,6 +21,9 @@ export default async function GlobalSettingsPage({ params }: { params: Promise<{
   const tireTool = tools.find((row) => row.type === "tire_finder");
   const diagnosticTool = tools.find((row) => row.type === "ai_diagnostic");
   const tool = tireTool?.config?.url ? tireTool : diagnosticTool;
+  let inferredToolWidgetKey = "";
+  try { inferredToolWidgetKey = new URL(tool?.config?.url ?? "").searchParams.get("id") ?? ""; } catch { /* Keep the field blank for non-URL legacy values. */ }
+  const toolWidgetKey = tool?.config?.key || inferredToolWidgetKey;
 
   return (
     <>
@@ -46,10 +50,11 @@ export default async function GlobalSettingsPage({ params }: { params: Promise<{
               ["about", "About us", design.aboutCtaLabel ?? "About Us", design.aboutCtaHref ?? "/about-us/"],
               ["services", "Services", design.servicesCtaLabel ?? "View Services", design.servicesCtaHref ?? "/services/"],
               ["call", "Call", design.callCtaLabel ?? "Call Now", design.callCtaHref ?? (settings?.phone ? `tel:${settings.phone.replace(/[^+\d]/g, "")}` : "")],
-            ] as const).map(([key, title, label, href]) => <div key={key} className="grid gap-3 rounded-xl border border-slate-200 p-4 lg:grid-cols-[150px_1fr_1.3fr] lg:items-end">
+            ] as const).map(([key, title, label, href]) => <div key={key} className="grid gap-3 rounded-xl border border-slate-200 p-4 lg:grid-cols-[150px_1fr_1.1fr_1.3fr] lg:items-end">
               <div className="space-y-2"><strong className="block text-sm">{title}</strong><Checkbox label={`Enable ${title.toLowerCase()}`} name={`globalButton:${key}:enabled`} defaultChecked={isGlobalButtonEnabled(design, key)} /></div>
               <Input label="Button label" name={`${key}CtaLabel`} defaultValue={label} required />
-              <Input label="Button link" name={`${key}CtaHref`} defaultValue={href} required={key !== "call"} help={key === "call" ? "Leave blank to use the phone number from Business info." : undefined} />
+              <label className="block"><span className="label">Button widget ID</span><select name={`${key}CtaId`} className="input" defaultValue={design.globalButtonIds?.[key] ?? ""}><option value="">No widget ID</option>{widgetButtonIdBases.map((base) => <option key={base} value={base}>{base}</option>)}</select><span className="help">With a blank link, generates the selected ID + &quot;-{site.slug}-001&quot;, then 002 and onward.</span></label>
+              <Input label="Button link" name={`${key}CtaHref`} defaultValue={href} help={key === "call" ? "A link overrides the widget ID. Leave both blank to use the Business info phone number." : "A link overrides the widget ID. Clear this field to use the selected widget ID."} />
             </div>)}
             <div className="grid gap-3 rounded-xl border border-slate-200 p-4 lg:grid-cols-[150px_1fr_1.3fr] lg:items-end">
               <div className="space-y-2"><strong className="block text-sm">Service cards</strong><Checkbox label="Enable service card buttons" name="globalButton:serviceCard:enabled" defaultChecked={isGlobalButtonEnabled(design, "serviceCard")} /></div>
@@ -61,7 +66,8 @@ export default async function GlobalSettingsPage({ params }: { params: Promise<{
 
         <Card title="Shared tire and AI tool" description="One embed URL powers both the Tires and Diagnostics integrations.">
           <div className="space-y-4">
-            <Input label="Shared embed URL" name="toolEmbedUrl" type="url" defaultValue={tool?.config?.url ?? ""} placeholder="https://…" help="Paste the embeddable tool URL, not a full iframe tag." />
+            <Input label="Shared embed URL" name="toolEmbedUrl" type="url" defaultValue={tool?.config?.url ?? ""} placeholder="https://…" help="Paste the Raise a Hood widget-loader.js URL or an embeddable page URL, not a full script or iframe tag." />
+            <Input label="Shared widget key" name="toolWidgetKey" defaultValue={toolWidgetKey} placeholder="fe39b92a-c576-4939-b30f-b7df5cd19f46" help="For widget-loader.js?v=2.0 URLs, enter the data-key value. It is filled automatically when the URL contains ?id=." />
             <Checkbox label="Enable the shared tool" name="toolEnabled" defaultChecked={Boolean(tireTool?.enabled || diagnosticTool?.enabled)} />
           </div>
         </Card>

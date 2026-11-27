@@ -1,5 +1,5 @@
 import { RichText } from "@/lib/format";
-import { sharedToolConfig } from "@/lib/global-content";
+import { smartToolUrl } from "@/lib/global-content";
 import { getDesign } from "@platform/db/theme";
 import { CertificationBadges } from "../CertificationBadge";
 import { FeatureLink } from "./FeatureLink";
@@ -7,11 +7,10 @@ import type { BlockComponentProps } from "./types";
 
 export function SmartFeature({ bundle, props, pageSlug }: BlockComponentProps<"smart_feature">) {
   const design = getDesign(bundle.theme ?? {});
-  const tool = sharedToolConfig(bundle);
-  const toolUrl = props.integration === "custom" ? undefined : tool?.url;
+  const toolKind = props.integration === "ai_diagnostic" ? "diagnostics" : props.integration === "tire_finder" ? "tires" : undefined;
+  const toolUrl = toolKind ? smartToolUrl(bundle, toolKind) : undefined;
   const imageAlt = `${props.heading} at ${bundle.settings?.businessName ?? bundle.site.name}`;
   const ctaHref = props.variant === "tool" && toolUrl ? toolUrl : props.cta?.href;
-  const toolKind = props.integration === "ai_diagnostic" ? "diagnostics" : props.integration === "tire_finder" ? "tires" : undefined;
   const gradientBackground = (props.variant === "experience" || props.variant === "final")
     && (props.gradientStartColor || props.gradientEndColor)
     ? `linear-gradient(180deg, ${props.gradientStartColor ?? "var(--swatch-white)"} 0%, color-mix(in srgb, ${props.gradientEndColor ?? "var(--color-feature-panel)"} 30%, transparent) 100%)`

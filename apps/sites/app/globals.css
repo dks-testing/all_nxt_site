@@ -4718,7 +4718,7 @@ body.micks-tool-popup-open {
 .book-submit {
   justify-self: center;
   width: min(100%, 550px);
-  min-height: 52px;
+  min-height: 49px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -4728,7 +4728,7 @@ body.micks-tool-popup-open {
   background: var(--book-accent);
   text-transform: uppercase;
   font-style: italic;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .book-submit svg {
@@ -5430,7 +5430,7 @@ body.micks-tool-popup-open {
 
 .book-tool--landing .book-submit {
   width: 100%;
-  min-height: 62px;
+  /* min-height: 62px; */
   margin-top: 2px;
   border-radius: 5px;
   font-size: 21px;
@@ -5597,10 +5597,10 @@ body.micks-tool-popup-open {
 
 .micks-contact-booking .book-submit {
   width: 100%;
-  min-height: 62px;
+  /* min-height: 62px; */
   border-radius: 0;
-  font-size: 16px;
-  font-weight: 800;
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .micks-contact-booking .book-submit svg {

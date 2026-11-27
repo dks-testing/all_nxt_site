@@ -6,6 +6,9 @@ import { siteOrigin } from "@/lib/url";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { LocalBusinessJsonLd } from "@/components/JsonLd";
+import { WidgetButtonIds } from "@/components/WidgetButtonIds";
+import { RaiseAHoodWidgetScript } from "@/components/RaiseAHoodWidgetScript";
+import { sharedToolLoader } from "@/lib/global-content";
 
 type Params = { params: Promise<{ site: string }> };
 
@@ -31,6 +34,7 @@ export default async function SiteLayout({ children, params }: Params & { childr
   const ga4 = bundle.integrations.ga4?.measurementId;
   const gtm = bundle.integrations.gtm?.containerId;
   const googleFonts = googleFontsHref(bundle.theme?.fonts);
+  const widgetLoader = sharedToolLoader(bundle);
   const safeId = (v?: string) => (v && /^[A-Z0-9-]+$/i.test(v) ? v : undefined);
 
   return (
@@ -48,6 +52,14 @@ export default async function SiteLayout({ children, params }: Params & { childr
       <SiteHeader bundle={bundle} topBar={topBar} />
       <main>{children}</main>
       <SiteFooter bundle={bundle} />
+      {widgetLoader && (
+        <div hidden aria-hidden="true" data-key={widgetLoader.key}>
+          <button type="button" id={`open-GUSAI-Widget-${bundle.site.slug}-loader`} data-widget-loader-bridge="open-GUSAI-Widget" tabIndex={-1} />
+          <button type="button" id={`open-GUS-TIRE-Widget-${bundle.site.slug}-loader`} data-widget-loader-bridge="open-GUS-TIRE-Widget" tabIndex={-1} />
+        </div>
+      )}
+      {widgetLoader && <RaiseAHoodWidgetScript src={widgetLoader.src} />}
+      <WidgetButtonIds siteName={bundle.site.slug} />
       <LocalBusinessJsonLd bundle={bundle} url={siteOrigin(bundle)} />
       {!ctx.preview && safeId(ga4) && (
         <>

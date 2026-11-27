@@ -12,6 +12,7 @@
     "./rich-text": "./src/rich-text.ts",
     "./rich-text-html": "./src/rich-text-html.ts",
     "./preview": "./src/preview.ts",
+    "./widget-buttons": "./src/widget-buttons.ts",
     "./booking": "./src/booking.ts",
     "./booking-fields": "./src/booking-fields.ts",
     "./theme": "./src/theme.ts"

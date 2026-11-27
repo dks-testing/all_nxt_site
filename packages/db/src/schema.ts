@@ -13,6 +13,7 @@ import {
   date,
 } from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm";
+import type { WidgetButtonIdBase } from "./widget-buttons";
 
 const id = () => varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID());
 const siteId = () => varchar("site_id", { length: 36 }).notNull();
@@ -76,6 +77,7 @@ export type GlobalButton = (typeof globalButtonKeys)[number];
 
 export type DesignOptions = {
   disabledGlobalButtons?: GlobalButton[];
+  globalButtonIds?: Partial<Record<GlobalButton, WidgetButtonIdBase>>;
   headerStyle?: "standard" | "angled";
   heroStyle?: "classic" | "micks-overlay";
   quoteSvgUrl?: string;
