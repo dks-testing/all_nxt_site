@@ -3,7 +3,7 @@ import { z } from "zod";
 import { getDb, appointments, resolveHost, resolveSiteSlug, getSiteBundle } from "@platform/db";
 import { sendEmail, sendSms } from "@/lib/notify";
 import { validateExtraFields } from "@platform/db/booking-fields";
-import { buildSlots } from "@platform/db/booking";
+import { buildSlots, isDisabledBookingDate } from "@platform/db/booking";
 import { lookupLicensePlate, VehicleApiError } from "@/lib/vehicle-api";
 
 export const dynamic = "force-dynamic";
@@ -97,7 +97,7 @@ export async function POST(req: Request) {
     }
   }
   const min = new Date(); min.setUTCHours(0, 0, 0, 0); min.setUTCDate(min.getUTCDate() + (booking?.leadDays ?? 0));
-  if (start < min || (booking?.closedDays ?? [0, 6]).includes(start.getUTCDay()) || (booking?.disabledDates ?? []).includes(d.preferredDate)) return NextResponse.json({ error: "Choose an available date" }, { status: 400 });
+  if (start < min || (booking?.closedDays ?? [0, 6]).includes(start.getUTCDay()) || isDisabledBookingDate(d.preferredDate, booking?.disabledDates ?? [])) return NextResponse.json({ error: "Choose an available date" }, { status: 400 });
   const validSlots = buildSlots({ slotMinutes: booking?.slotMinutes ?? 30, openTime: booking?.openTime ?? "08:00", closeTime: booking?.closeTime ?? "16:30", closedDays: booking?.closedDays ?? [0, 6] });
   if (d.slot && d.slot !== "Soonest available" && !validSlots.includes(d.slot)) return NextResponse.json({ error: "Choose an available time" }, { status: 400 });
 
@@ -130,9 +130,26 @@ export async function POST(req: Request) {
   };
   const adminBody = replaceTokens(booking?.adminEmailTemplate ?? "New appointment request for {{business_name}}\n\nCustomer: {{customer_name}} · {{customer_phone}} · {{customer_email}}\nVehicle: {{vehicle}}\nWhen: {{date}} at {{time}} · {{dropoff}}\nIssue: {{message}}", tokens);
   const customerBody = replaceTokens(booking?.customerEmailTemplate ?? "Hi {{customer_name}},\n\nThanks for requesting service with {{business_name}}. We received your request for {{date}} at {{time}} and will contact you shortly to confirm.\n\n{{business_name}} · {{business_phone}}", tokens);
+  const from = booking?.notifyFromEmail || null;
+  const configuredReplyTo = booking?.notifyReplyToEmail || null;
   await Promise.allSettled([
-    sendEmail(booking?.notifyEmails ?? [], replaceTokens(booking?.adminEmailSubject ?? "New appointment: {{customer_name}}", tokens), adminBody),
-    d.email ? sendEmail([d.email], replaceTokens(booking?.customerEmailSubject ?? "We received your request — {{business_name}}", tokens), customerBody) : Promise.resolve(),
+    sendEmail(
+      booking?.notifyEmails ?? [],
+      replaceTokens(booking?.adminEmailSubject ?? "New appointment: {{customer_name}}", tokens),
+      adminBody,
+      {
+        from,
+        cc: booking?.notifyCcEmails ?? [],
+        bcc: booking?.notifyBccEmails ?? [],
+        replyTo: configuredReplyTo || d.email || settings?.email || null,
+      },
+    ),
+    d.email ? sendEmail(
+      [d.email],
+      replaceTokens(booking?.customerEmailSubject ?? "We received your request — {{business_name}}", tokens),
+      customerBody,
+      { from, replyTo: configuredReplyTo || settings?.email || null },
+    ) : Promise.resolve(),
     sendSms(booking?.notifySms ?? [], replaceTokens(booking?.smsTemplate ?? "{{business_name}}: New service request from {{customer_name}} for {{date}} at {{time}}. {{customer_phone}}", tokens).slice(0, 1000)),
   ]);
 

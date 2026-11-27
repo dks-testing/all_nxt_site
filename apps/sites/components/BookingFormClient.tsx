@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useMemo, useRef, useState, type ChangeEvent, type CSSProperties, type ReactNode } from "react";
 import type { BookingAppearance, BookingField } from "@platform/db";
+import { isDisabledBookingDate } from "@platform/db/booking";
 import { BookingVehicleDropdowns } from "./BookingVehicleDropdowns";
 
 const STATES = "AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY".split(" ");
@@ -84,7 +85,7 @@ function CalendarPicker({ minDate, closedDays, disabledDates, value, onChange }:
         {cells.map((date) => {
           const key = dateKey(date);
           const outside = date.getMonth() !== month.getMonth();
-          const unavailable = outside || key < minDate || closedDays.includes(date.getDay()) || disabledDates.includes(key);
+          const unavailable = outside || key < minDate || closedDays.includes(date.getDay()) || isDisabledBookingDate(key, disabledDates);
           const classes = [outside && "outside", !unavailable && "available", key === today && !outside && "today", value === key && !outside && "selected"];
           return <button key={key} type="button" disabled={unavailable}
             className={classes.filter(Boolean).join(" ")} aria-pressed={value === key && !outside}
@@ -126,6 +127,23 @@ export function BookingFormClient({ siteSlug, slots, closedDays, disabledDates =
   const [appointmentLead, ...appointmentDetailParts] = (subheading ?? "").split("\n");
   const appointmentDetail = appointmentDetailParts.join("\n");
 
+  function validateNativeDate(event: ChangeEvent<HTMLInputElement>) {
+    const input = event.currentTarget;
+    const value = input.value;
+    const unavailable = Boolean(value) && (
+      closedDays.includes(new Date(`${value}T12:00:00`).getDay())
+      || isDisabledBookingDate(value, disabledDates)
+    );
+    const message = unavailable ? "This date is unavailable. Please choose another date." : "";
+    input.setCustomValidity(message);
+    if (unavailable) {
+      setError("Please choose an available date.");
+      input.reportValidity();
+    } else {
+      setError("");
+    }
+  }
+
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
@@ -138,7 +156,7 @@ export function BookingFormClient({ siteSlug, slots, closedDays, disabledDates =
       fd.set("contactPref", contact);
     }
     const date = String(fd.get("preferredDate") || "");
-    if (!date || closedDays.includes(new Date(`${date}T12:00:00`).getDay()) || disabledDates.includes(date)) { setError("Please choose an available date."); return; }
+    if (!date || closedDays.includes(new Date(`${date}T12:00:00`).getDay()) || isDisabledBookingDate(date, disabledDates)) { setError("Please choose an available date."); return; }
     setStatus("sending");
     const body: Record<string, unknown> = Object.fromEntries(fd.entries());
     const extraFields: Record<string, string | boolean> = {};
@@ -155,9 +173,11 @@ export function BookingFormClient({ siteSlug, slots, closedDays, disabledDates =
   }
 
   if (status === "done") return <div className="book-confirmation" style={bookingColorStyle} role="status">{confirmation}</div>;
-  if (normalizedVariant === "default") return <form onSubmit={onSubmit} className="book-tool book-tool--default" style={bookingColorStyle}><VehicleFields mode={mode} setMode={setMode} /><div className="book-default-grid"><label>Preferred date<input type="date" name="preferredDate" min={minDate} required /></label><label>Time<select name="slot" defaultValue="Soonest available"><option>Soonest available</option>{slots.map((slot) => <option key={slot}>{slot}</option>)}</select></label><label>Drop-off<select name="dropOff"><option value="drop_off">I’ll drop it off</option><option value="wait">I’ll wait</option></select></label><label>Full name<input name="customerName" required /></label><label>Phone<input name="phone" type="tel" required /></label><label>Email<input name="email" type="email" /></label></div><input type="hidden" name="contactPref" value="phone" /><label>What can we help with?<textarea name="issue" maxLength={500} /></label><ExtraFields fields={fields} /><Submit status={status} error={error} /></form>;
+  if (normalizedVariant === "default") return <form onSubmit={onSubmit} className="book-tool book-tool--default" style={bookingColorStyle}><VehicleFields mode={mode} setMode={setMode} /><div className="book-default-grid"><label>Preferred date<input type="date" name="preferredDate" min={minDate} onChange={validateNativeDate} required /></label><label>Time<select name="slot" defaultValue="Soonest available"><option>Soonest available</option>{slots.map((slot) => <option key={slot}>{slot}</option>)}</select></label><label>Drop-off<select name="dropOff"><option value="drop_off">I’ll drop it off</option><option value="wait">I’ll wait</option></select></label><label>Full name<input name="customerName" required /></label><label>Phone<input name="phone" type="tel" required /></label><label>Email<input name="email" type="email" /></label></div><input type="hidden" name="contactPref" value="phone" /><label>What can we help with?<textarea name="issue" maxLength={500} /></label><ExtraFields fields={fields} /><Submit status={status} error={error} /></form>;
 
-  const visibleSlots = showAllSlots ? slots : slots.slice(0, initialSlotCount);
+  const selectedSlotIndex = slots.indexOf(selectedSlot);
+  const collapsedSlotStart = selectedSlotIndex >= 0 ? selectedSlotIndex : 0;
+  const visibleSlots = showAllSlots ? slots : slots.slice(collapsedSlotStart, collapsedSlotStart + initialSlotCount);
   return <form onSubmit={onSubmit} className={`book-tool book-tool--${normalizedVariant}`} style={bookingColorStyle}>
     {normalizedVariant === "appointment" && <header className="book-appointment-header"><div><h2>{heading || appearance?.appointmentHeading || "Schedule Your Service Online"}</h2><p>{subheading ? <><strong>{appointmentLead}</strong>{appointmentDetail && <span>{appointmentDetail}</span>}</> : <><strong>Fast, easy, and always free.</strong><span>A real advisor will confirm everything with you.</span></>}</p></div><BookingBenefits /></header>}
     {normalizedVariant === "landing" && <BookingBenefits />}
@@ -194,10 +214,10 @@ export function BookingFormClient({ siteSlug, slots, closedDays, disabledDates =
             <Icon name="dropoff" /><span><strong>I&apos;ll Drop It Off</strong></span><i aria-hidden="true" />
           </button>
           <button type="button" aria-pressed={dropOff === "wait"} className={`book-drop-card book-wait-card ${dropOff === "wait" ? "selected" : ""}`} onClick={() => setDropOff("wait")}>
-            <Icon name="wait" /><span><strong>I&apos;ll Wait</strong></span><small>We&apos;ll confirm the estimated wait.</small><i aria-hidden="true" />
+            <Icon name="wait" /><span><strong>I&apos;ll Wait</strong></span><small>If your appointment will be longer than 1–2 hours, we&apos;ll let you know in advance. All waiting appointments must start by noon.</small><i aria-hidden="true" />
           </button>
         </section>
-      </div> : <div className="book-landing-when"><Field icon="calendar" label="Date"><input type="date" name="preferredDate" min={minDate} required /></Field><Field icon="clock" label="Arrival Time"><select name="slot" defaultValue="Soonest available"><option>Soonest available</option>{slots.map((slot) => <option key={slot}>{slot}</option>)}</select></Field><Field icon="car" label="Drop Off or Wait?"><select name="dropOff"><option value="drop_off">I&apos;ll Drop It Off</option><option value="wait">I&apos;ll Wait</option></select></Field></div>}
+      </div> : <div className="book-landing-when"><Field icon="calendar" label="Date"><input type="date" name="preferredDate" min={minDate} onChange={validateNativeDate} required /></Field><Field icon="clock" label="Arrival Time"><select name="slot" defaultValue="Soonest available"><option>Soonest available</option>{slots.map((slot) => <option key={slot}>{slot}</option>)}</select></Field><Field icon="car" label="Drop Off or Wait?"><select name="dropOff"><option value="drop_off">I&apos;ll Drop It Off</option><option value="wait">I&apos;ll Wait</option></select></Field></div>}
     <label className="book-issue">
       <strong>{normalizedVariant === "appointment" ? "5. " : ""}What can we help you with?</strong>
       {normalizedVariant === "appointment" && <Icon name="issue" />}
@@ -263,6 +283,7 @@ function BookingPlateFields({ siteSlug, isLanding, defaultState, showResult }: {
   }
 
   const vehicleName = vehicle ? [vehicle.year, vehicle.make, vehicle.model, vehicle.trim].filter(Boolean).join(" ") : "Vehicle details";
+  const hasPlateAndState = Boolean(plate.trim() && state.trim());
   return <div className={`book-plate-fields${showResult ? "" : " book-plate-fields--compact"}`}>
     <Field icon="plate" label="License Plate"><input type="text" name="plate" value={plate} onChange={(event) => { setPlate(event.target.value); clearLookup(); }} onBlur={() => void lookup()} autoComplete="off" aria-label="License Plate" placeholder={isLanding ? "License Plate Ex. ABC1234" : "Ex. ABC1234"} required /></Field>
     <Field icon="pin" label="State">
@@ -271,7 +292,7 @@ function BookingPlateFields({ siteSlug, isLanding, defaultState, showResult }: {
         {STATES.map((stateOption) => <option key={stateOption}>{stateOption}</option>)}
       </select>
     </Field>
-    {showResult && <div className={`book-vehicle-result is-${lookupStatus}`} role="status" aria-live="polite">
+    {showResult && hasPlateAndState && <div className={`book-vehicle-result is-${lookupStatus}`} role="status" aria-live="polite">
       <Icon name="car" />
       <span><strong>{lookupStatus === "loading" ? "Looking up vehicle..." : vehicleName}</strong><small>{vehicle ? `VIN ${vehicle.vin}` : lookupMessage}</small></span>
     </div>}

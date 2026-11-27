@@ -11,6 +11,7 @@ import { blockSchemas, blockFields, defaultBlockProps, isBlockType, type Field }
 import { cleanRichText } from "@platform/db/rich-text-html";
 import { bookingColorRoles, buildPalette, colorRoles, componentColorRoles, componentColors, fontOptions, getThemePalette, normalizeColor, paletteColor } from "@platform/db/theme";
 import { fieldsSchema } from "@platform/db/booking-fields";
+import { isValidDisabledDateRule } from "@platform/db/booking";
 import { isWidgetButtonIdBase } from "@platform/db/widget-buttons";
 import { requireSiteAccess, requireSuperAdmin } from "../auth";
 import { afterChange } from "../mutate";
@@ -630,7 +631,7 @@ export async function saveBooking(fd: FormData) {
       values.closeTime = time("closeTime");
       values.closedDays = [0, 1, 2, 3, 4, 5, 6].filter((d) => bool(fd, `closed_${d}`));
       values.leadDays = Math.max(0, int(fd, "leadDays", 0));
-      values.disabledDates = lines(str(fd, "disabledDates")).filter((v) => /^\d{4}-\d{2}-\d{2}$/.test(v));
+      values.disabledDates = [...new Set(lines(str(fd, "disabledDates")).filter(isValidDisabledDateRule))];
     } else if (section === "appearance") {
       values.appearance = {
         logoUrl: str(fd, "logoUrl"),
@@ -647,7 +648,22 @@ export async function saveBooking(fd: FormData) {
       if (Boolean(carApiToken) !== Boolean(carApiSecret)) throw new Error("Enter both the CarAPI token and secret");
       values.vehicleApi = { plateToVinToken, carApiToken, carApiSecret };
     } else if (section === "notifications") {
-      values.notifyEmails = emails(str(fd, "notifyEmails"));
+      const parseEmails = (field: string, label: string) => {
+        const parsed = [...new Set(emails(str(fd, field)).map((value) => value.toLowerCase()))];
+        const invalid = parsed.find((value) => value.length > 191 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value));
+        if (invalid) throw new Error(`${label} contains an invalid email address: ${invalid}`);
+        return parsed;
+      };
+      const parseSingleEmail = (field: string, label: string) => {
+        const parsed = parseEmails(field, label);
+        if (parsed.length > 1) throw new Error(`${label} accepts one email address`);
+        return parsed[0] ?? null;
+      };
+      values.notifyEmails = parseEmails("notifyEmails", "To");
+      values.notifyFromEmail = parseSingleEmail("notifyFromEmail", "From");
+      values.notifyCcEmails = parseEmails("notifyCcEmails", "Cc");
+      values.notifyBccEmails = parseEmails("notifyBccEmails", "Bcc");
+      values.notifyReplyToEmail = parseSingleEmail("notifyReplyToEmail", "Reply-To");
       values.notifySms = lines(str(fd, "notifySms"));
       values.confirmationMessage = opt(fd, "confirmationMessage");
     } else if (section === "templates") {

@@ -2,17 +2,36 @@
  * Booking notifications. Works without config (logs only); set RESEND_API_KEY + NOTIFY_FROM_EMAIL
  * for email and TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN / TWILIO_FROM for SMS.
  */
-export async function sendEmail(to: string[], subject: string, text: string) {
+export type EmailRouting = {
+  from?: string | null;
+  cc?: string[] | null;
+  bcc?: string[] | null;
+  replyTo?: string | null;
+};
+
+export async function sendEmail(to: string[], subject: string, text: string, routing: EmailRouting = {}) {
   const key = process.env.RESEND_API_KEY;
-  const from = process.env.NOTIFY_FROM_EMAIL;
+  const from = routing.from?.trim() || process.env.NOTIFY_FROM_EMAIL;
   if (!key || !from || !to.length) {
-    console.info(`[notify] email skipped (${to.length ? "no RESEND_API_KEY" : "no recipients"}): ${subject}`);
+    const reason = !to.length ? "no recipients" : !key ? "no RESEND_API_KEY" : "no sender";
+    console.info(`[notify] email skipped (${reason}): ${subject}`);
     return;
   }
+  const cc = routing.cc?.map((value) => value.trim()).filter(Boolean) ?? [];
+  const bcc = routing.bcc?.map((value) => value.trim()).filter(Boolean) ?? [];
+  const replyTo = routing.replyTo?.trim();
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
-    body: JSON.stringify({ from, to, subject, text }),
+    body: JSON.stringify({
+      from,
+      to,
+      subject,
+      text,
+      ...(cc.length ? { cc } : {}),
+      ...(bcc.length ? { bcc } : {}),
+      ...(replyTo ? { reply_to: replyTo } : {}),
+    }),
   });
   if (!res.ok) console.error("[notify] email failed", res.status, await res.text());
 }

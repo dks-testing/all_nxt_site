@@ -25,3 +25,22 @@ export function isClosedDay(rules: BookingRules, isoDate: string) {
   const d = new Date(`${isoDate}T12:00:00Z`);
   return rules.closedDays.includes(d.getUTCDay());
 }
+
+/** Exact closures use YYYY-MM-DD; annual closures use *-MM-DD. */
+export function isValidDisabledDateRule(value: string): boolean {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const date = new Date(`${value}T12:00:00Z`);
+    return Number.isFinite(date.valueOf()) && date.toISOString().slice(0, 10) === value;
+  }
+  if (/^\*-\d{2}-\d{2}$/.test(value)) {
+    const monthDay = value.slice(2);
+    const date = new Date(`2000-${monthDay}T12:00:00Z`);
+    return Number.isFinite(date.valueOf()) && date.toISOString().slice(5, 10) === monthDay;
+  }
+  return false;
+}
+
+export function isDisabledBookingDate(isoDate: string, rules: readonly string[] = []): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) return false;
+  return rules.includes(isoDate) || rules.includes(`*-${isoDate.slice(5)}`);
+}

@@ -61,7 +61,16 @@ export async function cloneSite(opts: CloneOptions) {
     }
 
     const [booking] = await tx.select().from(s.bookingSettings).where(eq(s.bookingSettings.siteId, sid));
-    if (booking) await tx.insert(s.bookingSettings).values({ ...booking, siteId, notifyEmails: [], notifySms: [] });
+    if (booking) await tx.insert(s.bookingSettings).values({
+      ...booking,
+      siteId,
+      notifyEmails: [],
+      notifyFromEmail: null,
+      notifyCcEmails: [],
+      notifyBccEmails: [],
+      notifyReplyToEmail: null,
+      notifySms: [],
+    });
 
     // Pages need an id map so sections and parent links follow.
     const pageRows = await tx.select().from(s.pages).where(eq(s.pages.siteId, sid));

@@ -457,6 +457,10 @@ export const bookingSettings = mysqlTable("booking_settings", {
   closedDays: json("closed_days").$type<number[]>().notNull(), // 0 = Sunday
   leadDays: int("lead_days").notNull().default(0),
   notifyEmails: json("notify_emails").$type<string[]>().notNull(),
+  notifyFromEmail: varchar("notify_from_email", { length: 191 }),
+  notifyCcEmails: json("notify_cc_emails").$type<string[]>(),
+  notifyBccEmails: json("notify_bcc_emails").$type<string[]>(),
+  notifyReplyToEmail: varchar("notify_reply_to_email", { length: 191 }),
   notifySms: json("notify_sms").$type<string[]>().notNull(),
   confirmationMessage: text("confirmation_message"),
   formFields: json("form_fields").$type<BookingField[]>(),
